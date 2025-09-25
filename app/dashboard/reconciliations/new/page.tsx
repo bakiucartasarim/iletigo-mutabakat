@@ -152,7 +152,7 @@ export default function NewReconciliationPage() {
   }
 
   const handleNextStep = () => {
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       setCurrentStep(currentStep + 1)
     }
   }
@@ -232,13 +232,13 @@ export default function NewReconciliationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (currentStep === 1) {
-      // İlk adımda sadece bir sonraki adıma geç
+    if (currentStep === 1 || currentStep === 2) {
+      // İlk iki adımda sadece bir sonraki adıma geç
       handleNextStep()
       return
     }
 
-    if (currentStep === 4) {
+    if (currentStep === 3) {
       // Son adımda gerçek submit işlemi
       setLoading(true)
       setSuccessMessage('')
@@ -279,8 +279,7 @@ export default function NewReconciliationPage() {
   const steps = [
     { number: 1, title: 'Mutabakat Ayarları', active: currentStep >= 1 },
     { number: 2, title: 'Mutabakat Dosyası', active: currentStep >= 2 },
-    { number: 3, title: 'Ekstre Dosyası', active: currentStep >= 3 },
-    { number: 4, title: 'Sonuç', active: currentStep >= 4 }
+    { number: 3, title: 'Sonuç', active: currentStep >= 3 }
   ]
 
   return (
@@ -312,7 +311,7 @@ export default function NewReconciliationPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Progress Steps */}
         <div className="mb-8">
-          <div className="grid grid-cols-4 gap-4 items-start">
+          <div className="grid grid-cols-3 gap-4 items-start">
             {steps.map((step, index) => (
               <div key={step.number} className={`step ${step.active ? 'step-active' : 'step-inactive'}`}>
                 <div className="flex flex-col items-center w-full">
@@ -660,13 +659,13 @@ export default function NewReconciliationPage() {
           {/* Step 2: Mutabakat Dosyası */}
           {currentStep === 2 && (
             <>
-              {/* File Upload Section */}
-              <div className="bg-green-50 border-2 border-dashed border-green-300 rounded-lg p-8">
+              {/* File Upload Section - Smaller */}
+              <div className="bg-green-50 border-2 border-dashed border-green-300 rounded-lg p-6 max-w-2xl mx-auto">
                 <div className="text-center">
-                  <svg className="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                  <svg className="mx-auto h-8 w-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
                   </svg>
-                  <div className="mt-4">
+                  <div className="mt-3">
                     <label htmlFor="excel-file" className="cursor-pointer">
                       <span className="mt-2 block text-sm font-medium text-gray-900">
                         Excel dosyasını buraya sürükleyin veya seçin
@@ -679,22 +678,22 @@ export default function NewReconciliationPage() {
                         accept=".xlsx,.xls,.csv"
                         onChange={handleFileUpload}
                       />
-                      <span className="mt-2 block text-xs text-gray-500">
+                      <span className="mt-1 block text-xs text-gray-500">
                         .xlsx, .xls veya .csv formatında dosya yükleyin
                       </span>
                     </label>
                   </div>
-                  <div className="mt-6">
+                  <div className="mt-4 flex justify-center space-x-3">
                     <button
                       type="button"
-                      className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors text-sm"
                       onClick={() => document.getElementById('excel-file')?.click()}
                     >
                       Dosya Seç
                     </button>
                     <button
                       type="button"
-                      className="ml-4 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors text-sm"
                     >
                       Yeni Mutabakat Kaydı
                     </button>
@@ -764,6 +763,174 @@ export default function NewReconciliationPage() {
             </>
           )}
 
+          {/* Step 3: Sonuç */}
+          {currentStep === 3 && (
+            <>
+              {/* Results Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {/* Toplam Kayıt */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-blue-100 rounded-full">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-blue-800">Toplam Kayıt</h3>
+                      <p className="text-2xl font-bold text-blue-900">{excelData.length}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Başarılı Gönderim */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-green-100 rounded-full">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-green-800">Başarılı Gönderim</h3>
+                      <p className="text-2xl font-bold text-green-900">{excelData.length}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hatalı Kayıt */}
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-red-100 rounded-full">
+                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-red-800">Hatalı Kayıt</h3>
+                      <p className="text-2xl font-bold text-red-900">0</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* E-posta Adresi */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-yellow-100 rounded-full">
+                      <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-yellow-800">E-posta Adresi</h3>
+                      <p className="text-2xl font-bold text-yellow-900">{excelData.filter(row => row.ilgiliKisiEposta).length}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tutar Toplamı TL */}
+                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-indigo-100 rounded-full">
+                      <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-indigo-800">Tutar Toplamı (TL)</h3>
+                      <p className="text-2xl font-bold text-indigo-900">
+                        {excelData
+                          .filter(row => row.birim === 'TRL' || row.birim === 'TRY')
+                          .reduce((sum, row) => sum + parseFloat(row.tutar || 0), 0)
+                          .toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tutar Toplamı USD */}
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-purple-100 rounded-full">
+                      <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                    </div>
+                    <div className="ml-4">
+                      <h3 className="text-lg font-semibold text-purple-800">Tutar Toplamı (USD)</h3>
+                      <p className="text-2xl font-bold text-purple-900">
+                        ${excelData
+                          .filter(row => row.birim === 'USD')
+                          .reduce((sum, row) => sum + parseFloat(row.tutar || 0), 0)
+                          .toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">İşlemler</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <button className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Excel İndir</span>
+                  </button>
+
+                  <button className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>E-posta Gönder</span>
+                  </button>
+
+                  <button className="px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors flex items-center justify-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>Ön İzleme</span>
+                  </button>
+
+                  <button className="px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>Raporlar</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Summary Information */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Mutabakat Özeti</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">Genel Bilgiler</h4>
+                    <ul className="space-y-1 text-sm text-gray-600">
+                      <li>• Mutabakat Türü: {formData.type === 'cari_mutabakat' ? 'Cari Mutabakat' : formData.type}</li>
+                      <li>• Dil: {formData.language === 'tr' ? 'Türkçe' : formData.language}</li>
+                      <li>• Şablon: {formData.template}</li>
+                      <li>• Gönderen Şube: {formData.sender_branch}</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">İstatistikler</h4>
+                    <ul className="space-y-1 text-sm text-gray-600">
+                      <li>• Borç Kayıtları: {excelData.filter(row => row.borcAlacak === 'BORÇ').length}</li>
+                      <li>• Alacak Kayıtları: {excelData.filter(row => row.borcAlacak === 'ALACAK').length}</li>
+                      <li>• Farklı Para Birimleri: {[...new Set(excelData.map(row => row.birim))].join(', ')}</li>
+                      <li>• Oluşturulma Tarihi: {new Date().toLocaleDateString('tr-TR')}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex justify-between items-center mt-8">
             {/* Back Button */}
@@ -794,7 +961,7 @@ export default function NewReconciliationPage() {
                   </div>
                 ) : (
                   <>
-                    {currentStep === 4 ? 'Tamamla' : 'Devam'}
+                    {currentStep === 3 ? 'Tamamla' : 'Devam'}
                     <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
