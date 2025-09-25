@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Yeni Cari Mutabakat</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#007bff",
+                        "background-light": "#f8f9fa",
+                        "background-dark": "#1a202c",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2d3748",
+                        "text-light": "#212529",
+                        "text-dark": "#e2e8f0",
+                        "muted-light": "#6c757d",
+                        "muted-dark": "#a0aec0",
+                        "border-light": "#dee2e6",
+                        "border-dark": "#4a5568",
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.375rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .step {
+            display: flex;
+            align-items: center;
+        }
+        .step-number {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .step-line {
+            flex-grow: 1;
+            height: 2px;
+        }
+        .step-active .step-number {
+            background-color: #007bff;
+            color: white;
+        }
+        .step-inactive .step-number {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+         .dark .step-inactive .step-number {
+            background-color: #4a5568;
+            color: #a0aec0;
+        }
+        .step-active .step-line {
+            background-color: #007bff;
+        }
+        .step-inactive .step-line {
+            background-color: #e9ecef;
+        }
+        .dark .step-inactive .step-line {
+            background-color: #4a5568;
+        }
+        .sidebar-link.active {
+            @apply text-primary font-semibold;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-sans">
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-surface-light dark:bg-surface-dark shadow-md flex-shrink-0">
+        <div class="p-4 border-b border-border-light dark:border-border-dark">
+            <h1 class="text-2xl font-bold text-primary">İletigo</h1>
+        </div>
+        <nav class="p-4 space-y-1">
+            <a href="#" class="sidebar-link flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-muted-light dark:text-muted-dark">
+                <span class="material-icons mr-2 text-base">home</span> Ana Sayfa
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-muted-light dark:text-muted-dark">
+                <span class="material-icons mr-2 text-base">mail_outline</span> KM Posta
+            </a>
+            <div class="relative">
+                <button class="sidebar-link active w-full flex items-center justify-between p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-primary font-semibold">
+                    <span class="flex items-center">
+                        <span class="material-icons mr-2 text-base">account_balance_wallet</span> Mutabakat Yönetimi
+                    </span>
+                    <span class="material-icons">expand_more</span>
+                </button>
+                <div class="pl-4 mt-1 space-y-1">
+                    <a href="#" class="sidebar-link text-sm block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-muted-light dark:text-muted-dark">Yeni Cari Mutabakat</a>
+                    <a href="#" class="sidebar-link text-sm block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-muted-light dark:text-muted-dark">Mutabakat Listesi</a>
+                </div>
+            </div>
+            <a href="#" class="sidebar-link flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-muted-light dark:text-muted-dark relative">
+                <span class="material-icons mr-2 text-base">mail</span> Gelen Mutabakatlar <span class="ml-2 inline-block bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">3</span>
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-muted-light dark:text-muted-dark">
+                <span class="material-icons mr-2 text-base">description</span> Raporlar ve Şablonlar
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-muted-light dark:text-muted-dark">
+                <span class="material-icons mr-2 text-base">compare_arrows</span> Karşılaştırma Motoru
+            </a>
+        </nav>
+        <div class="p-4 mt-auto">
+            <div class="text-right text-sm">
+                <p class="font-semibold">Yeni Mutabakat Şirketi A.Ş.</p>
+                <p class="text-muted-light dark:text-muted-dark">Vergi No: 7070596980 - Şirket Yetkilisi: Employeebekir | Kod: 1900</p>
+            </div>
+            <div class="flex items-center justify-end space-x-2 mt-2">
+                <div class="relative">
+                    <button class="flex items-center space-x-1">
+                        <img alt="Turkish Flag" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjH8CG21rBHrqHcazterLfGuH2LIW4VC-MycEp7Ej3vUyPn7N14yIwYZfrAajzJLffJEpQGG2qRNtz3dr0s4uC8tzB_Ff5zlyBBD96cJUuW8AI4ykmuck1-UQ-zJqLsqbPoIs5yV9BddOQzAK-ikfhizppdbRcpfxnUqB4fXSZJj18oXTrj8qJd_0_OwikRoSWOjgrwQnYDHKE2Wu4rU9tbWnckYcSLx8sOov5aR9R5VromHtcv7eoRXXpYLzCJUWPtulucG6AxXU"/>
+                        <span class="material-icons text-muted-light dark:text-muted-dark">expand_more</span>
+                    </button>
+                </div>
+                <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <span class="material-icons text-muted-light dark:text-muted-dark">person</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <header class="bg-surface-light dark:bg-surface-dark shadow-sm">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-end items-center py-3">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right text-sm">
+                            <p class="font-semibold">Yeni Mutabakat Şirketi A.Ş.</p>
+                            <p class="text-muted-light dark:text-muted-dark">Vergi No: 7070596980 - Şirket Yetkilisi: Employeebekir | Kod: 1900</p>
+                        </div>
+                        <div class="relative">
+                            <button class="flex items-center space-x-1">
+                                <img alt="Turkish Flag" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjH8CG21rBHrqHcazterLfGuH2LIW4VC-MycEp7Ej3vUyPn7N14yIwYZfrAajzJLffJEpQGG2qRNtz3dr0s4uC8tzB_Ff5zlyBBD96cJUuW8AI4ykmuck1-UQ-zJqLsqbPoIs5yV9BddOQzAK-ikfhizppdbRcpfxnUqB4fXSZJj18oXTrj8qJd_0_OwikRoSWOjgrwQnYDHKE2Wu4rU9tbWnckYcSLx8sOov5aR9R5VromHtcv7eoRXXpYLzCJUWPtulucG6AxXU"/>
+                                <span class="material-icons text-muted-light dark:text-muted-dark">expand_more</span>
+                            </button>
+                        </div>
+                        <button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <span class="material-icons text-muted-light dark:text-muted-dark">person</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-primary">
+                <div class="container mx-auto px-4 py-2">
+                    <h2 class="text-white text-lg font-semibold">Yeni Cari Mutabakat</h2>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 container mx-auto px-4 py-8">
+            <div class="mb-8">
+                <div class="grid grid-cols-4 gap-4 items-start">
+                    <div class="step step-active">
+                        <div class="flex flex-col items-center w-full">
+                            <div class="flex items-center w-full">
+                                <div class="step-number">1</div>
+                                <div class="step-line"></div>
+                            </div>
+                            <p class="text-sm mt-2 text-primary font-semibold">Mutabakat Ayarları</p>
+                        </div>
+                    </div>
+                    <div class="step step-inactive">
+                        <div class="flex flex-col items-center w-full">
+                            <div class="flex items-center w-full">
+                                <div class="step-number">2</div>
+                                <div class="step-line"></div>
+                            </div>
+                            <p class="text-sm mt-2 text-muted-light dark:text-muted-dark">Mutabakat Dosyası</p>
+                        </div>
+                    </div>
+                    <div class="step step-inactive">
+                        <div class="flex flex-col items-center w-full">
+                            <div class="flex items-center w-full">
+                                <div class="step-number">3</div>
+                                <div class="step-line"></div>
+                            </div>
+                            <p class="text-sm mt-2 text-muted-light dark:text-muted-dark">Ekstre Dosyası</p>
+                        </div>
+                    </div>
+                    <div class="step step-inactive">
+                        <div class="flex flex-col items-center w-full">
+                            <div class="flex items-center w-full">
+                                <div class="step-number">4</div>
+                            </div>
+                            <p class="text-sm mt-2 text-muted-light dark:text-muted-dark">Sonuç</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Mutabakat Türü</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input checked="" class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" id="cari-mutabakat" name="mutabakat-turu" type="radio"/>
+                                <label class="ml-3 block text-sm font-medium text-text-light dark:text-text-dark" for="cari-mutabakat">Cari Mutabakat</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" id="ba-mutabakat" name="mutabakat-turu" type="radio"/>
+                                <label class="ml-3 block text-sm font-medium text-text-light dark:text-text-dark" for="ba-mutabakat">BA Mutabakatı</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" id="bs-mutabakat" name="mutabakat-turu" type="radio"/>
+                                <label class="ml-3 block text-sm font-medium text-text-light dark:text-text-dark" for="bs-mutabakat">BS Mutabakatı</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" id="bakiyesiz-mutabakat" name="mutabakat-turu" type="radio"/>
+                                <label class="ml-3 block text-sm font-medium text-text-light dark:text-text-dark" for="bakiyesiz-mutabakat">Bakiyesiz Mutabakat</label>
+                            </div>
+                        </div>
+                        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-muted-light dark:text-muted-dark" for="mutabakat-donemi">Mutabakat Dönemi</label>
+                                <div class="mt-1 relative">
+                                    <input class="w-full rounded-md border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark focus:ring-primary focus:border-primary pr-10" id="mutabakat-donemi" name="mutabakat-donemi" type="text" value="30 Haziran 2025"/>
+                                    <span class="material-icons absolute inset-y-0 right-0 pr-3 flex items-center text-muted-light dark:text-muted-dark pointer-events-none">calendar_today</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-muted-light dark:text-muted-dark" for="bitis-tarihi">Bitiş Tarihi</label>
+                                <div class="mt-1 relative">
+                                    <input class="w-full rounded-md border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark focus:ring-primary focus:border-primary pr-10" id="bitis-tarihi" name="bitis-tarihi" type="text" value="15.10.2025"/>
+                                    <span class="material-icons absolute inset-y-0 right-0 pr-3 flex items-center text-muted-light dark:text-muted-dark pointer-events-none">calendar_today</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-muted-light dark:text-muted-dark" for="ilgili-tur">İlgili Tür *</label>
+                            <select class="mt-1 block w-full rounded-md border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark focus:ring-primary focus:border-primary" id="ilgili-tur" name="ilgili-tur">
+                                <option>Cari Hesap Bakiye Mutabakatı</option>
+                                <option>Tedarikçi Mutabakatı</option>
+                                <option>Müşteri Mutabakatı</option>
+                                <option>Banka Mutabakatı</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Genel Ayarlar</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-muted-light dark:text-muted-dark" for="e-posta-gunleri">E-posta ile Hatırlatma Günleri</label>
+                                <select class="mt-1 block w-full rounded-md border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark focus:ring-primary focus:border-primary" id="e-posta-gunleri" name="e-posta-gunleri">
+                                    <option>Pazartesi, Salı, Cuma</option>
+                                    <option>Sadece Pazartesi</option>
+                                    <option>Sadece Cuma</option>
+                                    <option>Her Gün</option>
+                                    <option>Hafta Sonları Hariç</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-medium text-muted-light dark:text-muted-dark" for="gonderen-sube">Gönderen Şube *</label>
+                                    <select class="mt-1 block w-full rounded-md border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark focus:ring-primary focus:border-primary" id="gonderen-sube" name="gonderen-sube">
+                                        <option>Merkez (kredi: 1496)</option>
+                                        <option>Ankara Şubesi (kredi: 1520)</option>
+                                        <option>İstanbul Şubesi (kredi: 1580)</option>
+                                        <option>İzmir Şubesi (kredi: 1630)</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-medium text-muted-light dark:text-muted-dark" for="dil-secimi">Dil Seçimi *</label>
+                                    <select class="mt-1 block w-full rounded-md border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark focus:ring-primary focus:border-primary" id="dil-secimi" name="dil-secimi">
+                                        <option>Türkçe</option>
+                                        <option>English</option>
+                                        <option>Deutsch</option>
+                                        <option>العربية</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-medium text-muted-light dark:text-muted-dark" for="mutabakat-sablonu">Mutabakat Şablonu *</label>
+                                    <select class="mt-1 block w-full rounded-md border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark focus:ring-primary focus:border-primary" id="mutabakat-sablonu" name="mutabakat-sablonu">
+                                        <option>Cari Mutabakat (TR)</option>
+                                        <option>Detaylı Mutabakat (TR)</option>
+                                        <option>Özet Mutabakat (TR)</option>
+                                        <option>International Template (EN)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between pt-4">
+                                <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" type="button">
+                                    Ön İzleme
+                                </button>
+                                <button class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" type="button">
+                                    Şablon Editörü
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-100 dark:bg-gray-900/30 border border-border-light dark:border-border-dark rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-text-light dark:text-text-dark">Özel Ayarlar</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <input class="h-4 w-4 mt-1 text-primary border-gray-300 rounded focus:ring-primary" id="option1" type="checkbox"/>
+                                <label class="ml-3 block text-sm text-text-light dark:text-text-dark" for="option1">Mutabık Olmayanlardan Otomatik Ekstre Talep Et.</label>
+                            </div>
+                            <div class="flex items-start">
+                                <input class="h-4 w-4 mt-1 text-primary border-gray-300 rounded focus:ring-primary" id="option2" type="checkbox"/>
+                                <label class="ml-3 block text-sm text-text-light dark:text-text-dark" for="option2">Mutabık Olmayanları Bana E-Posta ile Bildir.</label>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <input class="h-4 w-4 mt-1 text-primary border-gray-300 rounded focus:ring-primary" id="option3" type="checkbox"/>
+                                <label class="ml-3 block text-sm text-text-light dark:text-text-dark" for="option3">İmzalı Doküman Eksik Yanıtlar İçin Otomatik Doküman Talep Et.</label>
+                            </div>
+                            <div class="flex items-start">
+                                <input class="h-4 w-4 mt-1 text-primary border-gray-300 rounded focus:ring-primary" id="option4" type="checkbox"/>
+                                <label class="ml-3 block text-sm text-text-light dark:text-text-dark" for="option4">Alternatif E-posta Bulucu</label>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <input class="h-4 w-4 mt-1 text-primary border-gray-300 rounded focus:ring-primary" id="option5" type="checkbox"/>
+                                <label class="ml-3 block text-sm text-text-light dark:text-text-dark" for="option5">Mutabakat Farkları İçin Tolerans Seviyesi Belirle.</label>
+                            </div>
+                            <div class="flex items-start">
+                                <input class="h-4 w-4 mt-1 text-primary border-gray-300 rounded focus:ring-primary" id="option6" type="checkbox"/>
+                                <label class="ml-3 block text-sm text-text-light dark:text-text-dark" for="option6">E-posta adreslerini doğrulanmış e-posta adresi ile güncelle</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-8">
+                    <button class="px-6 py-3 bg-green-500 text-white font-bold rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex items-center" type="button">
+                        Devam <span class="material-icons ml-2">arrow_forward</span>
+                    </button>
+                </div>
+                <div class="text-right text-muted-light dark:text-muted-dark mt-4 text-sm" id="current-time">
+                    <!-- JavaScript ile güncel saat gösterilecek -->
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Güncel saati göstermek için
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('tr-TR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('current-time').textContent = timeString;
+    }
+
+    // Sayfa yüklendiğinde ve her dakika saati güncelle
+    updateTime();
+    setInterval(updateTime, 60000);
+
+    // Form validasyonu
+    document.addEventListener('DOMContentLoaded', function() {
+        const requiredSelects = document.querySelectorAll('select[id*="ilgili-tur"], select[id*="gonderen-sube"], select[id*="dil-secimi"], select[id*="mutabakat-sablonu"]');
+
+        function validateForm() {
+            let allValid = true;
+            requiredSelects.forEach(select => {
+                if (!select.value || select.value === '') {
+                    select.classList.add('border-red-500', 'bg-red-50');
+                    allValid = false;
+                } else {
+                    select.classList.remove('border-red-500', 'bg-red-50');
+                }
+            });
+
+            const continueBtn = document.querySelector('button[type="button"]:last-of-type');
+            if (continueBtn) {
+                continueBtn.disabled = !allValid;
+                if (!allValid) {
+                    continueBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    continueBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        // Form alanları değiştirildiğinde validasyonu çalıştır
+        requiredSelects.forEach(select => {
+            select.addEventListener('change', validateForm);
+        });
+
+        // İlk validasyon kontrolü
+        validateForm();
+    });
+</script>
+</body>
+</html>

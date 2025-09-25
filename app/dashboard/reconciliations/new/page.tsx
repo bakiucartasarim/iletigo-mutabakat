@@ -18,25 +18,57 @@ export default function NewReconciliationPage() {
   const [loading, setLoading] = useState(false)
   const [companyLoading, setCompanyLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [currentStep, setCurrentStep] = useState(1) // Progress step indicator
   const [formData, setFormData] = useState({
     company_code: '',
     company_name: '',
     contact_person: '',
     email: '',
-    phone: '', // Şirket telefonu
-    mobile_phone: '', // Cep telefonu (zorunlu değil)
-    type: 'mutabakat', // mutabakat, bilgilendirme, cari_bakiye_hatirlatma
-    debt_credit: 'borc', // borc, alacak
+    phone: '',
+    mobile_phone: '',
+    type: 'cari_mutabakat', // Cari Mutabakat varsayılan
+    debt_credit: 'borc',
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     amount: '',
     description: '',
     due_date: '',
-    reconciliation_date: new Date().toISOString().split('T')[0] // Bugünün tarihi
+    reconciliation_date: new Date().toISOString().split('T')[0],
+    // Yeni alanlar HTML'e uygun olarak
+    reconciliation_period: '',
+    end_date: '',
+    related_type: 'cari_hesap_bakiye',
+    reminder_days: 'pazartesi_sali_cuma',
+    sender_branch: 'merkez',
+    language: 'tr',
+    template: 'cari_mutabakat_tr',
+    // Özel ayarlar
+    auto_request_statement: false,
+    email_notification: false,
+    auto_document_request: false,
+    alternative_email_finder: false,
+    tolerance_level: false,
+    update_verified_emails: false
   })
 
+  const [currentTime, setCurrentTime] = useState('')
+
   useEffect(() => {
-    // Tarih değiştiğinde yıl ve ay otomatik güncelle
+    // Güncel saati göster
+    const updateTime = () => {
+      const now = new Date()
+      const timeString = now.toLocaleTimeString('tr-TR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+      setCurrentTime(timeString)
+    }
+    updateTime()
+    const timeInterval = setInterval(updateTime, 60000)
+    return () => clearInterval(timeInterval)
+  }, [])
+
+  useEffect(() => {
     if (formData.reconciliation_date) {
       const date = new Date(formData.reconciliation_date)
       setFormData(prev => ({
@@ -54,7 +86,6 @@ export default function NewReconciliationPage() {
       company_code: code
     }))
 
-    // Eğer kod 3+ karakter ise şirket bilgilerini ara
     if (code.length >= 3) {
       setCompanyLoading(true)
       try {
@@ -63,11 +94,10 @@ export default function NewReconciliationPage() {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         })
-        
+
         if (response.ok) {
           const data = await response.json()
           if (data.company) {
-            // Şirket bulundu, bilgileri otomatik doldur
             setFormData(prev => ({
               ...prev,
               company_name: data.company.name,
@@ -77,7 +107,6 @@ export default function NewReconciliationPage() {
               mobile_phone: data.company.mobile_phone || ''
             }))
           } else {
-            // Şirket bulunamadı, sadece kodu bırak diğerlerini temizle
             setFormData(prev => ({
               ...prev,
               company_name: '',
@@ -94,7 +123,6 @@ export default function NewReconciliationPage() {
         setCompanyLoading(false)
       }
     } else {
-      // Kod çok kısa, bilgileri temizle
       setFormData(prev => ({
         ...prev,
         company_name: '',
@@ -107,10 +135,18 @@ export default function NewReconciliationPage() {
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }))
+  }
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked
     }))
   }
 
@@ -133,8 +169,6 @@ export default function NewReconciliationPage() {
 
       if (response.ok) {
         setSuccessMessage(`✅ ${responseData.message} - Referans: ${responseData.data.reference_number}`)
-        
-        // 3 saniye sonra yönlendir
         setTimeout(() => {
           router.push('/dashboard/reconciliations')
         }, 3000)
@@ -150,28 +184,18 @@ export default function NewReconciliationPage() {
     }
   }
 
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i)
-  const months = [
-    { value: 1, label: 'Ocak' },
-    { value: 2, label: 'Şubat' },
-    { value: 3, label: 'Mart' },
-    { value: 4, label: 'Nisan' },
-    { value: 5, label: 'Mayıs' },
-    { value: 6, label: 'Haziran' },
-    { value: 7, label: 'Temmuz' },
-    { value: 8, label: 'Ağustos' },
-    { value: 9, label: 'Eylül' },
-    { value: 10, label: 'Ekim' },
-    { value: 11, label: 'Kasım' },
-    { value: 12, label: 'Aralık' }
+  const steps = [
+    { number: 1, title: 'Mutabakat Ayarları', active: currentStep === 1 },
+    { number: 2, title: 'Mutabakat Dosyası', active: currentStep === 2 },
+    { number: 3, title: 'Ekstre Dosyası', active: currentStep === 3 },
+    { number: 4, title: 'Sonuç', active: currentStep === 4 }
   ]
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="bg-white min-h-screen">
       {/* Success Message */}
       {successMessage && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,349 +210,505 @@ export default function NewReconciliationPage() {
         </div>
       )}
 
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-              Yeni Mutabakat Oluştur
-            </h1>
-            <p className="text-gray-600">
-              Şirket kodunu girin, bilgiler otomatik dolacaktır
-            </p>
-          </div>
-          <div className="hidden lg:block">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-          </div>
+      {/* Header with Blue Background */}
+      <div className="bg-blue-600 border-b">
+        <div className="container mx-auto px-4 py-2">
+          <h2 className="text-white text-lg font-semibold">Yeni Cari Mutabakat</h2>
         </div>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Şirket Bilgileri */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-            <span className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </span>
-            Şirket Bilgileri
-          </h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Şirket Kodu */}
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Şirket Kodu *
-                <span className="text-blue-600 text-xs ml-1">
-                  {companyLoading ? '(Aranıyor...)' : '(3+ karakter girin, otomatik arama)'}
-                </span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="company_code"
-                  value={formData.company_code}
-                  onChange={handleCompanyCodeChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 uppercase tracking-wider font-mono"
-                  placeholder="ABC123, XYZ-001, vb."
-                  maxLength={20}
-                />
-                {companyLoading && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+      <main className="container mx-auto px-4 py-8">
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="grid grid-cols-4 gap-4 items-start">
+            {steps.map((step, index) => (
+              <div key={step.number} className={`step ${step.active ? 'step-active' : 'step-inactive'}`}>
+                <div className="flex flex-col items-center w-full">
+                  <div className="flex items-center w-full">
+                    <div className={`step-number ${step.active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                      {step.number}
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`step-line ${step.active ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
+                    )}
                   </div>
-                )}
+                  <p className={`text-sm mt-2 text-center ${step.active ? 'text-blue-600 font-semibold' : 'text-gray-500'}`}>
+                    {step.title}
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Şirket kodu benzersiz olmalıdır. Excel aktarımında kullanılacaktır.
-              </p>
+            ))}
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Mutabakat Türü */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">Mutabakat Türü</h3>
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <input
+                    checked={formData.type === 'cari_mutabakat'}
+                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    id="cari-mutabakat"
+                    name="type"
+                    type="radio"
+                    value="cari_mutabakat"
+                    onChange={handleInputChange}
+                  />
+                  <label className="ml-3 block text-sm font-medium text-gray-900" htmlFor="cari-mutabakat">
+                    Cari Mutabakat
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    checked={formData.type === 'ba_mutabakat'}
+                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    id="ba-mutabakat"
+                    name="type"
+                    type="radio"
+                    value="ba_mutabakat"
+                    onChange={handleInputChange}
+                  />
+                  <label className="ml-3 block text-sm font-medium text-gray-900" htmlFor="ba-mutabakat">
+                    BA Mutabakatı
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    checked={formData.type === 'bs_mutabakat'}
+                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    id="bs-mutabakat"
+                    name="type"
+                    type="radio"
+                    value="bs_mutabakat"
+                    onChange={handleInputChange}
+                  />
+                  <label className="ml-3 block text-sm font-medium text-gray-900" htmlFor="bs-mutabakat">
+                    BS Mutabakatı
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    checked={formData.type === 'bakiyesiz_mutabakat'}
+                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    id="bakiyesiz-mutabakat"
+                    name="type"
+                    type="radio"
+                    value="bakiyesiz_mutabakat"
+                    onChange={handleInputChange}
+                  />
+                  <label className="ml-3 block text-sm font-medium text-gray-900" htmlFor="bakiyesiz-mutabakat">
+                    Bakiyesiz Mutabakat
+                  </label>
+                </div>
+              </div>
+
+              {/* Tarih Alanları */}
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="reconciliation_period">
+                    Mutabakat Dönemi
+                  </label>
+                  <div className="relative">
+                    <input
+                      className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 px-3 py-2"
+                      id="reconciliation_period"
+                      name="reconciliation_period"
+                      type="text"
+                      value={formData.reconciliation_period}
+                      onChange={handleInputChange}
+                      placeholder="30 Haziran 2025"
+                    />
+                    <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 pointer-events-none">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="end_date">
+                    Bitiş Tarihi
+                  </label>
+                  <div className="relative">
+                    <input
+                      className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 px-3 py-2"
+                      id="end_date"
+                      name="end_date"
+                      type="text"
+                      value={formData.end_date}
+                      onChange={handleInputChange}
+                      placeholder="15.10.2025"
+                    />
+                    <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 pointer-events-none">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="related_type">
+                  İlgili Tür <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
+                  id="related_type"
+                  name="related_type"
+                  value={formData.related_type}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="cari_hesap_bakiye">Cari Hesap Bakiye Mutabakatı</option>
+                  <option value="tedarikci">Tedarikçi Mutabakatı</option>
+                  <option value="musteri">Müşteri Mutabakatı</option>
+                  <option value="banka">Banka Mutabakatı</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Şirket Adı *
-              </label>
-              <input
-                type="text"
-                name="company_name"
-                value={formData.company_name}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                placeholder="Şirket adını giriniz"
-              />
-            </div>
+            {/* Genel Ayarlar */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">Genel Ayarlar</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="reminder_days">
+                    E-posta ile Hatırlatma Günleri
+                  </label>
+                  <select
+                    className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
+                    id="reminder_days"
+                    name="reminder_days"
+                    value={formData.reminder_days}
+                    onChange={handleInputChange}
+                  >
+                    <option value="pazartesi_sali_cuma">Pazartesi, Salı, Cuma</option>
+                    <option value="pazartesi">Sadece Pazartesi</option>
+                    <option value="cuma">Sadece Cuma</option>
+                    <option value="her_gun">Her Gün</option>
+                    <option value="hafta_ici">Hafta Sonları Hariç</option>
+                  </select>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Yetkili Kişi
-              </label>
-              <input
-                type="text"
-                name="contact_person"
-                value={formData.contact_person}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                placeholder="Yetkili kişi adı"
-              />
-            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="sender_branch">
+                      Gönderen Şube <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
+                      id="sender_branch"
+                      name="sender_branch"
+                      value={formData.sender_branch}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="merkez">Merkez (kredi: 1496)</option>
+                      <option value="ankara">Ankara Şubesi (kredi: 1520)</option>
+                      <option value="istanbul">İstanbul Şubesi (kredi: 1580)</option>
+                      <option value="izmir">İzmir Şubesi (kredi: 1630)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="language">
+                      Dil Seçimi <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
+                      id="language"
+                      name="language"
+                      value={formData.language}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="tr">Türkçe</option>
+                      <option value="en">English</option>
+                      <option value="de">Deutsch</option>
+                      <option value="ar">العربية</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="template">
+                      Mutabakat Şablonu <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
+                      id="template"
+                      name="template"
+                      value={formData.template}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="cari_mutabakat_tr">Cari Mutabakat (TR)</option>
+                      <option value="detayli_mutabakat_tr">Detaylı Mutabakat (TR)</option>
+                      <option value="ozet_mutabakat_tr">Özet Mutabakat (TR)</option>
+                      <option value="international_en">International Template (EN)</option>
+                    </select>
+                  </div>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                E-posta Adresi *
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                placeholder="email@ornek.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Şirket Telefonu *
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                placeholder="0(212) 123 45 67"
-              />
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cep Telefonu
-                <span className="text-gray-400 text-xs ml-1">(İsteğe bağlı)</span>
-              </label>
-              <input
-                type="tel"
-                name="mobile_phone"
-                value={formData.mobile_phone}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                placeholder="0(555) 123 45 67"
-              />
+                <div className="flex items-center justify-between pt-4">
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    type="button"
+                  >
+                    Ön İzleme
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                    type="button"
+                  >
+                    Şablon Editörü
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Şirket Durumu Bilgisi */}
-          {formData.company_code.length >= 3 && (
-            <div className="mt-4 p-4 rounded-xl border-l-4 border-indigo-500 bg-indigo-50">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  {companyLoading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
-                  ) : formData.company_name ? (
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
+          {/* Şirket Bilgileri */}
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 flex items-center">
+              <span className="mr-3">🏢</span>
+              Şirket Bilgileri
+            </h3>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Şirket Kodu *
+                  <span className="text-blue-600 text-xs ml-1">
+                    {companyLoading ? '(Aranıyor...)' : '(3+ karakter girin, otomatik arama)'}
+                  </span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="company_code"
+                    value={formData.company_code}
+                    onChange={handleCompanyCodeChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white uppercase tracking-wider font-mono"
+                    placeholder="ABC123, XYZ-001, vb."
+                    maxLength={20}
+                  />
+                  {companyLoading && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    </div>
                   )}
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-800">
-                    {companyLoading ? 'Şirket aranıyor...' : 
-                     formData.company_name ? `Şirket bulundu: ${formData.company_name}` :
-                     'Yeni şirket oluşturulacak'}
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {companyLoading ? 'Lütfen bekleyin' :
-                     formData.company_name ? 'Bilgiler otomatik dolduruldu' :
-                     'Şirket bilgilerini manuel olarak giriniz'}
-                  </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Şirket Adı *</label>
+                <input
+                  type="text"
+                  name="company_name"
+                  value={formData.company_name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                  placeholder="Şirket adını giriniz"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Yetkili Kişi</label>
+                <input
+                  type="text"
+                  name="contact_person"
+                  value={formData.contact_person}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                  placeholder="Yetkili kişi adı"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">E-posta Adresi *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                  placeholder="email@ornek.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Şirket Telefonu *</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                  placeholder="0(212) 123 45 67"
+                />
+              </div>
+
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tutar (₺) *
+                </label>
+                <input
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleInputChange}
+                  required
+                  step="0.01"
+                  min="0"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Özel Ayarlar */}
+          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">Özel Ayarlar</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <input
+                    className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    id="auto_request_statement"
+                    name="auto_request_statement"
+                    type="checkbox"
+                    checked={formData.auto_request_statement}
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="ml-3 block text-sm text-gray-900" htmlFor="auto_request_statement">
+                    Mutabık Olmayanlardan Otomatik Ekstre Talep Et.
+                  </label>
+                </div>
+                <div className="flex items-start">
+                  <input
+                    className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    id="email_notification"
+                    name="email_notification"
+                    type="checkbox"
+                    checked={formData.email_notification}
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="ml-3 block text-sm text-gray-900" htmlFor="email_notification">
+                    Mutabık Olmayanları Bana E-Posta ile Bildir.
+                  </label>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <input
+                    className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    id="auto_document_request"
+                    name="auto_document_request"
+                    type="checkbox"
+                    checked={formData.auto_document_request}
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="ml-3 block text-sm text-gray-900" htmlFor="auto_document_request">
+                    İmzalı Doküman Eksik Yanıtlar İçin Otomatik Doküman Talep Et.
+                  </label>
+                </div>
+                <div className="flex items-start">
+                  <input
+                    className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    id="alternative_email_finder"
+                    name="alternative_email_finder"
+                    type="checkbox"
+                    checked={formData.alternative_email_finder}
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="ml-3 block text-sm text-gray-900" htmlFor="alternative_email_finder">
+                    Alternatif E-posta Bulucu
+                  </label>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <input
+                    className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    id="tolerance_level"
+                    name="tolerance_level"
+                    type="checkbox"
+                    checked={formData.tolerance_level}
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="ml-3 block text-sm text-gray-900" htmlFor="tolerance_level">
+                    Mutabakat Farkları İçin Tolerans Seviyesi Belirle.
+                  </label>
+                </div>
+                <div className="flex items-start">
+                  <input
+                    className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    id="update_verified_emails"
+                    name="update_verified_emails"
+                    type="checkbox"
+                    checked={formData.update_verified_emails}
+                    onChange={handleCheckboxChange}
+                  />
+                  <label className="ml-3 block text-sm text-gray-900" htmlFor="update_verified_emails">
+                    E-posta adreslerini doğrulanmış e-posta adresi ile güncelle
+                  </label>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Mutabakat Detayları */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-            <span className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </span>
-            Mutabakat Detayları
-          </h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                İşlem Türü *
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-              >
-                <option value="mutabakat">Mutabakat</option>
-                <option value="cari_bakiye_hatirlatma">Cari Bakiye Hatırlatma</option>
-                <option value="bilgilendirme">Bilgilendirme</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Borç/Alacak Durumu *
-              </label>
-              <select
-                name="debt_credit"
-                value={formData.debt_credit}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-              >
-                <option value="borc">Borç</option>
-                <option value="alacak">Alacak</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tutar (₺) *
-              </label>
-              <input
-                type="number"
-                name="amount"
-                value={formData.amount}
-                onChange={handleInputChange}
-                required
-                step="0.01"
-                min="0"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                placeholder="0.00"
-              />
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mutabakat Tarihi *
-              </label>
-              <input
-                type="date"
-                name="reconciliation_date"
-                value={formData.reconciliation_date}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Yıl (Otomatik)
-              </label>
-              <input
-                type="number"
-                name="year"
-                value={formData.year}
-                readOnly
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Ay (Otomatik)
-              </label>
-              <input
-                type="text"
-                value={months.find(m => m.value === formData.month)?.label || ''}
-                readOnly
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed"
-              />
-            </div>
-
-            <div className="lg:col-span-3">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Vade Tarihi
-              </label>
-              <input
-                type="date"
-                name="due_date"
-                value={formData.due_date}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-              />
-            </div>
+          {/* Action Buttons */}
+          <div className="flex justify-end mt-8">
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-3 bg-green-500 text-white font-bold rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex items-center disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Oluşturuluyor...
+                </div>
+              ) : (
+                <>
+                  Devam
+                  <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </>
+              )}
+            </button>
           </div>
-        </div>
 
-        {/* Açıklama */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-            <span className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-              </svg>
-            </span>
-            Açıklama
-          </h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ek Açıklama
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={4}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50"
-              placeholder="Mutabakat ile ilgili ek bilgiler..."
-            />
+          {/* Footer Time */}
+          <div className="text-right text-gray-500 mt-4 text-sm">
+            {currentTime}
           </div>
-        </div>
+        </form>
+      </main>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-end">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
-          >
-            İptal
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Oluşturuluyor...
-              </div>
-            ) : (
-              'Mutabakat Oluştur'
-            )}
-          </button>
-        </div>
-      </form>
+      <style jsx>{`
+        .step-number {
+          width: 2rem;
+          height: 2rem;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+        }
+        .step-line {
+          flex-grow: 1;
+          height: 2px;
+        }
+      `}</style>
     </div>
   )
 }
