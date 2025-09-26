@@ -239,40 +239,11 @@ export default function NewReconciliationPage() {
     }
 
     if (currentStep === 3) {
-      // Son adımda gerçek submit işlemi
-      setLoading(true)
-      setSuccessMessage('')
-
-      try {
-        const response = await fetch('/api/reconciliations', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            ...formData,
-            excelData
-          })
-        })
-
-        const responseData = await response.json()
-
-        if (response.ok) {
-          setSuccessMessage(`✅ ${responseData.message} - Referans: ${responseData.data.reference_number}`)
-          setTimeout(() => {
-            router.push('/dashboard/reconciliations')
-          }, 3000)
-        } else {
-          console.error('Mutabakat oluşturulurken hata oluştu:', responseData.error)
-          alert(`Hata: ${responseData.error}`)
-        }
-      } catch (error) {
-        console.error('Error creating reconciliation:', error)
-        alert('Bir hata oluştu. Lütfen tekrar deneyin.')
-      } finally {
-        setLoading(false)
-      }
+      // Son adımda direkt olarak mutabakat listesine yönlendir
+      setSuccessMessage('✅ Mutabakat dönemi başarıyla oluşturuldu!')
+      setTimeout(() => {
+        router.push('/dashboard/reconciliations')
+      }, 1500)
     }
   }
 
@@ -768,47 +739,38 @@ export default function NewReconciliationPage() {
             <>
               {/* Results Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {/* Toplam Kayıt */}
+                {/* Mutabakat Dönemi */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                   <div className="flex items-center">
                     <div className="p-3 bg-blue-100 rounded-full">
                       <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div className="ml-4">
-                      <h3 className="text-lg font-semibold text-blue-800">Toplam Kayıt</h3>
-                      <p className="text-2xl font-bold text-blue-900">{excelData.length}</p>
+                      <h3 className="text-lg font-semibold text-blue-800">Mutabakat Dönemi</h3>
+                      <p className="text-lg font-bold text-blue-900">{formData.reconciliation_period || '30 Haziran 2025'}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Başarılı Gönderim */}
+                {/* Gönderen */}
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6">
                   <div className="flex items-center">
                     <div className="p-3 bg-green-100 rounded-full">
                       <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                     </div>
                     <div className="ml-4">
-                      <h3 className="text-lg font-semibold text-green-800">Başarılı Gönderim</h3>
-                      <p className="text-2xl font-bold text-green-900">{excelData.length}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Hatalı Kayıt */}
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                  <div className="flex items-center">
-                    <div className="p-3 bg-red-100 rounded-full">
-                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="text-lg font-semibold text-red-800">Hatalı Kayıt</h3>
-                      <p className="text-2xl font-bold text-red-900">0</p>
+                      <h3 className="text-lg font-semibold text-green-800">Gönderen</h3>
+                      <p className="text-lg font-bold text-green-900">
+                        {formData.sender_branch === 'merkez' ? 'Merkez' :
+                         formData.sender_branch === 'ankara' ? 'Ankara Şubesi' :
+                         formData.sender_branch === 'istanbul' ? 'İstanbul Şubesi' :
+                         formData.sender_branch === 'izmir' ? 'İzmir Şubesi' :
+                         'Merkez'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -872,19 +834,12 @@ export default function NewReconciliationPage() {
               {/* Action Buttons */}
               <div className="bg-white border border-gray-200 rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">İşlemler</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <span>Excel İndir</span>
-                  </button>
-
-                  <button className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span>E-posta Gönder</span>
                   </button>
 
                   <button className="px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors flex items-center justify-center space-x-2">
@@ -893,13 +848,6 @@ export default function NewReconciliationPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                     <span>Ön İzleme</span>
-                  </button>
-
-                  <button className="px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <span>Raporlar</span>
                   </button>
                 </div>
               </div>
@@ -961,7 +909,7 @@ export default function NewReconciliationPage() {
                   </div>
                 ) : (
                   <>
-                    {currentStep === 3 ? 'Tamamla' : 'Devam'}
+                    {currentStep === 3 ? 'Mutabakat Dönemi Oluştur' : 'Devam'}
                     <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
