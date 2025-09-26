@@ -334,33 +334,81 @@ export default function RegisterPage() {
               </h3>
 
               {/* Sözleşme Metni */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto text-sm text-gray-700">
-                <p className="mb-3 font-medium">
-                  iletigo.com web sitesini kullanmanız için Genel Hak ve Sorumluluktlar
-                </p>
-                <p className="mb-3">
-                  Eğer bu sayfada belirtilen koşulların herhangi bir taanı için uygun değilse
-                  lütfen iletigo.com klasik uygulamasını kullanın. Saha zamanki hicretsir değilsat
-                  değişiklerinle yer alabilir formları dokümanlıız bu kavlariçla yazıli tam kapsılan
-                  bu anlaşma gırcaksizı geçer.
-                </p>
-                <p className="mb-3">
-                  İş bu Kullanıma lisykon Genel Hak ve Sorumluktlar, kolaymutiakant merkaris.
-                  Açıklama vur verasında hüzurm tarafirı kar gelix ane vau anlıktlıyasaya
-                  adımında sizinle temel olan hizmet koşularanıcız. Kolaymutiakaat
-                  uygulcamlarinin kulanıcısı veu no keyler sır bui tüm tüm anlaşmaya uyumunvuz
-                  ve tam öricir hiçumanlı bu kolamıma talyan hak veu Sorumluhtlular kabul ettiniz
-                  anlamına gelir.
-                </p>
-                <p className="mb-3">
-                  kolaymutiakant.com web sitesine girmeniz vey veu sitelenice veu özen
-                  eşirmrianina to hak yükıy ve alındık alicı siresdir vou her atıl kuul
-                  anğına gülanıdirsımız. Kolay Mutiakaat Bilgım Görlerinimi
-                  mağındayımız.
-                </p>
-                <p>
-                  Kolay Mutiakat siresınin veu internet hayinlıs hakolları, aşağı-lada veu ömeık çağıuyamr.
-                </p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 max-h-60 overflow-y-auto text-xs text-gray-700">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">1. Taraflar</h4>
+                    <p>
+                      İşbu Kullanıcı Sözleşmesi ("Sözleşme"), İletigo Teknoloji Ltd. Şti. (bundan sonra kısaca "İletigo" olarak anılacaktır) ile iletigo.com web sitesini ("Site") ziyaret eden veya kullanan tüm gerçek ve tüzel kişiler ("Kullanıcı") arasında akdedilmiştir.
+                    </p>
+                    <p className="mt-2">
+                      Kullanıcı, Site'ye giriş yaparak ve/veya kullanarak bu sözleşmenin tamamını okuduğunu, anladığını ve burada belirtilen tüm şartları, kuralları ve sorumlulukları kayıtsız şartsız kabul ettiğini beyan ve taahhüt eder.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">2. Sözleşmenin Konusu</h4>
+                    <p>
+                      İşbu Sözleşme'nin konusu, İletigo tarafından sunulan hizmetlerin kullanımına ilişkin olarak Taraflar'ın karşılıklı hak ve yükümlülüklerinin belirlenmesidir.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">3. Kullanım Koşulları</h4>
+                    <p className="mb-2">
+                      • Kullanıcı, Site'yi yalnızca hukuka uygun amaçlarla kullanacağını ve yasalara aykırı herhangi bir faaliyette bulunmayacağını kabul eder.
+                    </p>
+                    <p className="mb-2">
+                      • Site'nin işleyişini engelleyecek veya aksatacak herhangi bir yazılım, araç veya mekanizma kullanılamaz.
+                    </p>
+                    <p className="mb-2">
+                      • Kullanıcı, diğer kullanıcıların bilgilerine ve verilerine izinsiz olarak ulaşmayacağını ve bunları kullanmayacağını taahhüt eder.
+                    </p>
+                    <p>
+                      • Site içeriğinin İletigo'nun izni olmaksızın ticari amaçlarla kopyalanması, çoğaltılması, dağıtılması veya işlenmesi yasaktır.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">4. Tarafların Hak ve Sorumlulukları</h4>
+                    <p className="mb-2 font-medium">4.1. İletigo'nun Hak ve Sorumlulukları</p>
+                    <p className="mb-2">
+                      İletigo, Site'nin kesintisiz ve hatasız bir şekilde çalışması için azami gayreti gösterecektir. Ancak teknik arızalar, siber saldırılar veya mücbir sebeplerden kaynaklanabilecek kesintilerden sorumlu tutulamaz.
+                    </p>
+                    <p className="mb-2 font-medium">4.2. Kullanıcı'nın Hak ve Sorumlulukları</p>
+                    <p>
+                      Kullanıcı, Site'yi kullanırken verdiği tüm bilgilerin doğru, güncel ve eksiksiz olduğunu kabul ve beyan eder. Bu bilgilerin yanlış veya eksik olmasından doğacak tüm zararlardan Kullanıcı sorumludur.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">5. Fikri Mülkiyet Hakları</h4>
+                    <p>
+                      iletigo.com web sitesinde yer alan her türlü tasarım, metin, görsel, logo, ikon, yazılım, kod ve diğer tüm unsurların mülkiyeti ve telif hakları İletigo'ya aittir.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">6. Sorumluluğun Sınırlandırılması</h4>
+                    <p>
+                      İletigo, Site'nin kullanımından veya kullanılamamasından kaynaklanan doğrudan veya dolaylı hiçbir zarardan (veri kaybı, kar kaybı vb.) sorumlu değildir.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">7. Uygulanacak Hukuk ve Yetkili Mahkeme</h4>
+                    <p>
+                      İşbu Sözleşme'nin uygulanmasından ve yorumlanmasından doğacak her türlü uyuşmazlığın çözümünde Türk Hukuku uygulanacaktır. Uyuşmazlıkların çözümünde İstanbul (Çağlayan) Mahkemeleri ve İcra Daireleri yetkilidir.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">8. Yürürlük</h4>
+                    <p>
+                      İşbu Sözleşme, Kullanıcı'nın iletigo.com web sitesini ziyaret ettiği ve kullanmaya başladığı andan itibaren yürürlüğe girer.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Checkbox'lar */}
@@ -376,7 +424,7 @@ export default function RegisterPage() {
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   />
                   <label htmlFor="acceptTerms" className="ml-3 text-sm text-gray-700">
-                    Kolaymutiakaat kullanıcı sözleşmesini okudum ve kabul ediyorum.
+                    İletigo kullanıcı sözleşmesini okudum ve kabul ediyorum.
                   </label>
                 </div>
 
@@ -408,8 +456,8 @@ export default function RegisterPage() {
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   />
                   <label htmlFor="acceptMarketing" className="ml-3 text-sm text-gray-700">
-                    Güncel hızuı verg betcher ile ilgili kampanyalar, indirimler ve
-                    haberlerin hakkında telefon, e-posta veya sms örmek istiyorum.
+                    Güncel hizmetler ile ilgili kampanyalar, indirimler ve
+                    haberler hakkında telefon, e-posta veya SMS almak istiyorum.
                   </label>
                 </div>
               </div>
