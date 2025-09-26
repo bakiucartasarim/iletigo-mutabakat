@@ -161,74 +161,19 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Charts and Activity */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-        {/* Status Chart */}
-        <div className="bg-white/70 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl border border-white/20">
-          <div className="p-4 sm:p-6 border-b border-gray-200/50">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Mutabakat Durumları</h3>
-            <p className="text-gray-600 text-xs sm:text-sm">Anlık durum analizi</p>
-          </div>
-          <div className="p-4 sm:p-6">
-            {stats?.reconciliation_stats && (
-              <div className="space-y-4 sm:space-y-6">
-                {stats.reconciliation_stats.map((stat: any, index: number) => (
-                  <div key={index} className="relative">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                        <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-gradient-to-r ${getStatusColor(stat.status)}`}></div>
-                        <span className="font-semibold text-gray-800 text-sm sm:text-base truncate">{getStatusText(stat.status)}</span>
-                        <span className="text-xs sm:text-sm text-gray-500">({stat.count} adet)</span>
-                      </div>
-                      <span className="font-bold text-gray-900 text-xs sm:text-sm whitespace-nowrap ml-2">
-                        ₺{stat.total_difference.toLocaleString('tr-TR')}
-                      </span>
-                    </div>
-                    
-                    <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3 overflow-hidden">
-                      <div 
-                        className={`h-2 sm:h-3 bg-gradient-to-r ${getStatusColor(stat.status)} rounded-full transition-all duration-1000 ease-out`}
-                        style={{ width: `${Math.min((stat.count / 20) * 100, 100)}%` }}
-                      ></div>
-                    </div>
-                    
-                    <p className="text-xs text-gray-500 mt-1 sm:mt-2">
-                      Ortalama: ₺{stat.avg_difference.toLocaleString('tr-TR')}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+      {/* Single Image Display Area */}
+      <div className="bg-white/70 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl border border-white/20">
+        <div className="p-4 sm:p-6 border-b border-gray-200/50">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Cari Mutabakat</h3>
+          <p className="text-gray-600 text-xs sm:text-sm">Şirket kaydı sayfası</p>
         </div>
-
-        {/* Activity Feed */}
-        <div className="bg-white/70 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl border border-white/20">
-          <div className="p-4 sm:p-6 border-b border-gray-200/50">
-            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Son Aktiviteler</h3>
-            <p className="text-gray-600 text-xs sm:text-sm">Sistem etkinlikleri</p>
-          </div>
-          <div className="p-4 sm:p-6 max-h-80 overflow-y-auto">
-            <div className="space-y-3 sm:space-y-4">
-              {[
-                { action: 'Yeni mutabakat oluşturuldu', user: 'Admin User', time: '2 dakika önce', type: 'create' },
-                { action: 'Şirket bilgileri güncellendi', user: 'Manager', time: '15 dakika önce', type: 'update' },
-                { action: 'Rapor dışa aktarıldı', user: 'Admin User', time: '1 saat önce', type: 'export' },
-                { action: 'Yeni kullanıcı eklendi', user: 'Admin User', time: '2 saat önce', type: 'create' },
-              ].map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3 sm:space-x-4 p-2 sm:p-3 rounded-xl hover:bg-white/50 transition-all duration-200">
-                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mt-2 ${
-                    activity.type === 'create' ? 'bg-green-400' :
-                    activity.type === 'update' ? 'bg-blue-400' :
-                    'bg-purple-400'
-                  } animate-pulse`}></div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{activity.action}</p>
-                    <p className="text-xs text-gray-600 truncate">{activity.user} • {activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="p-4 sm:p-6 flex items-center justify-center">
+          <div className="w-full max-w-4xl">
+            <img
+              src="/images/6.png"
+              alt="Cari Mutabakat Şirket Kaydı"
+              className="w-full h-auto rounded-xl shadow-lg"
+            />
           </div>
         </div>
       </div>
