@@ -311,16 +311,34 @@ export default function RegisterPage() {
         </div>
 
         {/* Sağ Taraf - Görsel */}
-        <div className="relative md:w-[40%] hidden md:block">
-          <img
-            alt="Cari mutabakat süreçlerini gösteren iş adamları"
-            className="w-full h-full object-cover"
-            src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
-          />
-          <div className="absolute inset-0 bg-blue-900 bg-opacity-60 flex items-center justify-center p-8">
-            <div className="text-center text-white">
-              <h2 className="text-4xl font-bold mb-4">Cari Mutabakatta Devrim</h2>
-              <p className="text-lg">İletigo ile cari mutabakat süreçlerinizi dijitalleştirin. Hızlı, güvenli ve verimli bir şekilde mutabakatlarınızı tamamlayın. Hemen kaydolun ve farkı yaşayın.</p>
+        <div className="relative md:w-[40%] hidden md:flex flex-col">
+          {/* Üst yarı */}
+          <div className="relative flex-1">
+            <img
+              alt="İletigo cari mutabakat dashboard mockup"
+              className="w-full h-full object-cover"
+              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMDMzNjYzIi8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjM2MCIgaGVpZ2h0PSIyNjAiIHJ4PSIxMiIgZmlsbD0iI2ZmZmZmZiIvPgo8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSIzNjAiIGhlaWdodD0iNDAiIGZpbGw9IiMxZjJkM2QiLz4KPGV4dCB4PSI0MCIgeT0iNDMiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJBcmlhbCI+aWxldGlnbyAtIENhcmkgTXV0YWJha2F0PC90ZXh0Pgo8cmVjdCB4PSI0MCIgeT0iODAiIHdpZHRoPSIxNDAiIGhlaWdodD0iNDAiIHJ4PSI0IiBmaWxsPSIjMzMzNWZmIi8+Cjx0ZXh0IHg9IjEwNCIgeT0iMTA0IiBmaWxsPSIjZmZmZmZmIiBmb250LXNpemU9IjEyIiBmb250LWZhbWlseT0iQXJpYWwiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlllbmkgTXV0YWJha2F0PC90ZXh0Pgo8cmVjdCB4PSIyMDAiIHk9IjgwIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjQwIiByeD0iNCIgZmlsbD0iIzJhYmE2YSIvPgo8dGV4dCB4PSIyNzAiIHk9IjEwNCIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NdXRhYmFrYXQgUmFwb3J1PC90ZXh0Pgo8cmVjdCB4PSI0MCIgeT0iMTUwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0iI2Y1ZjVmNSIvPgo8cmVjdCB4PSI0MCIgeT0iMTgwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0iI2Y1ZjVmNSIvPgo8cmVjdCB4PSI0MCIgeT0iMjEwIiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0iI2Y1ZjVmNSIvPgo8Y2lyY2xlIGN4PSIzNDAiIGN5PSIxODAiIHI9IjMwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMzMzM1ZmYiIHN0cm9rZS13aWR0aD0iMyIvPgo8dGV4dCB4PSIzNDAiIHk9IjE4NSIgZmlsbD0iIzMzMzVmZiIgZm9udC1zaXplPSIxNCIgZm9udC1mYW1pbHk9IkFyaWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj44OSU8L3RleHQ+Cjwvc3ZnPgo="
+            />
+            <div className="absolute inset-0 bg-blue-900 bg-opacity-20 flex items-center justify-center p-4">
+              <div className="text-center text-white">
+                <h3 className="text-2xl font-bold mb-2">İletigo Dashboard</h3>
+                <p className="text-sm">Cari mutabakat yönetimi</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Alt yarı */}
+          <div className="relative flex-1">
+            <img
+              alt="Cari mutabakat süreçlerini gösteren iş görüntüsü"
+              className="w-full h-full object-cover"
+              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjZjhmOWZhIi8+CjxyZWN0IHg9IjUwIiB5PSI1MCIgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiIHJ4PSI4IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiNlNWU3ZWIiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjIwIiBmaWxsPSIjMzMzNWZmIi8+Cjx0ZXh0IHg9IjEzMCIgeT0iOTAiIGZpbGw9IiMzNzQxNTEiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtZmFtaWx5PSJBcmlhbCI+QWhtZXQgWcSxbG1hejwvdGV4dD4KPHR5cGU+PHRleHQgeD0iMTMwIiB5PSIxMDUiIGZpbGw9IiM2Yjc5ODAiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCI+U2lydmV0IFlldGtpbGlzaTwvdGV4dD4KPHR5cGU+PHRleHQgeD0iMTMwIiB5PSIxMjAiIGZpbGw9IiM2Yjc5ODAiIGZvbnQtc2l6ZT0iMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCI+YWhtZXRAc2lya2V0LmNvbTwvdGV4dD4KPHJlY3QgeD0iMjgwIiB5PSI4MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iNCIgZmlsbD0iIzJhYmE2YSIvPgo8dGV4dCB4PSIzMDAiIHk9IjEwNCIgZmlsbD0iI2ZmZmZmZiIgZm9udC1zaXplPSIxNCIgZm9udC1mYW1pbHk9IkFyaWFsIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7inJM8L3RleHQ+CjxyZWN0IHg9IjcwIiB5PSIxNTAiIHdpZHRoPSIyNjAiIGhlaWdodD0iMyIgZmlsbD0iI2Y1ZjVmNSIvPgo8cmVjdCB4PSI3MCIgeT0iMTcwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMzMzNWZmIi8+CjxyZWN0IHg9IjE4MCIgeT0iMTcwIiB3aWR0aD0iODAiIGhlaWdodD0iMTAiIGZpbGw9IiNmNWY1ZjUiLz4KPHJlY3QgeD0iMjcwIiB5PSIxNzAiIHdpZHRoPSI2MCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2ZlZGQ1MyIvPgo8L3N2Zz4K"
+            />
+            <div className="absolute inset-0 bg-green-600 bg-opacity-20 flex items-center justify-center p-4">
+              <div className="text-center text-white">
+                <h3 className="text-2xl font-bold mb-2">Hızlı Onay</h3>
+                <p className="text-sm">Tek tıkla mutabakat</p>
+              </div>
             </div>
           </div>
         </div>
