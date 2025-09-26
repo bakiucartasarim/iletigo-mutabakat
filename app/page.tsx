@@ -152,7 +152,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Hesabınız yok mu?{' '}
-              <a href="#" className="text-indigo-600 hover:text-indigo-500 font-medium transition duration-200">
+              <a href="/register" className="text-indigo-600 hover:text-indigo-500 font-medium transition duration-200">
                 Kayıt olun
               </a>
             </p>
