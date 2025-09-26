@@ -62,8 +62,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Registration error:', error)
+    console.error('Error details:', error.message)
+    console.error('Error stack:', error.stack)
     return NextResponse.json(
-      { error: 'Sunucu hatası' },
+      { error: 'Sunucu hatası: ' + error.message },
       { status: 500 }
     )
   }
