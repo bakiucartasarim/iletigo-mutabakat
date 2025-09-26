@@ -3,10 +3,8 @@ const fs = require('fs')
 const path = require('path')
 
 const pool = new Pool({
-  connectionString: 'postgres://postgres:cA3U0JURbsbl95Y0Yf4DObCfmZO1tU4oA5IieoDYCHVExHMuYP2oDnYd3wNUt8qh@yg0sggsk0088w4o088oswcw8.postgresql.neon.tech:5432/postgres',
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: 'postgres://postgres:cA3U0JURbsbl95Y0Yf4DObCfmZO1tU4oA5IieoDYCHVExHMuYP2oDnYd3wNUt8qh@178.18.206.227:5438/postgres',
+  ssl: false
 })
 
 async function setupDatabase() {
