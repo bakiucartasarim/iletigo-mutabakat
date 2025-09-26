@@ -138,65 +138,24 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Şirket Bilgileri */}
-            <div>
-              <h2 className="font-semibold text-lg text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                Şirket Bilgileri
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Şirket Adı *</label>
-                  <input
-                    id="companyName"
-                    name="companyName"
-                    type="text"
-                    required
-                    value={formData.companyName}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Örn: Acme Teknoloji A.Ş."
-                  />
-                </div>
-                <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700">Şirket Açıklaması</label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    rows={3}
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm resize-none"
-                    placeholder="Şirketinizin kısa açıklaması..."
-                  />
-                </div>
-                <div>
-                  <label htmlFor="website" className="block text-sm font-medium text-gray-700">Website</label>
-                  <input
-                    id="website"
-                    name="website"
-                    type="url"
-                    value={formData.website}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="https://www.sirketiniz.com"
-                  />
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Tek sütun kompakt form */}
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Şirket Adı *</label>
+                <input
+                  id="companyName"
+                  name="companyName"
+                  type="text"
+                  required
+                  value={formData.companyName}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="Örn: Acme Teknoloji A.Ş."
+                />
               </div>
-            </div>
 
-            {/* Şirket Yöneticisi Bilgileri */}
-            <div>
-              <h2 className="font-semibold text-lg text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Şirket Yöneticisi Bilgileri
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="contactName" className="block text-sm font-medium text-gray-700">Yönetici Adı Soyadı *</label>
                   <input
@@ -206,7 +165,7 @@ export default function RegisterPage() {
                     required
                     value={formData.contactName}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Örn: Ahmet Yılmaz"
                   />
                 </div>
@@ -222,13 +181,14 @@ export default function RegisterPage() {
                       type="tel"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="block w-full pl-12 pr-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="block w-full pl-12 pr-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       placeholder="532 123 45 67"
                     />
                   </div>
                 </div>
               </div>
-              <div className="mt-4">
+
+              <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-posta Adresi *</label>
                 <input
                   id="email"
@@ -237,21 +197,12 @@ export default function RegisterPage() {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="ahmet@sirketiniz.com"
                 />
               </div>
-            </div>
 
-            {/* Giriş Bilgileri */}
-            <div>
-              <h2 className="font-semibold text-lg text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Giriş Bilgileri
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700">Şifre *</label>
                   <input
@@ -261,7 +212,7 @@ export default function RegisterPage() {
                     required
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="En az 6 karakter"
                   />
                 </div>
@@ -274,22 +225,16 @@ export default function RegisterPage() {
                     required
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Şifrenizi tekrar girin"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Sözleşmeler */}
-            <div className="space-y-4">
-              <div className="h-24 overflow-y-auto p-3 border border-gray-300 rounded-md bg-gray-50 text-sm text-gray-600">
-                <p className="mb-2">İletigo kullanıcı sözleşmesi kapsamında, hizmetlerimizi kullanırken tüm yasal sorumluluklarınızı kabul etmiş sayılırsınız.</p>
-                <p className="mb-2">Kişisel verilerinizin işlenmesi, güvenliği ve üçüncü taraflarla paylaşımı konularında KVKK kapsamında haklarınız saklıdır.</p>
-                <p>Detaylı bilgi için sözleşme metnini inceleyebilirsiniz.</p>
-              </div>
-
-              <div className="space-y-3">
+            {/* Sözleşmeler - Daha kompakt */}
+            <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex items-start">
                   <input
                     id="acceptTerms"
@@ -299,7 +244,7 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="acceptTerms" className="ml-3 text-sm font-medium text-gray-700">
+                  <label htmlFor="acceptTerms" className="ml-3 text-sm text-gray-700">
                     Kullanıcı sözleşmesini okudum ve kabul ediyorum.
                   </label>
                 </div>
@@ -313,14 +258,13 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="acceptPrivacy" className="ml-3 text-sm font-medium text-gray-700">
+                  <label htmlFor="acceptPrivacy" className="ml-3 text-sm text-gray-700">
                     <span
                       className="text-blue-600 hover:underline cursor-pointer"
                       onClick={() => setShowPrivacyModal(true)}
                     >
                       Gizlilik Politikası
-                    </span> kabul ediyorum; kullanım deneyimimi geliştirmek için verilerin işlenmesine
-                    ve bu kapsamda yurtdışındaki çözüm ortaklarıyla paylaşıma aktarılmak üzere tarafımca onaylanmış veri veriyorum.
+                    </span> kabul ediyorum.
                   </label>
                 </div>
 
@@ -333,9 +277,8 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="acceptMarketing" className="ml-3 text-sm font-medium text-gray-700">
-                    Güncel hizmetler ile ilgili kampanyalar, indirimler ve
-                    haberler hakkında telefon, e-posta veya SMS almak istiyorum.
+                  <label htmlFor="acceptMarketing" className="ml-3 text-sm text-gray-700">
+                    Güncel hizmetler ile ilgili bildirimler almak istiyorum.
                   </label>
                 </div>
               </div>
@@ -406,7 +349,7 @@ export default function RegisterPage() {
 
             <div className="p-6 overflow-y-auto max-h-[70vh] text-sm text-gray-700 space-y-4">
               <p>
-                İletigo Teknoloji Ltd. Şti. ("İletigo" veya "Şirket") olarak, kullanıcılarımızın ve hizmet verdiğimiz kurumsal müşterilerimizin ("Müşteri Firma") verilerinin gizliliğine ve güvenliğine büyük önem veriyoruz.
+                İletigo Teknoloji Ltd. Şti. ("İletigo" veya "Şirket") olarak, kullanıcılarımızın ve hizmet verdiğimiz kurumsal müşterilerimizin ("Müşteri Firma") verilerinin gizliliğine ve güvenliğine büyük önem veriyoruz. İşbu Gizlilik ve Kişisel Verilerin Korunması Politikası ("Politika"), İletigo'nun iletigo.com web sitesi ("Site") ve sunduğu mutabakat hizmetleri ("Hizmetler") aracılığıyla topladığı kişisel verilerin nasıl işlendiğini, kimlerle paylaşıldığını ve veri sahiplerinin haklarının neler olduğunu açıklamak amacıyla hazırlanmıştır.
               </p>
 
               <div>
@@ -417,23 +360,61 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">2. Veri Sahibinin Hakları</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">2. Hangi Kişisel Verileri Topluyoruz?</h3>
+                <p className="mb-2">Sunduğumuz kurumsal mutabakat hizmetinin doğası gereği aşağıdaki verileri işleyebiliriz:</p>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Kimlik Bilgileri:</strong> Ad, soyadı, T.C. kimlik numarası (gerekli durumlarda)</li>
+                  <li><strong>İletişim Bilgileri:</strong> Kurumsal e-posta adresi, cep telefonu numarası, iş telefonu, unvan</li>
+                  <li><strong>Kullanıcı Hesap Bilgileri:</strong> Kullanıcı adı, şifrelenmiş parola, IP adresi, log kayıtları</li>
+                  <li><strong>Finansal Veriler:</strong> Mutabakat süreçlerinde kullanılan cari hesap ekstreleri, fatura bilgileri</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">3. Kişisel Verileri Hangi Amaçlarla İşliyoruz?</h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Hizmetlerin sunulması ve kullanıcı hesabı oluşturma</li>
+                  <li>Mutabakat süreçlerini yürütme ve taraflar arasında iletişimi sağlama</li>
+                  <li>Sistem güvenliğini sağlama ve sahtekarlığı önleme</li>
+                  <li>Yasal yükümlülükleri yerine getirme</li>
+                  <li>Hizmet iyileştirme ve kullanıcı deneyimini geliştirme</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">4. Veri Sahibinin Hakları (KVKK Madde 11)</h3>
                 <p className="mb-2">
                   KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:
                 </p>
                 <ul className="list-disc ml-6 space-y-1">
                   <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
-                  <li>İşlenme amacını öğrenme</li>
+                  <li>İşlenmişse buna ilişkin bilgi talep etme</li>
+                  <li>İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme</li>
                   <li>Verilerin aktarıldığı üçüncü kişileri bilme</li>
                   <li>Eksik veya yanlış işlenmişse düzeltilmesini isteme</li>
-                  <li>Silinmesini veya yok edilmesini isteme</li>
+                  <li>KVKK'da öngörülen şartlar çerçevesinde silinmesini veya yok edilmesini isteme</li>
+                  <li>Verilerin kanuna aykırı olarak işlenmesi sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">3. İletişim</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">5. Veri Güvenliği</h3>
+                <p>
+                  İletigo, kişisel verilerinizin hukuka aykırı olarak işlenmesini önlemek ve muhafazasını sağlamak amacıyla şifreleme, erişim yetki kontrolleri, güvenlik duvarları, veri yedekleme gibi gerekli tüm teknik ve idari tedbirleri almaktadır.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">6. İletişim</h3>
                 <p>
                   Bu haklarınızı kullanmak için <a href="mailto:info@iletigo.com" className="text-blue-600 underline">info@iletigo.com</a> e-posta adresinden bizimle iletişime geçebilirsiniz.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">7. Politika'da Yapılacak Değişiklikler</h3>
+                <p>
+                  İletigo, işbu Gizlilik Politikası'nda mevzuattaki değişiklikler veya hizmetlerindeki yenilikler doğrultusunda değişiklik yapma hakkını saklı tutar. Politikanın güncel versiyonu her zaman Site'de yayınlanacaktır.
                 </p>
               </div>
             </div>
