@@ -15,16 +15,19 @@ export default function RegisterPage() {
     phone: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    acceptTerms: false,
+    acceptPrivacy: false,
+    acceptMarketing: false
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+    const { name, value, type, checked } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }))
   }
 
@@ -43,6 +46,18 @@ export default function RegisterPage() {
 
     if (formData.password.length < 6) {
       setError('Şifre en az 6 karakter olmalıdır')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.acceptTerms) {
+      setError('Kullanıcı sözleşmesini kabul etmelisiniz')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.acceptPrivacy) {
+      setError('Gizlilik politikasını kabul etmelisiniz')
       setLoading(false)
       return
     }
@@ -308,6 +323,94 @@ export default function RegisterPage() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
                     placeholder="Şifrenizi tekrar girin"
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Kullanıcı Sözleşmesi */}
+            <div className="border-t border-gray-200 pt-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Kullanıcı Sözleşmesi
+              </h3>
+
+              {/* Sözleşme Metni */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto text-sm text-gray-700">
+                <p className="mb-3 font-medium">
+                  iletigo.com web sitesini kullanmanız için Genel Hak ve Sorumluluktlar
+                </p>
+                <p className="mb-3">
+                  Eğer bu sayfada belirtilen koşulların herhangi bir taanı için uygun değilse
+                  lütfen iletigo.com klasik uygulamasını kullanın. Saha zamanki hicretsir değilsat
+                  değişiklerinle yer alabilir formları dokümanlıız bu kavlariçla yazıli tam kapsılan
+                  bu anlaşma gırcaksizı geçer.
+                </p>
+                <p className="mb-3">
+                  İş bu Kullanıma lisykon Genel Hak ve Sorumluktlar, kolaymutiakant merkaris.
+                  Açıklama vur verasında hüzurm tarafirı kar gelix ane vau anlıktlıyasaya
+                  adımında sizinle temel olan hizmet koşularanıcız. Kolaymutiakaat
+                  uygulcamlarinin kulanıcısı veu no keyler sır bui tüm tüm anlaşmaya uyumunvuz
+                  ve tam öricir hiçumanlı bu kolamıma talyan hak veu Sorumluhtlular kabul ettiniz
+                  anlamına gelir.
+                </p>
+                <p className="mb-3">
+                  kolaymutiakant.com web sitesine girmeniz vey veu sitelenice veu özen
+                  eşirmrianina to hak yükıy ve alındık alicı siresdir vou her atıl kuul
+                  anğına gülanıdirsımız. Kolay Mutiakaat Bilgım Görlerinimi
+                  mağındayımız.
+                </p>
+                <p>
+                  Kolay Mutiakat siresınin veu internet hayinlıs hakolları, aşağı-lada veu ömeık çağıuyamr.
+                </p>
+              </div>
+
+              {/* Checkbox'lar */}
+              <div className="space-y-3">
+                {/* Kullanıcı Sözleşmesi */}
+                <div className="flex items-start">
+                  <input
+                    id="acceptTerms"
+                    name="acceptTerms"
+                    type="checkbox"
+                    checked={formData.acceptTerms}
+                    onChange={handleInputChange}
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="acceptTerms" className="ml-3 text-sm text-gray-700">
+                    Kolaymutiakaat kullanıcı sözleşmesini okudum ve kabul ediyorum.
+                  </label>
+                </div>
+
+                {/* Gizlilik Politikası */}
+                <div className="flex items-start">
+                  <input
+                    id="acceptPrivacy"
+                    name="acceptPrivacy"
+                    type="checkbox"
+                    checked={formData.acceptPrivacy}
+                    onChange={handleInputChange}
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="acceptPrivacy" className="ml-3 text-sm text-gray-700">
+                    <span className="text-blue-600 underline cursor-pointer">Gizlilik Politikası</span> kabul ediyorum;
+                    kullanım deneyimimi geliştirebilim için verilerin işlenmesine
+                    ve bu kapsamda yurtiçindeki veya yurtdışındaki kuruluşlara aktarılmak üzere tarafımca onaylanmiş veri veriyorum.
+                  </label>
+                </div>
+
+                {/* Pazarlama İzni */}
+                <div className="flex items-start">
+                  <input
+                    id="acceptMarketing"
+                    name="acceptMarketing"
+                    type="checkbox"
+                    checked={formData.acceptMarketing}
+                    onChange={handleInputChange}
+                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="acceptMarketing" className="ml-3 text-sm text-gray-700">
+                    Güncel hızuı verg betcher ile ilgili kampanyalar, indirimler ve
+                    haberlerin hakkında telefon, e-posta veya sms örmek istiyorum.
+                  </label>
                 </div>
               </div>
             </div>
