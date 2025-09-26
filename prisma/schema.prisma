@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password_hash String
+  first_name    String
+  last_name     String
+  role          String    @default("user")
+  company_id    Int?
+  is_active     Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  company       Company?  @relation(fields: [company_id], references: [id])
+  reconciliations Reconciliation[]
+
+  @@map("users")
+}
+
+model Company {
+  id             Int       @id @default(autoincrement())
+  code           String    @unique
+  name           String
+  contact_person String?
+  email          String?
+  phone          String?
+  mobile_phone   String?
+  address        String?
+  tax_office     String?
+  tax_number     String?
+  is_active      Boolean   @default(true)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  users          User[]
+  reconciliations Reconciliation[]
+
+  @@map("companies")
+}
+
+model Reconciliation {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  company_id  Int
+  period      String
+  status      String    @default("pending")
+  total_count Int       @default(0)
+  matched     Int       @default(0)
+  unmatched   Int       @default(0)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  user        User      @relation(fields: [user_id], references: [id])
+  company     Company   @relation(fields: [company_id], references: [id])
+  details     ReconciliationDetail[]
+
+  @@map("reconciliations")
+}
+
+model ReconciliationDetail {
+  id               Int       @id @default(autoincrement())
+  reconciliation_id Int
+  document_number  String?
+  date             DateTime?
+  description      String?
+  debit            Decimal?  @db.Decimal(15,2)
+  credit           Decimal?  @db.Decimal(15,2)
+  balance          Decimal?  @db.Decimal(15,2)
+  status           String    @default("pending")
+  created_at       DateTime  @default(now())
+
+  reconciliation   Reconciliation @relation(fields: [reconciliation_id], references: [id], onDelete: Cascade)
+
+  @@map("reconciliation_details")
+}
