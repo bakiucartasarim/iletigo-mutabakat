@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
 
     // Insert user
     const result = await pool.query(
-      `INSERT INTO users (email, password_hash, first_name, last_name, role)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users (email, password_hash, first_name, last_name, role, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
        RETURNING id, email, first_name, last_name, role, created_at`,
       [email.toLowerCase(), passwordHash, firstName, lastName, role]
     )
