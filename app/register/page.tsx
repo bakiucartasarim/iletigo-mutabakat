@@ -23,6 +23,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showPrivacyModal, setShowPrivacyModal] = useState(false)
+  const [showTermsModal, setShowTermsModal] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type, checked } = e.target
@@ -102,7 +103,7 @@ export default function RegisterPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center p-6">
-      <div className="relative flex flex-col md:flex-row m-6 space-y-8 md:space-y-0 md:space-x-8 bg-white shadow-2xl rounded-2xl overflow-hidden max-w-6xl w-full">
+      <div className="relative flex flex-col md:flex-row m-6 space-y-8 md:space-y-0 md:space-x-8 bg-white shadow-2xl rounded-2xl overflow-hidden max-w-6xl w-full max-h-[700px]">
 
         {/* Sol Taraf - Form */}
         <div className="w-full md:w-[60%] p-8 md:p-12">
@@ -245,7 +246,12 @@ export default function RegisterPage() {
                     className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label htmlFor="acceptTerms" className="ml-3 text-sm text-gray-700">
-                    Kullanıcı sözleşmesini okudum ve kabul ediyorum.
+                    <span
+                      className="text-blue-600 hover:underline cursor-pointer"
+                      onClick={() => setShowTermsModal(true)}
+                    >
+                      Kullanıcı sözleşmesini
+                    </span> okudum ve kabul ediyorum.
                   </label>
                 </div>
 
@@ -311,8 +317,8 @@ export default function RegisterPage() {
         </div>
 
         {/* Sağ Taraf - Tek Görsel */}
-        <div className="relative md:w-[40%] hidden md:flex">
-          <div className="relative w-full h-full">
+        <div className="relative md:w-[40%] hidden md:flex items-stretch">
+          <div className="relative w-full">
             <img
               alt="Şirket kaydı ve cari mutabakat platformu"
               className="w-full h-full object-cover rounded-r-2xl"
@@ -348,6 +354,10 @@ export default function RegisterPage() {
                 İletigo Teknoloji Ltd. Şti. ("İletigo" veya "Şirket") olarak, kullanıcılarımızın ve hizmet verdiğimiz kurumsal müşterilerimizin ("Müşteri Firma") verilerinin gizliliğine ve güvenliğine büyük önem veriyoruz. İşbu Gizlilik ve Kişisel Verilerin Korunması Politikası ("Politika"), İletigo'nun iletigo.com web sitesi ("Site") ve sunduğu mutabakat hizmetleri ("Hizmetler") aracılığıyla topladığı kişisel verilerin nasıl işlendiğini, kimlerle paylaşıldığını ve veri sahiplerinin haklarının neler olduğunu açıklamak amacıyla hazırlanmıştır.
               </p>
 
+              <p>
+                Bu Politika, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca veri sorumlusu sıfatıyla hareket eden İletigo'nun yükümlülüklerini yerine getirmesi için temel bir belgedir.
+              </p>
+
               <div>
                 <h3 className="font-semibold text-lg text-gray-900 mb-2">1. Veri Sorumlusu</h3>
                 <p>
@@ -357,58 +367,101 @@ export default function RegisterPage() {
 
               <div>
                 <h3 className="font-semibold text-lg text-gray-900 mb-2">2. Hangi Kişisel Verileri Topluyoruz?</h3>
-                <p className="mb-2">Sunduğumuz kurumsal mutabakat hizmetinin doğası gereği aşağıdaki verileri işleyebiliriz:</p>
-                <ul className="list-disc ml-6 space-y-1">
-                  <li><strong>Kimlik Bilgileri:</strong> Ad, soyadı, T.C. kimlik numarası (gerekli durumlarda)</li>
-                  <li><strong>İletişim Bilgileri:</strong> Kurumsal e-posta adresi, cep telefonu numarası, iş telefonu, unvan</li>
-                  <li><strong>Kullanıcı Hesap Bilgileri:</strong> Kullanıcı adı, şifrelenmiş parola, IP adresi, log kayıtları</li>
-                  <li><strong>Finansal Veriler:</strong> Mutabakat süreçlerinde kullanılan cari hesap ekstreleri, fatura bilgileri</li>
-                </ul>
+                <p className="mb-2">Sunduğumuz kurumsal mutabakat hizmetinin doğası gereği, hem hizmetlerimizi kullanan Müşteri Firma yetkililerinin hem de mutabakat süreçlerinde yer alan üçüncü taraf firma yetkililerinin verilerini işleyebiliriz.</p>
+
+                <div className="mb-3">
+                  <h4 className="font-medium text-gray-900 mb-1">Kullanıcı ve Müşteri Firma Verileri:</h4>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li><strong>Kimlik Bilgileri:</strong> Ad, soyadı, T.C. kimlik numarası (gerekli durumlarda, örn. e-mutabakat).</li>
+                    <li><strong>İletişim Bilgileri:</strong> Kurumsal e-posta adresi, cep telefonu numarası, iş telefonu, unvan, çalışılan departman ve firma adı.</li>
+                    <li><strong>Kullanıcı Hesap Bilgileri:</strong> Kullanıcı adı, şifrelenmiş parola, kullanıcı ID, IP adresi, siteye giriş-çıkış (log) kayıtları, tarayıcı bilgileri.</li>
+                    <li><strong>Finansal Veriler:</strong> Mutabakat süreçlerinin bir parçası olarak Müşteri Firmalar tarafından sisteme yüklenen cari hesap ekstreleri, fatura bilgileri, bakiye bilgileri gibi veriler. Bu veriler Müşteri Firma'nın kontrolünde olup, İletigo bu verileri yalnızca hizmetin gerektirdiği ölçüde işler.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-1">Üçüncü Taraf (Muhatap Firma) Verileri:</h4>
+                  <p>Müşteri Firmalarımızın mutabakat yapmak amacıyla sisteme girdikleri karşı firma yetkililerinin ad, soyadı, unvan, kurumsal e-posta ve telefon numarası gibi iletişim bilgileri. Bu durumda veri sorumlusu Müşteri Firma olup, İletigo "veri işleyen" sıfatına sahiptir.</p>
+                </div>
               </div>
 
               <div>
                 <h3 className="font-semibold text-lg text-gray-900 mb-2">3. Kişisel Verileri Hangi Amaçlarla İşliyoruz?</h3>
+                <p className="mb-2">Topladığımız kişisel verileri aşağıdaki amaçlarla işlemekteyiz:</p>
                 <ul className="list-disc ml-6 space-y-1">
-                  <li>Hizmetlerin sunulması ve kullanıcı hesabı oluşturma</li>
-                  <li>Mutabakat süreçlerini yürütme ve taraflar arasında iletişimi sağlama</li>
-                  <li>Sistem güvenliğini sağlama ve sahtekarlığı önleme</li>
-                  <li>Yasal yükümlülükleri yerine getirme</li>
-                  <li>Hizmet iyileştirme ve kullanıcı deneyimini geliştirme</li>
+                  <li><strong>Hizmetlerin Sunulması:</strong> Kullanıcı hesabı oluşturmak, mutabakat süreçlerini yürütmek, taraflar arasında iletişimi sağlamak.</li>
+                  <li><strong>İletişim:</strong> Hizmetle ilgili güncellemeler, teknik destek, bildirimler ve hatırlatmalar (mutabakat onayı, reddi vb.) hakkında bilgi vermek.</li>
+                  <li><strong>Güvenlik:</strong> Sistem güvenliğini sağlamak, sahtekarlığı veya yasa dışı faaliyetleri önlemek ve tespit etmek.</li>
+                  <li><strong>Yasal Yükümlülükler:</strong> Ticari faaliyetlerimize ilişkin yasal ve idari yükümlülükleri (vergi, e-fatura, denetim vb.) yerine getirmek.</li>
+                  <li><strong>Hizmet İyileştirme:</strong> Hizmetlerimizin performansını analiz etmek, kullanıcı deneyimini geliştirmek ve yeni özellikler sunmak.</li>
+                  <li><strong>Pazarlama ve Bilgilendirme (Açık Rıza Halinde):</strong> Yeni hizmetlerimiz, kampanyalarımız ve etkinliklerimiz hakkında bilgi vermek amacıyla ticari elektronik ileti göndermek.</li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">4. Veri Sahibinin Hakları (KVKK Madde 11)</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">4. Kişisel Verilerin İşlenmesinin Hukuki Sebepleri</h3>
+                <p className="mb-2">Kişisel verileriniz, KVKK'nın 5. ve 6. maddelerinde belirtilen hukuki sebeplere dayanılarak işlenmektedir:</p>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Bir sözleşmenin kurulması veya ifasıyla doğrudan doğruya ilgili olması,</li>
+                  <li>Veri sorumlusunun hukuki yükümlülüğünü yerine getirebilmesi için zorunlu olması,</li>
+                  <li>İlgili kişinin temel hak ve özgürlüklerine zarar vermemek kaydıyla, veri sorumlusunun meşru menfaatleri için veri işlenmesinin zorunlu olması,</li>
+                  <li>Kanunlarda açıkça öngörülmesi,</li>
+                  <li>Açık rızanızın bulunması (örn. pazarlama faaliyetleri için).</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">5. Kişisel Verilerin Aktarılması</h3>
+                <p className="mb-2">Kişisel verilerinizin güvenliği bizim için esastır. Verilerinizi kural olarak üçüncü taraflarla paylaşmayız. Ancak aşağıdaki durumlarda ve yasal sınırlar çerçevesinde veri aktarımı yapılabilir:</p>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li><strong>Yetkili Kurum ve Kuruluşlar:</strong> Yasal bir zorunluluk gereği, talep edilmesi halinde mahkemeler, savcılıklar, bakanlıklar ve diğer kamu kurumları ile paylaşılabilir.</li>
+                  <li><strong>Hizmet Sağlayıcılar ve İş Ortakları:</strong> Hizmetlerimizi sunabilmek için destek aldığımız altyapı sağlayıcıları (sunucu, bulut hizmetleri), e-posta gönderim servisleri, SMS sağlayıcıları gibi iş ortaklarımızla, yalnızca hizmetin gerektirdiği ölçüde ve gizlilik taahhüdü altında paylaşılabilir.</li>
+                  <li><strong>Müşteri Firma:</strong> Bir Müşteri Firma çalışanı iseniz, hesap ve aktivite bilgileriniz, hizmet sözleşmesi kapsamında Müşteri Firmanızdaki yetkili kişilerle paylaşılabilir.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">6. Kişisel Verilerin Saklanma Süresi</h3>
+                <p>
+                  Kişisel verilerinizi, ilgili mevzuatta öngörülen veya işlendikleri amaç için gerekli olan süre kadar muhafaza etmekteyiz. Yasal saklama sürelerinin sona ermesi veya işleme amacının ortadan kalkması durumunda, kişisel verileriniz KVKK'ya uygun olarak silinir, yok edilir veya anonim hale getirilir.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">7. Veri Sahibinin Hakları (KVKK Madde 11)</h3>
                 <p className="mb-2">
-                  KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:
+                  Kişisel veri sahibi olarak KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:
                 </p>
                 <ul className="list-disc ml-6 space-y-1">
-                  <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
-                  <li>İşlenmişse buna ilişkin bilgi talep etme</li>
-                  <li>İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme</li>
-                  <li>Verilerin aktarıldığı üçüncü kişileri bilme</li>
-                  <li>Eksik veya yanlış işlenmişse düzeltilmesini isteme</li>
-                  <li>KVKK'da öngörülen şartlar çerçevesinde silinmesini veya yok edilmesini isteme</li>
-                  <li>Verilerin kanuna aykırı olarak işlenmesi sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme</li>
+                  <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme,</li>
+                  <li>İşlenmişse buna ilişkin bilgi talep etme,</li>
+                  <li>İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme,</li>
+                  <li>Yurt içinde veya yurt dışında verilerin aktarıldığı üçüncü kişileri bilme,</li>
+                  <li>Eksik veya yanlış işlenmişse düzeltilmesini isteme,</li>
+                  <li>KVKK'da öngörülen şartlar çerçevesinde silinmesini veya yok edilmesini isteme,</li>
+                  <li>Yapılan düzeltme, silme veya yok etme işlemlerinin, verilerin aktarıldığı üçüncü kişilere bildirilmesini isteme,</li>
+                  <li>İşlenen verilerin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme,</li>
+                  <li>Verilerin kanuna aykırı olarak işlenmesi sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme.</li>
                 </ul>
+                <p className="mt-2">Bu haklarınızı kullanmak için <a href="mailto:iletisim@iletigo.com" className="text-blue-600 underline">iletisim@iletigo.com</a> e-posta adresinden veya şirket adresimize yazılı olarak başvurabilirsiniz.</p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">5. Veri Güvenliği</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">8. Veri Güvenliği</h3>
                 <p>
-                  İletigo, kişisel verilerinizin hukuka aykırı olarak işlenmesini önlemek ve muhafazasını sağlamak amacıyla şifreleme, erişim yetki kontrolleri, güvenlik duvarları, veri yedekleme gibi gerekli tüm teknik ve idari tedbirleri almaktadır.
+                  İletigo, kişisel verilerinizin hukuka aykırı olarak işlenmesini, erişilmesini önlemek ve muhafazasını sağlamak amacıyla şifreleme, erişim yetki kontrolleri, güvenlik duvarları, veri yedekleme gibi gerekli tüm teknik ve idari tedbirleri almaktadır.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">6. İletişim</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">9. Çerez (Cookie) Politikası</h3>
                 <p>
-                  Bu haklarınızı kullanmak için <a href="mailto:info@iletigo.com" className="text-blue-600 underline">info@iletigo.com</a> e-posta adresinden bizimle iletişime geçebilirsiniz.
+                  Sitemizi ziyaretiniz sırasında kullanıcı deneyiminizi geliştirmek amacıyla çerezler kullanmaktayız. Çerez politikamız hakkında detaylı bilgi için lütfen çerez politikası sayfamızı ziyaret ediniz.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">7. Politika'da Yapılacak Değişiklikler</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">10. Politika'da Yapılacak Değişiklikler</h3>
                 <p>
                   İletigo, işbu Gizlilik Politikası'nda mevzuattaki değişiklikler veya hizmetlerindeki yenilikler doğrultusunda değişiklik yapma hakkını saklı tutar. Politikanın güncel versiyonu her zaman Site'de yayınlanacaktır.
                 </p>
@@ -418,6 +471,132 @@ export default function RegisterPage() {
             <div className="p-6 border-t border-gray-200">
               <button
                 onClick={() => setShowPrivacyModal(false)}
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Kullanıcı Sözleşmesi Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  iletigo.com Web Sitesi Kullanım Koşulları ve Genel Sorumluluklar Sözleşmesi
+                </h2>
+                <button
+                  onClick={() => setShowTermsModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">Son Güncelleme Tarihi: 27.09.2025</p>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[70vh] text-sm text-gray-700 space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">1. Taraflar</h3>
+                <p>
+                  İşbu Kullanıcı Sözleşmesi ("Sözleşme"), İletigo Teknoloji Ltd. Şti. ("İletigo") ile iletigo.com web sitesini ("Site") ziyaret eden veya kullanan tüm gerçek ve tüzel kişiler ("Kullanıcı") arasında akdedilmiştir.
+                </p>
+                <p className="mt-2">
+                  Kullanıcı, Site'ye giriş yaparak ve/veya kullanarak bu sözleşmenin tamamını okuduğunu, anladığını ve burada belirtilen tüm şartları, kuralları ve sorumlulukları kayıtsız şartsız kabul ettiğini beyan ve taahhüt eder. Bu koşulları kabul etmiyorsanız, lütfen Site'yi kullanmaktan vazgeçiniz.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">2. Sözleşmenin Konusu</h3>
+                <p>
+                  İşbu Sözleşme'nin konusu, İletigo tarafından sunulan hizmetlerin kullanımına ilişkin olarak Taraflar'ın karşılıklı hak ve yükümlülüklerinin belirlenmesidir.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">3. Kullanım Koşulları</h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Kullanıcı, Site'yi yalnızca hukuka uygun amaçlarla kullanacağını ve yasalara aykırı herhangi bir faaliyette bulunmayacağını kabul eder.</li>
+                  <li>Site'nin işleyişini engelleyecek veya aksatacak herhangi bir yazılım, araç veya mekanizma kullanılamaz.</li>
+                  <li>Kullanıcı, diğer kullanıcıların bilgilerine ve verilerine izinsiz olarak ulaşmayacağını ve bunları kullanmayacağını taahhüt eder.</li>
+                  <li>Site içeriğinin İletigo'nun izni olmaksızın ticari amaçlarla kopyalanması, çoğaltılması, dağıtılması veya işlenmesi yasaktır.</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">4. Tarafların Hak ve Sorumlulukları</h3>
+
+                <div className="mb-3">
+                  <h4 className="font-medium text-gray-900 mb-1">4.1. İletigo'nun Hak ve Sorumlulukları</h4>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li>İletigo, Site'nin kesintisiz ve hatasız bir şekilde çalışması için azami gayreti gösterecektir. Ancak teknik arızalar, siber saldırılar veya mücbir sebeplerden kaynaklanabilecek kesintilerden sorumlu tutulamaz.</li>
+                    <li>İletigo, Site üzerinden sunulan hizmetlerin içeriğinde ve kullanım koşullarında önceden haber vermeksizin değişiklik yapma hakkını saklı tutar. Yapılan değişiklikler, Site'de yayınlandığı tarihten itibaren geçerli olur.</li>
+                    <li>İletigo, Kullanıcı'nın işbu Sözleşme hükümlerine aykırı davrandığını tespit etmesi halinde, Kullanıcı'nın Site'ye erişimini tek taraflı olarak ve bildirimde bulunmaksızın sonlandırma hakkına sahiptir.</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-1">4.2. Kullanıcı'nın Hak ve Sorumlulukları</h4>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li>Kullanıcı, Site'yi kullanırken verdiği tüm bilgilerin doğru, güncel ve eksiksiz olduğunu kabul ve beyan eder. Bu bilgilerin yanlış veya eksik olmasından doğacak tüm zararlardan Kullanıcı sorumludur.</li>
+                    <li>Varsa, kullanıcı adı ve şifre gibi hesap bilgilerinin güvenliğinden Kullanıcı bizzat sorumludur. Bu bilgilerin üçüncü şahısların eline geçmesi sonucu doğabilecek zararlardan İletigo sorumlu değildir.</li>
+                    <li>Kullanıcı, Site'yi kullanarak gerçekleştirdiği tüm işlemlerin hukuki ve cezai sorumluluğunun kendisine ait olduğunu kabul eder.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">5. Fikri Mülkiyet Hakları</h3>
+                <p>
+                  iletigo.com web sitesinde yer alan her türlü tasarım, metin, görsel, logo, ikon, yazılım, kod ve diğer tüm unsurların mülkiyeti ve telif hakları İletigo'ya aittir. Bu unsurlar, İletigo'nun yazılı izni olmaksızın kopyalanamaz, çoğaltılamaz, değiştirilemez, dağıtılamaz veya başka bir amaçla kullanılamaz.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">6. Sorumluluğun Sınırlandırılması</h3>
+                <p>
+                  İletigo, Site'nin kullanımından veya kullanılamamasından kaynaklanan doğrudan veya dolaylı hiçbir zarardan (veri kaybı, kar kaybı vb.) sorumlu değildir.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">7. Sözleşme Değişiklikleri</h3>
+                <p>
+                  İletigo, işbu Sözleşme'yi ve eklerini, herhangi bir zamanda ve önceden bildirimde bulunmaksızın tek taraflı olarak değiştirme hakkına sahiptir. Değişiklikler Site'de yayınlandığı anda yürürlüğe girer. Kullanıcı, Site'yi kullanmaya devam ederek bu değişiklikleri kabul etmiş sayılır. Sözleşmeyi düzenli olarak gözden geçirmek Kullanıcı'nın sorumluluğundadır.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">8. Mücbir Sebepler</h3>
+                <p>
+                  Doğal afetler, savaş, terör eylemleri, siber saldırılar, mevzuat değişiklikleri, genel salgın hastalıklar ve tarafların kontrolü dışında gelişen benzeri durumlar "mücbir sebep" olarak kabul edilir. Mücbir sebeplerin varlığı halinde tarafların işbu Sözleşme'den doğan yükümlülükleri askıya alınır ve gecikmeden dolayı taraflar sorumlu tutulamaz.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">9. Uygulanacak Hukuk ve Yetkili Mahkeme</h3>
+                <p>
+                  İşbu Sözleşme'nin uygulanmasından ve yorumlanmasından doğacak her türlü uyuşmazlığın çözümünde Türk Hukuku uygulanacaktır. Uyuşmazlıkların çözümünde İstanbul (Çağlayan) Mahkemeleri ve İcra Daireleri yetkilidir.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">10. Yürürlük</h3>
+                <p>
+                  İşbu Sözleşme, Kullanıcı'nın iletigo.com web sitesini ziyaret ettiği ve kullanmaya başladığı andan itibaren yürürlüğe girer ve Site'yi kullanmayı sonlandırmadığı müddetçe yürürlükte kalır.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200">
+              <button
+                onClick={() => setShowTermsModal(false)}
                 className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 Kapat
