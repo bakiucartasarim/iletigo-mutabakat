@@ -8,17 +8,19 @@ export default function RegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
+    companyName: '',
+    description: '',
+    website: '',
+    contactName: '',
+    phone: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    role: 'user'
+    confirmPassword: ''
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -54,9 +56,13 @@ export default function RegisterPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          role: formData.role
+          firstName: formData.contactName.split(' ')[0] || formData.contactName,
+          lastName: formData.contactName.split(' ').slice(1).join(' ') || 'Şirket',
+          role: 'admin',
+          companyName: formData.companyName,
+          description: formData.description,
+          website: formData.website,
+          phone: formData.phone
         })
       })
 
@@ -98,10 +104,10 @@ export default function RegisterPage() {
           </div>
 
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            Hesap Oluştur
+            Şirket Kaydı
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            İletigo Mutabakat Sistemi
+            Şirketinizi sisteme kaydedin ve toplanı yönetiminizi başlatın
           </p>
         </div>
 
@@ -137,107 +143,173 @@ export default function RegisterPage() {
           )}
 
           <div className="space-y-4">
-            {/* Ad Soyad */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Ad
+            {/* Şirket Bilgileri */}
+            <div className="border-b border-gray-200 pb-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
+                <svg className="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Şirket Bilgileri
+              </h3>
+
+              <div className="space-y-4">
+                {/* Şirket Adı */}
+                <div>
+                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Şirket Adı *
+                  </label>
+                  <input
+                    id="companyName"
+                    name="companyName"
+                    type="text"
+                    required
+                    value={formData.companyName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                    placeholder="Örn: Acme Teknoloji A.Ş."
+                  />
+                </div>
+
+                {/* Şirket Açıklaması */}
+                <div>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                    Şirket Açıklaması
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    rows={3}
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                    placeholder="Şirketinizin kısa açıklaması..."
+                  />
+                </div>
+
+                {/* Website */}
+                <div>
+                  <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+                    Website
+                  </label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="url"
+                    value={formData.website}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                    placeholder="https://www.sirketiniz.com"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Şirket Yöneticisi Bilgileri */}
+            <div className="border-b border-gray-200 pb-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
+                <svg className="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Şirket Yöneticisi Bilgileri
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Yönetici Adı Soyadı */}
+                <div>
+                  <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Yönetici Adı Soyadı *
+                  </label>
+                  <input
+                    id="contactName"
+                    name="contactName"
+                    type="text"
+                    required
+                    value={formData.contactName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                    placeholder="Örn: Ahmet Yılmaz"
+                  />
+                </div>
+
+                {/* Telefon */}
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                    Telefon
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                    placeholder="0532 123 45 67"
+                  />
+                </div>
+              </div>
+
+              {/* E-posta Adresi */}
+              <div className="mt-4">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  E-posta Adresi *
                 </label>
                 <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
+                  id="email"
+                  name="email"
+                  type="email"
                   required
-                  value={formData.firstName}
+                  value={formData.email}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                  placeholder="Adınız"
-                />
-              </div>
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Soyad
-                </label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                  placeholder="Soyadınız"
+                  placeholder="ahmet@sirketiniz.com"
                 />
               </div>
             </div>
 
-            {/* E-posta */}
+            {/* Şifre Bilgileri */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                E-posta Adresi
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                placeholder="ornek@email.com"
-              />
-            </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
+                <svg className="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Giriş Bilgileri
+              </h3>
 
-            {/* Şifre */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Şifre
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                placeholder="En az 6 karakter"
-              />
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Şifre */}
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Şifre *
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                    placeholder="En az 6 karakter"
+                  />
+                </div>
 
-            {/* Şifre Tekrar */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Şifre Tekrar
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
-                placeholder="Şifrenizi tekrar girin"
-              />
-            </div>
-
-            {/* Rol */}
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                Rol
-              </label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
-              >
-                <option value="user">Kullanıcı</option>
-                <option value="manager">Yönetici</option>
-                <option value="admin">Admin</option>
-              </select>
+                {/* Şifre Tekrar */}
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                    Şifre Tekrar *
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/80 backdrop-blur-sm"
+                    placeholder="Şifrenizi tekrar girin"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -253,14 +325,14 @@ export default function RegisterPage() {
                   Hesap Oluşturuluyor...
                 </div>
               ) : (
-                'Hesap Oluştur'
+                'Şirketi Kaydet ve Bağlan'
               )}
             </button>
           </div>
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Zaten hesabınız var mı?{' '}
+              Şirketiniz zaten kayıtlı mı?{' '}
               <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200">
                 Giriş Yap
               </Link>
