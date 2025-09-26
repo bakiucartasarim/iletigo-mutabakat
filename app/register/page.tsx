@@ -22,6 +22,7 @@ export default function RegisterPage() {
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type, checked } = e.target
@@ -439,9 +440,14 @@ export default function RegisterPage() {
                     className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   />
                   <label htmlFor="acceptPrivacy" className="ml-3 text-sm text-gray-700">
-                    <span className="text-blue-600 underline cursor-pointer">Gizlilik Politikası</span> kabul ediyorum;
-                    kullanım deneyimimi geliştirebilim için verilerin işlenmesine
-                    ve bu kapsamda yurtiçindeki veya yurtdışındaki kuruluşlara aktarılmak üzere tarafımca onaylanmiş veri veriyorum.
+                    <span
+                      className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                      onClick={() => setShowPrivacyModal(true)}
+                    >
+                      Gizlilik Politikası
+                    </span> kabul ediyorum;
+                    kullanım deneyimimi geliştirebilmek için verilerin işlenmesine
+                    ve bu kapsamda yurtiçindeki veya yurtdışındaki kuruluşlara aktarılmak üzere tarafımca onaylanmış veri veriyorum.
                   </label>
                 </div>
 
@@ -491,6 +497,125 @@ export default function RegisterPage() {
           </div>
         </form>
       </div>
+
+      {/* Gizlilik Politikası Modal */}
+      {showPrivacyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Gizlilik ve Kişisel Verilerin Korunması Politikası
+                </h2>
+                <button
+                  onClick={() => setShowPrivacyModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">Son Güncelleme Tarihi: 27.09.2025</p>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[70vh] text-sm text-gray-700 space-y-4">
+              <p>
+                İletigo Teknoloji Ltd. Şti. ("İletigo" veya "Şirket") olarak, kullanıcılarımızın ve hizmet verdiğimiz kurumsal müşterilerimizin ("Müşteri Firma") verilerinin gizliliğine ve güvenliğine büyük önem veriyoruz. İşbu Gizlilik ve Kişisel Verilerin Korunması Politikası ("Politika"), İletigo'nun iletigo.com web sitesi ("Site") ve sunduğu mutabakat hizmetleri ("Hizmetler") aracılığıyla topladığı kişisel verilerin nasıl işlendiğini, kimlerle paylaşıldığını ve veri sahiplerinin haklarının neler olduğunu açıklamak amacıyla hazırlanmıştır.
+              </p>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">1. Veri Sorumlusu</h3>
+                <p>
+                  İşbu Politika kapsamında kişisel verilerinizin veri sorumlusu, İletigo Teknoloji Ltd. Şti.'dir.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">2. Hangi Kişisel Verileri Topluyoruz?</h3>
+                <p className="mb-3">
+                  Sunduğumuz kurumsal mutabakat hizmetinin doğası gereği, hem hizmetlerimizi kullanan Müşteri Firma yetkililerinin hem de mutabakat süreçlerinde yer alan üçüncü taraf firma yetkililerinin verilerini işleyebiliriz.
+                </p>
+
+                <div className="ml-4">
+                  <h4 className="font-medium mb-2">Kullanıcı ve Müşteri Firma Verileri:</h4>
+                  <ul className="list-disc ml-6 space-y-1">
+                    <li><strong>Kimlik Bilgileri:</strong> Ad, soyadı, T.C. kimlik numarası (gerekli durumlarda)</li>
+                    <li><strong>İletişim Bilgileri:</strong> E-posta adresi, telefon numarası, unvan, firma adı</li>
+                    <li><strong>Hesap Bilgileri:</strong> Kullanıcı adı, şifrelenmiş parola, IP adresi, giriş kayıtları</li>
+                    <li><strong>Finansal Veriler:</strong> Mutabakat süreçlerinin bir parçası olarak yüklenen cari hesap ekstreleri</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">3. Kişisel Verileri Hangi Amaçlarla İşliyoruz?</h3>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Hizmetlerin sunulması ve mutabakat süreçlerinin yürütülmesi</li>
+                  <li>İletişim ve bilgilendirme</li>
+                  <li>Sistem güvenliğinin sağlanması</li>
+                  <li>Yasal yükümlülüklerin yerine getirilmesi</li>
+                  <li>Hizmet iyileştirme ve analiz</li>
+                  <li>Pazarlama faaliyetleri (açık rıza halinde)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">4. Kişisel Verilerin İşlenmesinin Hukuki Sebepleri</h3>
+                <p>
+                  Kişisel verileriniz, 6698 sayılı KVKK'nın 5. ve 6. maddelerinde belirtilen hukuki sebeplere dayanılarak işlenmektedir:
+                </p>
+                <ul className="list-disc ml-6 space-y-1 mt-2">
+                  <li>Sözleşmenin kurulması veya ifası</li>
+                  <li>Hukuki yükümlülüğün yerine getirilmesi</li>
+                  <li>Meşru menfaatler</li>
+                  <li>Kanunlarda açıkça öngörülmesi</li>
+                  <li>Açık rızanızın bulunması</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">5. Veri Sahibinin Hakları</h3>
+                <p className="mb-2">
+                  KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:
+                </p>
+                <ul className="list-disc ml-6 space-y-1">
+                  <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
+                  <li>İşlenme amacını öğrenme</li>
+                  <li>Verilerin aktarıldığı üçüncü kişileri bilme</li>
+                  <li>Eksik veya yanlış işlenmişse düzeltilmesini isteme</li>
+                  <li>Silinmesini veya yok edilmesini isteme</li>
+                  <li>Otomatik sistemlerle analiz edilmesine itiraz etme</li>
+                  <li>Zarara uğramanız halinde tazminat talep etme</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">6. Veri Güvenliği</h3>
+                <p>
+                  İletigo, kişisel verilerinizin güvenliğini sağlamak amacıyla şifreleme, erişim kontrolleri, güvenlik duvarları ve veri yedekleme gibi gerekli tüm teknik ve idari tedbirleri almaktadır.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-2">7. İletişim</h3>
+                <p>
+                  Bu haklarınızı kullanmak için <a href="mailto:info@iletigo.com" className="text-blue-600 underline">info@iletigo.com</a> e-posta adresinden bizimle iletişime geçebilirsiniz.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200">
+              <button
+                onClick={() => setShowPrivacyModal(false)}
+                className="w-full bg-indigo-600 text-white py-3 px-4 rounded-xl hover:bg-indigo-700 transition-colors font-medium"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
