@@ -1,86 +1,99 @@
-import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import pool from '@/lib/db'
+import { NextRequest, NextResponse } from "next/server"
+import { query } from "@/lib/db"
+import bcrypt from "bcryptjs"
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const { companyId, email, password } = await request.json()
 
-    // Validation
-    if (!email || !password) {
+    if (!companyId || !email || !password) {
       return NextResponse.json(
-        { error: 'E-posta ve şifre gereklidir' },
+        { error: "Şirket, e-posta ve şifre gereklidir" },
         { status: 400 }
       )
     }
 
-    // Find user
-    const userResult = await pool.query(
-      'SELECT id, email, password_hash, first_name, last_name, role, is_active FROM users WHERE email = $1',
-      [email.toLowerCase()]
-    )
+    // Önce şirketin varlığını kontrol et
+    const companyQuery = `
+      SELECT id, name FROM companies
+      WHERE id = $1 AND is_active = true
+    `
+    const companyResult = await query(companyQuery, [companyId])
 
-    if (userResult.rows.length === 0) {
+    if (companyResult.rows.length === 0) {
       return NextResponse.json(
-        { error: 'Geçersiz e-posta veya şifre' },
+        { error: "Geçersiz şirket seçimi" },
         { status: 401 }
       )
     }
 
-    const user = userResult.rows[0]
+    // Veritabanından kullanıcıyı bul (şirket ile eşleşen)
+    const userQuery = `
+      SELECT u.id, u.email, u.password_hash, u.first_name, u.last_name,
+             u.role, u.is_active, u.company_id, c.name as company_name
+      FROM users u
+      JOIN companies c ON u.company_id = c.id
+      WHERE u.email = $1 AND u.company_id = $2 AND u.is_active = true AND c.is_active = true
+    `
 
-    // Check if user is active
-    if (!user.is_active) {
+    const result = await query(userQuery, [email, companyId])
+
+    if (result.rows.length === 0) {
       return NextResponse.json(
-        { error: 'Hesap devre dışı bırakılmış' },
+        { error: "Bu şirkette kayıtlı kullanıcı bulunamadı veya şifre hatalı" },
         { status: 401 }
       )
     }
 
-    // Verify password
+    const user = result.rows[0]
+
+    // Şifre doğrulama
     const isValidPassword = await bcrypt.compare(password, user.password_hash)
 
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Geçersiz e-posta veya şifre' },
+        { error: "Bu şirkette kayıtlı kullanıcı bulunamadı veya şifre hatalı" },
         { status: 401 }
       )
     }
 
-    // Create JWT token
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-        role: user.role
-      },
-      process.env.NEXTAUTH_SECRET || 'fallback-secret',
-      { expiresIn: '24h' }
-    )
-
-    // Update last login
-    await pool.query(
-      'UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+    // Son giriş zamanını güncelle
+    await query(
+      "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1",
       [user.id]
     )
 
-    return NextResponse.json({
-      message: 'Giriş başarılı',
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        role: user.role
-      }
+    // Başarılı giriş
+    const response = NextResponse.json(
+      {
+        message: "Giriş başarılı",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          role: user.role,
+          companyId: user.company_id,
+          companyName: user.company_name
+        }
+      },
+      { status: 200 }
+    )
+
+    // Session cookie set
+    response.cookies.set("auth-token", `user-${user.id}-${Date.now()}`, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7 // 7 gün
     })
 
+    return response
+
   } catch (error) {
-    console.error('Login error:', error)
+    console.error("Login error:", error)
     return NextResponse.json(
-      { error: 'Sunucu hatası' },
+      { error: "Sunucu hatası" },
       { status: 500 }
     )
   }

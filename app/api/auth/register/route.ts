@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import pool from '@/lib/db'
+import { query, transaction } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, firstName, lastName, role = 'user' } = await request.json()
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      companyName,
+      description,
+      website,
+      phone,
+      role = 'admin'
+    } = await request.json()
 
     // Validation
-    if (!email || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName || !companyName) {
       return NextResponse.json(
-        { error: 'Tüm alanlar gereklidir' },
+        { error: 'E-posta, şifre, ad, soyad ve şirket adı gereklidir' },
         { status: 400 }
       )
     }
@@ -22,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const existingUser = await pool.query(
+    const existingUser = await query(
       'SELECT id FROM users WHERE email = $1',
       [email.toLowerCase()]
     )
@@ -38,34 +48,62 @@ export async function POST(request: NextRequest) {
     const saltRounds = 12
     const passwordHash = await bcrypt.hash(password, saltRounds)
 
-    // Insert user
-    const result = await pool.query(
-      `INSERT INTO users (email, password_hash, first_name, last_name, role, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-       RETURNING id, email, first_name, last_name, role, created_at`,
-      [email.toLowerCase(), passwordHash, firstName, lastName, role]
-    )
+    // Transaction ile hem şirket hem kullanıcı oluştur
+    const result = await transaction(async (client) => {
+      // Şirket oluştur
+      const companyResult = await client.query(
+        `INSERT INTO companies (code, name, contact_person, email, phone, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+         RETURNING id, code, name, contact_person, email, phone`,
+        [
+          `COMP-${Date.now()}`, // Unique company code
+          companyName,
+          `${firstName} ${lastName}`,
+          email.toLowerCase(),
+          phone || null
+        ]
+      )
 
-    const user = result.rows[0]
+      const company = companyResult.rows[0]
+
+      // Kullanıcı oluştur
+      const userResult = await client.query(
+        `INSERT INTO users (email, password_hash, first_name, last_name, role, company_id, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+         RETURNING id, email, first_name, last_name, role, company_id, created_at`,
+        [email.toLowerCase(), passwordHash, firstName, lastName, role, company.id]
+      )
+
+      const user = userResult.rows[0]
+
+      return { user, company }
+    })
 
     return NextResponse.json({
-      message: 'Kullanıcı başarıyla oluşturuldu',
+      message: 'Şirket ve kullanıcı hesabı başarıyla oluşturuldu',
       user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
-        role: user.role,
-        createdAt: user.created_at
+        id: result.user.id,
+        email: result.user.email,
+        firstName: result.user.first_name,
+        lastName: result.user.last_name,
+        role: result.user.role,
+        companyId: result.user.company_id,
+        createdAt: result.user.created_at
+      },
+      company: {
+        id: result.company.id,
+        code: result.company.code,
+        name: result.company.name,
+        contactPerson: result.company.contact_person,
+        email: result.company.email,
+        phone: result.company.phone
       }
     })
 
   } catch (error) {
     console.error('Registration error:', error)
-    console.error('Error details:', error.message)
-    console.error('Error stack:', error.stack)
     return NextResponse.json(
-      { error: 'Sunucu hatası: ' + error.message },
+      { error: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.' },
       { status: 500 }
     )
   }
