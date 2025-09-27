@@ -22,21 +22,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if company already exists (by email or tax number)
-    const existingCompanyQuery = `
-      SELECT id FROM companies
-      WHERE email = $1 OR (tax_number = $2 AND tax_number IS NOT NULL)
-    `
-    const existingCompany = await query(existingCompanyQuery, [
-      email.toLowerCase(),
-      taxNumber || null
-    ])
+    // Check if company already exists (by email)
+    const existingEmailQuery = `SELECT id FROM companies WHERE email = $1`
+    const existingEmail = await query(existingEmailQuery, [email.toLowerCase()])
 
-    if (existingCompany.rows.length > 0) {
+    if (existingEmail.rows.length > 0) {
       return NextResponse.json(
-        { error: 'Bu e-posta adresi veya vergi numarası zaten kayıtlı' },
+        { error: 'Bu e-posta adresi zaten kayıtlı' },
         { status: 400 }
       )
+    }
+
+    // Check if tax number already exists (only if provided)
+    if (taxNumber && taxNumber.trim() !== '') {
+      const existingTaxQuery = `SELECT id FROM companies WHERE tax_number = $1`
+      const existingTax = await query(existingTaxQuery, [taxNumber.trim()])
+
+      if (existingTax.rows.length > 0) {
+        return NextResponse.json(
+          { error: 'Bu vergi numarası zaten kayıtlı' },
+          { status: 400 }
+        )
+      }
     }
 
     // Şirket oluştur
@@ -46,12 +53,12 @@ export async function POST(request: NextRequest) {
        RETURNING id, name, tax_number, contact_person, email, phone, address, city, country, created_at`,
       [
         companyName,
-        taxNumber || null,
+        (taxNumber && taxNumber.trim() !== '') ? taxNumber.trim() : null,
         contactPerson,
         email.toLowerCase(),
-        phone || null,
-        address || null,
-        city || null,
+        (phone && phone.trim() !== '') ? phone.trim() : null,
+        (address && address.trim() !== '') ? address.trim() : null,
+        (city && city.trim() !== '') ? city.trim() : null,
         country
       ]
     )
@@ -76,8 +83,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Company registration error:', error)
+    console.error('Error details:', error.message)
+    console.error('Error stack:', error.stack)
     return NextResponse.json(
-      { error: 'Şirket kaydı sırasında bir hata oluştu. Lütfen tekrar deneyin.' },
+      { error: 'Şirket kaydı sırasında bir hata oluştu: ' + error.message },
       { status: 500 }
     )
   }
