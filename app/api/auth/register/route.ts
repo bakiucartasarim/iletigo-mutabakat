@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { query } from '@/lib/db'
+import { query, transaction } from '@/lib/db'
+import bcrypt from 'bcryptjs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,22 +9,32 @@ export async function POST(request: NextRequest) {
       taxNumber,
       contactPerson,
       email,
+      password,
       phone,
-      address,
-      city,
-      country = 'Türkiye'
+      address
     } = await request.json()
 
     // Validation
-    if (!companyName || !contactPerson || !email) {
+    if (!companyName || !contactPerson || !email || !password) {
       return NextResponse.json(
-        { error: 'Şirket adı, yetkili kişi ve e-posta gereklidir' },
+        { error: 'Şirket adı, yetkili kişi, e-posta ve şifre gereklidir' },
         { status: 400 }
       )
     }
 
-    // Check if company already exists (by email)
-    const existingEmailQuery = `SELECT id FROM companies WHERE email = $1`
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: 'Şifre en az 6 karakter olmalıdır' },
+        { status: 400 }
+      )
+    }
+
+    // Check if email already exists (both companies and users)
+    const existingEmailQuery = `
+      SELECT 'company' as type FROM companies WHERE email = $1
+      UNION
+      SELECT 'user' as type FROM users WHERE email = $1
+    `
     const existingEmail = await query(existingEmailQuery, [email.toLowerCase()])
 
     if (existingEmail.rows.length > 0) {
@@ -46,20 +57,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Şirket oluştur
+    // Hash password
+    const saltRounds = 12
+    const passwordHash = await bcrypt.hash(password, saltRounds)
+
+    // Şirket oluştur (şifreyi de companies tablosuna ekleyelim geçici olarak)
+    const companyCode = `COMP-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`
+
     const companyResult = await query(
-      `INSERT INTO companies (name, tax_number, contact_person, email, phone, address, city, country, created_at, updated_at)
+      `INSERT INTO companies (code, name, tax_number, contact_person, email, phone, address, password_hash, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-       RETURNING id, name, tax_number, contact_person, email, phone, address, city, country, created_at`,
+       RETURNING id, code, name, tax_number, contact_person, email, phone, address, created_at`,
       [
+        companyCode,
         companyName,
         (taxNumber && taxNumber.trim() !== '') ? taxNumber.trim() : null,
         contactPerson,
         email.toLowerCase(),
         (phone && phone.trim() !== '') ? phone.trim() : null,
         (address && address.trim() !== '') ? address.trim() : null,
-        (city && city.trim() !== '') ? city.trim() : null,
-        country
+        passwordHash
       ]
     )
 
@@ -69,14 +86,13 @@ export async function POST(request: NextRequest) {
       message: 'Şirket başarıyla kaydedildi',
       company: {
         id: company.id,
+        code: company.code,
         name: company.name,
         taxNumber: company.tax_number,
         contactPerson: company.contact_person,
         email: company.email,
         phone: company.phone,
         address: company.address,
-        city: company.city,
-        country: company.country,
         createdAt: company.created_at
       }
     })

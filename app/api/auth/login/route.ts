@@ -13,18 +13,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // E-mail adresinden kullanıcıyı ve şirketini bul
+    console.log('Login attempt for email:', email)
+
+    // E-mail adresinden şirketi bul (geçici çözüm: companies tablosundan giriş)
     const userQuery = `
-      SELECT u.id, u.email, u.password_hash, u.first_name, u.last_name,
-             u.role, u.is_active, u.company_id, c.name as company_name
-      FROM users u
-      JOIN companies c ON u.company_id = c.id
-      WHERE u.email = $1 AND u.is_active = true AND c.is_active = true
+      SELECT id, email, password_hash, contact_person as first_name,
+             name as company_name, 'admin' as role, is_active
+      FROM companies
+      WHERE email = $1 AND is_active = true
     `
 
     const result = await query(userQuery, [email])
+    console.log('User query result:', result.rows.length, 'rows found')
 
     if (result.rows.length === 0) {
+      console.log('No user found with email:', email)
       return NextResponse.json(
         { error: "E-posta veya şifre hatalı" },
         { status: 401 }
@@ -32,20 +35,24 @@ export async function POST(request: NextRequest) {
     }
 
     const user = result.rows[0]
+    console.log('Company found:', { id: user.id, email: user.email, company_name: user.company_name })
 
     // Şifre doğrulama
+    console.log('Comparing password with hash...')
     const isValidPassword = await bcrypt.compare(password, user.password_hash)
+    console.log('Password validation result:', isValidPassword)
 
     if (!isValidPassword) {
+      console.log('Password validation failed for user:', user.email)
       return NextResponse.json(
         { error: "E-posta veya şifre hatalı" },
         { status: 401 }
       )
     }
 
-    // Son giriş zamanını güncelle
+    // Son giriş zamanını güncelle (companies tablosuna ekleyelim)
     await query(
-      "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1",
+      "UPDATE companies SET updated_at = CURRENT_TIMESTAMP WHERE id = $1",
       [user.id]
     )
 
@@ -57,9 +64,9 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
           firstName: user.first_name,
-          lastName: user.last_name,
+          lastName: '',
           role: user.role,
-          companyId: user.company_id,
+          companyId: user.id,
           companyName: user.company_name
         }
       },

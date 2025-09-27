@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(20),
     role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'manager', 'user')),
     department VARCHAR(100),
+    company_id INTEGER REFERENCES companies(id),
     is_active BOOLEAN DEFAULT true,
     email_verified BOOLEAN DEFAULT false,
     last_login TIMESTAMP,
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- 2. Şirketler/Kurumlar Tablosu
 CREATE TABLE IF NOT EXISTS companies (
     id SERIAL PRIMARY KEY,
+    code VARCHAR(255) UNIQUE,
     name VARCHAR(255) NOT NULL,
     tax_number VARCHAR(50) UNIQUE,
     address TEXT,
@@ -28,6 +30,7 @@ CREATE TABLE IF NOT EXISTS companies (
     phone VARCHAR(20),
     email VARCHAR(255),
     contact_person VARCHAR(255),
+    password_hash VARCHAR(255),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

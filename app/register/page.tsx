@@ -13,9 +13,9 @@ export default function RegisterPage() {
     contactPerson: '',
     phone: '',
     email: '',
+    password: '',
+    confirmPassword: '',
     address: '',
-    city: '',
-    country: 'Türkiye',
     acceptTerms: false,
     acceptPrivacy: false,
     acceptMarketing: false
@@ -40,6 +40,18 @@ export default function RegisterPage() {
     setSuccess('')
 
     // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Şifreler eşleşmiyor')
+      setLoading(false)
+      return
+    }
+
+    if (formData.password.length < 6) {
+      setError('Şifre en az 6 karakter olmalıdır')
+      setLoading(false)
+      return
+    }
+
     if (!formData.acceptTerms) {
       setError('Kullanıcı sözleşmesini kabul etmelisiniz')
       setLoading(false)
@@ -63,17 +75,16 @@ export default function RegisterPage() {
           taxNumber: formData.taxNumber,
           contactPerson: formData.contactPerson,
           email: formData.email,
+          password: formData.password,
           phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          country: formData.country
+          address: formData.address
         })
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        setSuccess('Şirket başarıyla kaydedildi! Giriş sayfasına yönlendiriliyorsunuz...')
+        setSuccess('Şirket ve kullanıcı hesabı başarıyla oluşturuldu! Giriş sayfasına yönlendiriliyorsunuz...')
         setTimeout(() => {
           router.push('/login')
         }, 2000)
@@ -204,6 +215,35 @@ export default function RegisterPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">Şifre *</label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="En az 6 karakter"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Şifre Tekrar *</label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Şifrenizi tekrar girin"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="address" className="block text-sm font-medium text-gray-700">Adres</label>
                 <input
@@ -215,33 +255,6 @@ export default function RegisterPage() {
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Şirket adresi"
                 />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">Şehir</label>
-                  <input
-                    id="city"
-                    name="city"
-                    type="text"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="İstanbul"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="country" className="block text-sm font-medium text-gray-700">Ülke</label>
-                  <input
-                    id="country"
-                    name="country"
-                    type="text"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Türkiye"
-                  />
-                </div>
               </div>
             </div>
 
