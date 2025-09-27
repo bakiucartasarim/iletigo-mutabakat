@@ -62,7 +62,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
         <div 
@@ -77,12 +77,8 @@ export default function DashboardLayout({
           {/* Logo */}
           <div className="flex items-center px-6 py-4 border-b border-gray-200/50">
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <div className="absolute top-1.5 left-1.5 w-1 h-1 bg-white rounded-full opacity-80"></div>
-                <div className="absolute top-1.5 right-1.5 w-1 h-1 bg-white rounded-full opacity-80"></div>
-                <div className="absolute bottom-1.5 left-1.5 w-1 h-1 bg-white rounded-full opacity-80"></div>
-                <div className="absolute bottom-1.5 right-1.5 w-1 h-1 bg-white rounded-full opacity-80"></div>
-                <svg className="w-5 h-5 text-white z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -102,10 +98,10 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                        : 'text-gray-700 hover:bg-white/50 hover:text-indigo-600'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                     }`}
                   >
                     <span className="text-lg mr-3">{item.icon}</span>
@@ -119,7 +115,7 @@ export default function DashboardLayout({
           {/* User Info */}
           <div className="p-4 border-t border-gray-200/50">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                 {user?.first_name?.[0]}{user?.last_name?.[0]}
               </div>
               <div>
@@ -131,7 +127,7 @@ export default function DashboardLayout({
             </div>
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 text-sm text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-full px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 shadow-sm"
             >
               Çıkış Yap
             </button>
@@ -148,7 +144,7 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200/50">
             <div className="flex items-center">
               <div className="relative">
-                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -179,10 +175,10 @@ export default function DashboardLayout({
                     key={item.name}
                     href={item.href}
                     onClick={closeMobileMenu}
-                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                        : 'text-gray-700 hover:bg-white/50 hover:text-indigo-600'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
                     }`}
                   >
                     <span className="text-lg mr-3">{item.icon}</span>
@@ -196,7 +192,7 @@ export default function DashboardLayout({
           {/* Mobile User Info */}
           <div className="p-4 border-t border-gray-200/50">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                 {user?.first_name?.[0]}{user?.last_name?.[0]}
               </div>
               <div className="flex-1 min-w-0">
@@ -208,7 +204,7 @@ export default function DashboardLayout({
             </div>
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 text-sm text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="w-full px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 shadow-sm"
             >
               Çıkış Yap
             </button>
@@ -243,7 +239,7 @@ export default function DashboardLayout({
 
             {/* Mobile User Avatar */}
             <div className="lg:hidden">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                 {user?.first_name?.[0]}{user?.last_name?.[0]}
               </div>
             </div>
