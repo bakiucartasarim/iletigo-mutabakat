@@ -9,13 +9,13 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     companyName: '',
-    description: '',
-    website: '',
-    contactName: '',
+    taxNumber: '',
+    contactPerson: '',
     phone: '',
     email: '',
-    password: '',
-    confirmPassword: '',
+    address: '',
+    city: '',
+    country: 'Türkiye',
     acceptTerms: false,
     acceptPrivacy: false,
     acceptMarketing: false
@@ -40,18 +40,6 @@ export default function RegisterPage() {
     setSuccess('')
 
     // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Şifreler eşleşmiyor')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('Şifre en az 6 karakter olmalıdır')
-      setLoading(false)
-      return
-    }
-
     if (!formData.acceptTerms) {
       setError('Kullanıcı sözleşmesini kabul etmelisiniz')
       setLoading(false)
@@ -71,24 +59,23 @@ export default function RegisterPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          firstName: formData.contactName.split(' ')[0] || formData.contactName,
-          lastName: formData.contactName.split(' ').slice(1).join(' ') || 'Şirket',
-          role: 'admin',
           companyName: formData.companyName,
-          description: formData.description,
-          website: formData.website,
-          phone: formData.phone
+          taxNumber: formData.taxNumber,
+          contactPerson: formData.contactPerson,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          country: formData.country
         })
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        setSuccess('Hesap başarıyla oluşturuldu! Giriş sayfasına yönlendiriliyorsunuz...')
+        setSuccess('Şirket başarıyla kaydedildi! Giriş sayfasına yönlendiriliyorsunuz...')
         setTimeout(() => {
-          router.push('/')
+          router.push('/login')
         }, 2000)
       } else {
         setError(data.error || 'Bir hata oluştu')
@@ -140,7 +127,7 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Tek sütun kompakt form */}
+            {/* Şirket bilgileri formu */}
             <div className="space-y-3">
               <div>
                 <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Şirket Adı *</label>
@@ -158,16 +145,44 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="contactName" className="block text-sm font-medium text-gray-700">Yönetici Adı Soyadı *</label>
+                  <label htmlFor="taxNumber" className="block text-sm font-medium text-gray-700">Vergi Numarası</label>
                   <input
-                    id="contactName"
-                    name="contactName"
+                    id="taxNumber"
+                    name="taxNumber"
+                    type="text"
+                    value={formData.taxNumber}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="12345678901"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700">Yetkili Kişi *</label>
+                  <input
+                    id="contactPerson"
+                    name="contactPerson"
                     type="text"
                     required
-                    value={formData.contactName}
+                    value={formData.contactPerson}
                     onChange={handleInputChange}
                     className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Örn: Ahmet Yılmaz"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-posta Adresi *</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="ahmet@sirketiniz.com"
                   />
                 </div>
                 <div>
@@ -190,44 +205,41 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-posta Adresi *</label>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">Adres</label>
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
+                  id="address"
+                  name="address"
+                  type="text"
+                  value={formData.address}
                   onChange={handleInputChange}
                   className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="ahmet@sirketiniz.com"
+                  placeholder="Şirket adresi"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">Şifre *</label>
+                  <label htmlFor="city" className="block text-sm font-medium text-gray-700">Şehir</label>
                   <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    value={formData.password}
+                    id="city"
+                    name="city"
+                    type="text"
+                    value={formData.city}
                     onChange={handleInputChange}
                     className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="En az 6 karakter"
+                    placeholder="İstanbul"
                   />
                 </div>
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Şifre Tekrar *</label>
+                  <label htmlFor="country" className="block text-sm font-medium text-gray-700">Ülke</label>
                   <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    required
-                    value={formData.confirmPassword}
+                    id="country"
+                    name="country"
+                    type="text"
+                    value={formData.country}
                     onChange={handleInputChange}
                     className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Şifrenizi tekrar girin"
+                    placeholder="Türkiye"
                   />
                 </div>
               </div>
