@@ -1,46 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-
-interface Company {
-  id: number
-  name: string
-  tax_number: string
-  city: string
-}
 
 export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [companies, setCompanies] = useState<Company[]>([])
   const [formData, setFormData] = useState({
-    companyId: '',
     email: '',
     password: '',
     rememberMe: false
   })
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await fetch('/api/companies')
-        const data = await response.json()
-        if (response.ok) {
-          setCompanies(data.companies)
-        }
-      } catch (error) {
-        console.error('Companies fetch error:', error)
-      }
-    }
-    fetchCompanies()
-  }, [])
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
-    const checked = (e.target as HTMLInputElement).checked
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -59,7 +34,6 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          companyId: formData.companyId,
           email: formData.email,
           password: formData.password
         })
@@ -118,25 +92,6 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="companyId" className="block text-sm font-medium text-gray-700">Şirket Seçimi</label>
-                <select
-                  id="companyId"
-                  name="companyId"
-                  required
-                  value={formData.companyId}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  <option value="">Şirket seçiniz...</option>
-                  {companies.map((company) => (
-                    <option key={company.id} value={company.id}>
-                      {company.name} {company.city && `- ${company.city}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-posta Adresi</label>
                 <input

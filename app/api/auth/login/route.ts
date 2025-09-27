@@ -4,43 +4,29 @@ import bcrypt from "bcryptjs"
 
 export async function POST(request: NextRequest) {
   try {
-    const { companyId, email, password } = await request.json()
+    const { email, password } = await request.json()
 
-    if (!companyId || !email || !password) {
+    if (!email || !password) {
       return NextResponse.json(
-        { error: "Şirket, e-posta ve şifre gereklidir" },
+        { error: "E-posta ve şifre gereklidir" },
         { status: 400 }
       )
     }
 
-    // Önce şirketin varlığını kontrol et
-    const companyQuery = `
-      SELECT id, name FROM companies
-      WHERE id = $1 AND is_active = true
-    `
-    const companyResult = await query(companyQuery, [companyId])
-
-    if (companyResult.rows.length === 0) {
-      return NextResponse.json(
-        { error: "Geçersiz şirket seçimi" },
-        { status: 401 }
-      )
-    }
-
-    // Veritabanından kullanıcıyı bul (şirket ile eşleşen)
+    // E-mail adresinden kullanıcıyı ve şirketini bul
     const userQuery = `
       SELECT u.id, u.email, u.password_hash, u.first_name, u.last_name,
              u.role, u.is_active, u.company_id, c.name as company_name
       FROM users u
       JOIN companies c ON u.company_id = c.id
-      WHERE u.email = $1 AND u.company_id = $2 AND u.is_active = true AND c.is_active = true
+      WHERE u.email = $1 AND u.is_active = true AND c.is_active = true
     `
 
-    const result = await query(userQuery, [email, companyId])
+    const result = await query(userQuery, [email])
 
     if (result.rows.length === 0) {
       return NextResponse.json(
-        { error: "Bu şirkette kayıtlı kullanıcı bulunamadı veya şifre hatalı" },
+        { error: "E-posta veya şifre hatalı" },
         { status: 401 }
       )
     }
@@ -52,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: "Bu şirkette kayıtlı kullanıcı bulunamadı veya şifre hatalı" },
+        { error: "E-posta veya şifre hatalı" },
         { status: 401 }
       )
     }
