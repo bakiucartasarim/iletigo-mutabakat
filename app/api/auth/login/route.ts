@@ -74,7 +74,9 @@ export async function POST(request: NextRequest) {
     )
 
     // Session cookie set
-    response.cookies.set("auth-token", `user-${user.id}-${Date.now()}`, {
+    const authToken = `user-${user.id}-${Date.now()}`
+    console.log('Setting auth token:', authToken)
+    response.cookies.set("auth-token", authToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

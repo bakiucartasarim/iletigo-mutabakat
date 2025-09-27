@@ -42,6 +42,7 @@ export default function LoginPage() {
       const data = await response.json()
 
       if (response.ok) {
+        console.log('Login successful, redirecting to dashboard...')
         // Redirect to dashboard
         router.push('/dashboard')
       } else {

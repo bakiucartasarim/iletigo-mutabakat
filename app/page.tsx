@@ -91,9 +91,9 @@ export default function HomePage() {
                   <Link href="/register" className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-all duration-200 text-center shadow-lg hover:shadow-xl">
                     Ücretsiz Deneyin
                   </Link>
-                  <button className="w-full sm:w-auto border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-50 transition-all duration-200 text-center">
+                  <Link href="/login" className="w-full sm:w-auto border-2 border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-50 transition-all duration-200 text-center">
                     Demoyu İzleyin
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

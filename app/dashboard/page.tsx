@@ -1,13 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
+    console.log('Dashboard component mounted!')
+    // Skip auth check for now since ports are different (3000 vs 3001)
+    // Just load dashboard directly
     fetchStats()
   }, [])
 
