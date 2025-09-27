@@ -115,19 +115,16 @@ export default function DashboardLayout({
           {/* User Info */}
           <div className="p-4 border-t border-gray-200/50">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                {user?.first_name?.[0]}{user?.last_name?.[0]}
-              </div>
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {user?.first_name} {user?.last_name}
+                  Admin User
                 </p>
-                <p className="text-xs text-gray-600 capitalize">{user?.role}</p>
+                <p className="text-xs text-gray-600">Yönetici</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 shadow-sm"
+              className="w-full px-4 py-2 text-sm text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 shadow-sm"
             >
               Çıkış Yap
             </button>
@@ -192,19 +189,16 @@ export default function DashboardLayout({
           {/* Mobile User Info */}
           <div className="p-4 border-t border-gray-200/50">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                {user?.first_name?.[0]}{user?.last_name?.[0]}
-              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.first_name} {user?.last_name}
+                  Admin User
                 </p>
-                <p className="text-xs text-gray-600 capitalize">{user?.role}</p>
+                <p className="text-xs text-gray-600">Yönetici</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200 shadow-sm"
+              className="w-full px-4 py-2 text-sm text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-all duration-200 shadow-sm"
             >
               Çıkış Yap
             </button>
@@ -230,28 +224,30 @@ export default function DashboardLayout({
             {/* Page Title */}
             <div className="flex-1 lg:flex-none ml-4 lg:ml-0">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">
-                {navigation.find(item => item.href === pathname)?.name || 'Dashboard'}
+                {navigation.find(item => item.href === pathname)?.name || 'Ana Sayfa'}
               </h2>
-              <p className="text-sm text-gray-600 hidden sm:block">
-                Hoş geldiniz, {user?.first_name}
-              </p>
             </div>
 
-            {/* Mobile User Avatar */}
-            <div className="lg:hidden">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                {user?.first_name?.[0]}{user?.last_name?.[0]}
+            {/* Company and User Info */}
+            <div className="flex items-center space-x-4">
+              <div className="text-right text-xs hidden sm:block">
+                <p className="font-semibold">İletigo Mutabakat Şirketi A.Ş. <span className="text-blue-600">▼</span></p>
+                <p className="text-gray-600">Vergi No: 1234567890 - Şirket Yetkilisi / Admin / Subscriber</p>
               </div>
-            </div>
-
-            {/* Desktop Date */}
-            <div className="hidden lg:flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
-                {new Date().toLocaleDateString('tr-TR', { 
-                  day: 'numeric', 
-                  month: 'long', 
-                  year: 'numeric' 
-                })}
+              <div className="flex items-center space-x-2">
+                <a className="flex items-center text-gray-600 hover:text-blue-600" href="#">
+                  <span className="text-sm">🇹🇷</span>
+                  <span className="text-sm ml-1 hidden sm:inline">TR</span>
+                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </a>
+                <a className="flex items-center text-gray-600 hover:text-blue-600" href="#">
+                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold mr-1">
+                    A
+                  </div>
+                  <span className="text-sm hidden sm:inline">Admin User</span>
+                </a>
               </div>
             </div>
           </div>
