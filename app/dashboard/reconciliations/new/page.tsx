@@ -629,51 +629,19 @@ export default function NewReconciliationPage() {
           {/* Step 2: Mutabakat Dosyası */}
           {currentStep === 2 && (
             <>
-              {/* File Upload Section - Smaller */}
-              <div className="bg-green-50 border-2 border-dashed border-green-300 rounded-lg p-6 max-w-2xl mx-auto">
-                <div className="text-center">
-                  <svg className="mx-auto h-8 w-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" />
-                  </svg>
-                  <div className="mt-3">
-                    <label htmlFor="excel-file" className="cursor-pointer">
-                      <span className="mt-2 block text-sm font-medium text-gray-900">
-                        Excel dosyasını buraya sürükleyin veya seçin
-                      </span>
-                      <input
-                        id="excel-file"
-                        name="excel-file"
-                        type="file"
-                        className="sr-only"
-                        accept=".xlsx,.xls,.csv"
-                        onChange={handleFileUpload}
-                      />
-                      <span className="mt-1 block text-xs text-gray-500">
-                        .xlsx, .xls veya .csv formatında dosya yükleyin
-                      </span>
-                    </label>
-                  </div>
-                  <div className="mt-4 flex justify-center space-x-3">
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors text-sm"
-                      onClick={() => document.getElementById('excel-file')?.click()}
-                    >
-                      Dosya Seç
-                    </button>
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors text-sm"
-                      onClick={() => downloadSampleExcel()}
-                    >
-                      Örnek Excel Dosyası İndir
-                    </button>
-                  </div>
-                </div>
-              </div>
+
+              {/* Hidden file input */}
+              <input
+                id="excel-file"
+                name="excel-file"
+                type="file"
+                className="sr-only"
+                accept=".xlsx,.xls,.csv"
+                onChange={handleFileUpload}
+              />
 
               {/* Data Table */}
-              {excelData.length > 0 && (
+              {(
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                   <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900">Mutabakat Dosyası</h3>
@@ -703,7 +671,7 @@ export default function NewReconciliationPage() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {excelData.map((row, index) => (
+                        {excelData.length > 0 ? excelData.map((row, index) => (
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.siraNo}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.cariHesapKodu}</td>
@@ -720,7 +688,13 @@ export default function NewReconciliationPage() {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.kep}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{row.hata}</td>
                           </tr>
-                        ))}
+                        )) : (
+                          <tr>
+                            <td colSpan={14} className="px-6 py-8 text-center text-sm text-gray-500">
+                              Dosya yüklendiğinde veriler burada görüntülenecektir.
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
