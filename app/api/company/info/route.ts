@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     // Get company information
     const companyQuery = `
-      SELECT id, name, email, tax_number, contact_person, phone, address, is_active
+      SELECT id, name, email, tax_number, contact_person, phone, address, website, description, is_active
       FROM companies
       WHERE id = $1 AND is_active = true
     `
@@ -53,6 +53,8 @@ export async function GET(request: NextRequest) {
       contact_person: company.contact_person,
       phone: company.phone,
       address: company.address,
+      website: company.website,
+      description: company.description,
       is_active: company.is_active
     })
 
