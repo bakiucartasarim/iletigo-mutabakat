@@ -177,8 +177,7 @@ export default function NewReconciliationPage() {
         'Vergi Dairesi': 'Boğaziçi Kurumlar',
         'Vergi No': '9199999992',
         'Fax Numarası': '222222222',
-        'İlgili Kişi e-posta adresi': 'acelanten+test333@gmail.com',
-        'KEP': '',
+        'E-posta': 'acelanten+test333@gmail.com',
         'Hata': ''
       },
       {
@@ -193,8 +192,7 @@ export default function NewReconciliationPage() {
         'Vergi Dairesi': 'İstanbul Kurumlar',
         'Vergi No': '1234567890',
         'Fax Numarası': '111111111',
-        'İlgili Kişi e-posta adresi': 'ornek@firma.com',
-        'KEP': '',
+        'E-posta': 'ornek@firma.com',
         'Hata': ''
       }
     ]
@@ -646,8 +644,8 @@ export default function NewReconciliationPage() {
                   <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900">Mutabakat Dosyası</h3>
                     <div className="mt-2 flex space-x-4">
-                      <button className="text-blue-600 hover:text-blue-800 font-medium" onClick={() => document.getElementById('excel-file')?.click()}>Dosya Seç</button>
-                      <button className="text-green-600 hover:text-green-800 font-medium" onClick={() => downloadSampleExcel()}>Örnek Excel Dosyası İndir</button>
+                      <button type="button" className="text-blue-600 hover:text-blue-800 font-medium" onClick={() => document.getElementById('excel-file')?.click()}>Dosya Seç</button>
+                      <button type="button" className="text-green-600 hover:text-green-800 font-medium" onClick={() => downloadSampleExcel()}>Örnek Excel Dosyası İndir</button>
                     </div>
                   </div>
                   <div className="overflow-x-auto">
@@ -665,8 +663,7 @@ export default function NewReconciliationPage() {
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vergi Dairesi</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vergi No</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fax Numarası</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İlgili Kişi e-posta adresi</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KEP</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-posta</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hata</th>
                         </tr>
                       </thead>
@@ -685,23 +682,17 @@ export default function NewReconciliationPage() {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.vergiNo}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.faxNumarasi}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">{row.ilgiliKisiEposta}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.kep}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{row.hata}</td>
                           </tr>
                         )) : (
                           <tr>
-                            <td colSpan={14} className="px-6 py-8 text-center text-sm text-gray-500">
+                            <td colSpan={13} className="px-6 py-8 text-center text-sm text-gray-500">
                               Dosya yüklendiğinde veriler burada görüntülenecektir.
                             </td>
                           </tr>
                         )}
                       </tbody>
                     </table>
-                  </div>
-                  <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                      DOSYAYI İNDİR
-                    </button>
                   </div>
                 </div>
               )}
