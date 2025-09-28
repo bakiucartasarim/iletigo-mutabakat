@@ -31,7 +31,9 @@ export async function PUT(request: NextRequest) {
       address,
       contact_person,
       website,
-      description
+      description,
+      logo_url,
+      stamp_url
     } = await request.json()
 
     // Validate required fields
@@ -88,9 +90,11 @@ export async function PUT(request: NextRequest) {
            contact_person = $6,
            website = $7,
            description = $8,
+           logo_url = $9,
+           stamp_url = $10,
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $9`,
-      [name, tax_number, email, phone, address, contact_person, website, description, companyId]
+       WHERE id = $11`,
+      [name, tax_number, email, phone, address, contact_person, website, description, logo_url || '', stamp_url || '', companyId]
     )
 
     return NextResponse.json(
