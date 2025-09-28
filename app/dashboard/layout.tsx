@@ -11,6 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const [user, setUser] = useState<any>(null)
+  const [company, setCompany] = useState<any>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const router = useRouter()
@@ -26,7 +27,43 @@ export default function DashboardLayout({
       name: 'Dashboard User',
       email: 'user@example.com'
     })
+
+    // Fetch company info
+    fetchCompanyInfo()
   }, [router])
+
+  const fetchCompanyInfo = async () => {
+    try {
+      const response = await fetch('/api/auth/verify')
+      if (response.ok) {
+        const data = await response.json()
+        // Get company info from companies table
+        const companyResponse = await fetch('/api/company/info')
+        if (companyResponse.ok) {
+          const companyData = await companyResponse.json()
+          setCompany(companyData)
+          setUser({
+            name: companyData.contact_person || 'Admin User',
+            email: companyData.email,
+            role: 'Şirket Yetkilisi'
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching company info:', error)
+      // Set default values on error
+      setCompany({
+        name: 'İletigo Mutabakat Şirketi A.Ş.',
+        tax_number: '1234567890',
+        contact_person: 'Admin User'
+      })
+      setUser({
+        name: 'Admin User',
+        email: 'user@example.com',
+        role: 'Şirket Yetkilisi'
+      })
+    }
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -270,8 +307,8 @@ export default function DashboardLayout({
             {/* Company and User Info */}
             <div className="flex items-center space-x-4">
               <div className="text-right text-xs hidden sm:block">
-                <p className="font-semibold">İletigo Mutabakat Şirketi A.Ş. <span className="text-blue-600">▼</span></p>
-                <p className="text-gray-600">Vergi No: 1234567890 - Şirket Yetkilisi / Admin / Subscriber</p>
+                <p className="font-semibold">{company?.name || 'İletigo Mutabakat Şirketi A.Ş.'} <span className="text-blue-600">▼</span></p>
+                <p className="text-gray-600">Vergi No: {company?.tax_number || '1234567890'} - {user?.role || 'Şirket Yetkilisi'} / {user?.name || 'Admin User'} / Subscriber</p>
               </div>
               <div className="flex items-center space-x-2">
                 <a className="flex items-center text-gray-600 hover:text-blue-600" href="#">
