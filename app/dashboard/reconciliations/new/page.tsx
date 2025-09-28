@@ -209,66 +209,56 @@ export default function NewReconciliationPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      // Mock Excel data - Bu gerçek uygulamada Excel parsing kütüphanesi ile yapılacak
-      const mockData = [
-        {
-          siraNo: 2,
-          cariHesapKodu: "KM_01",
-          cariHesapAdi: "KM_01 Test Cari",
-          sube: "Müşteri",
-          tutar: 1000,
-          birim: "TRL",
-          borcAlacak: "ALACAK",
-          vergiDairesi: "Kadıköy",
-          vergiNo: "7999919985",
-          faksNumarasi: "2123120000",
-          ilgiliKisiEposta: "test@kolaymuhasebat.com",
-          notlar: "Sil"
-        },
-        {
-          siraNo: 3,
-          cariHesapKodu: "KM_01",
-          cariHesapAdi: "KM_01 Test Cari",
-          sube: "Müşteri",
-          tutar: 7845,
-          birim: "USD",
-          borcAlacak: "BORÇ",
-          vergiDairesi: "Kadıköy",
-          vergiNo: "7999919985",
-          faksNumarasi: "2123120000",
-          ilgiliKisiEposta: "soru.koc@kolaymuhasebat.com",
-          notlar: "Sil"
-        },
-        {
-          siraNo: 4,
-          cariHesapKodu: "KM_07",
-          cariHesapAdi: "KM_07 Test Cari",
-          sube: "Müşteri",
-          tutar: 7300,
-          birim: "TRY",
-          borcAlacak: "BORÇ",
-          vergiDairesi: "",
-          vergiNo: "5123440001",
-          faksNumarasi: "",
-          ilgiliKisiEposta: "muhasebat@kolay0test.com",
-          notlar: "Sil"
-        },
-        {
-          siraNo: 5,
-          cariHesapKodu: "KM_05",
-          cariHesapAdi: "KM_05 Test Cari",
-          sube: "Müşteri",
-          tutar: 8000,
-          birim: "EUR",
-          borcAlacak: "BORÇ",
-          vergiDairesi: "Kadıköy",
-          vergiNo: "8100002233",
-          faksNumarasi: "",
-          ilgiliKisiEposta: "muhasebat@km05test.com",
-          notlar: "Sil"
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        try {
+          const data = event.target?.result
+          const workbook = XLSX.read(data, { type: 'binary' })
+          const sheetName = workbook.SheetNames[0]
+          const worksheet = workbook.Sheets[sheetName]
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 })
+
+          // Skip header row and process data
+          const rows = jsonData.slice(1) as any[][]
+          const processedData = rows.map((row, index) => {
+            // Validate and process each row
+            const rowData = {
+              siraNo: row[0] || index + 1,
+              cariHesapKodu: row[1] || '',
+              cariHesapAdi: row[2] || '',
+              sube: row[3] || '',
+              cariHesapTuru: row[4] || '',
+              tutar: row[5] || '',
+              birim: row[6] || '',
+              borcAlacak: row[7] || '',
+              vergiDairesi: row[8] || '',
+              vergiNo: row[9] || '',
+              faxNumarasi: row[10] || '',
+              ilgiliKisiEposta: row[11] || '',
+              hata: ''
+            }
+
+            // Basic validation
+            if (!rowData.cariHesapKodu) {
+              rowData.hata = 'Cari hesap kodu gerekli'
+            } else if (!rowData.cariHesapAdi) {
+              rowData.hata = 'Cari hesap adı gerekli'
+            } else if (!rowData.tutar) {
+              rowData.hata = 'Tutar gerekli'
+            } else if (rowData.ilgiliKisiEposta && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rowData.ilgiliKisiEposta)) {
+              rowData.hata = 'Geçersiz e-posta formatı'
+            }
+
+            return rowData
+          }).filter(row => row.cariHesapKodu) // Filter out completely empty rows
+
+          setExcelData(processedData)
+        } catch (error) {
+          console.error('Excel dosyası işlenirken hata:', error)
+          alert('Excel dosyası işlenirken hata oluştu. Lütfen dosya formatını kontrol edin.')
         }
-      ]
-      setExcelData(mockData)
+      }
+      reader.readAsBinaryString(file)
     }
   }
 
