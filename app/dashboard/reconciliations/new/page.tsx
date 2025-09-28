@@ -20,6 +20,7 @@ export default function NewReconciliationPage() {
   const [successMessage, setSuccessMessage] = useState('')
   const [currentStep, setCurrentStep] = useState(1) // Progress step indicator
   const [excelData, setExcelData] = useState<any[]>([]) // Excel data storage
+  const [isReminderDropdownOpen, setIsReminderDropdownOpen] = useState(false)
   const [formData, setFormData] = useState({
     company_code: '',
     company_name: '',
@@ -36,20 +37,17 @@ export default function NewReconciliationPage() {
     due_date: '',
     reconciliation_date: new Date().toISOString().split('T')[0],
     // Yeni alanlar HTML'e uygun olarak
-    reconciliation_period: '',
-    end_date: '',
+    reconciliation_period: new Date().toISOString().split('T')[0],
+    end_date: new Date().toISOString().split('T')[0],
     related_type: 'cari_hesap_bakiye',
-    reminder_days: 'pazartesi_sali_cuma',
+    reminder_days: [],
     sender_branch: 'merkez',
     language: 'tr',
     template: 'cari_mutabakat_tr',
     // Özel ayarlar
     auto_request_statement: false,
     email_notification: false,
-    auto_document_request: false,
-    alternative_email_finder: false,
-    tolerance_level: false,
-    update_verified_emails: false
+    auto_document_request: false
   })
 
   const [currentTime, setCurrentTime] = useState('')
@@ -381,10 +379,9 @@ export default function NewReconciliationPage() {
                           className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 px-3 py-2"
                           id="reconciliation_period"
                           name="reconciliation_period"
-                          type="text"
+                          type="date"
                           value={formData.reconciliation_period}
                           onChange={handleInputChange}
-                          placeholder="30 Haziran 2025"
                         />
                         <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 pointer-events-none">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,10 +399,9 @@ export default function NewReconciliationPage() {
                           className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 px-3 py-2"
                           id="end_date"
                           name="end_date"
-                          type="text"
+                          type="date"
                           value={formData.end_date}
                           onChange={handleInputChange}
-                          placeholder="15.10.2025"
                         />
                         <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 pointer-events-none">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,47 +412,64 @@ export default function NewReconciliationPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="related_type">
-                      İlgili Tür <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
-                      id="related_type"
-                      name="related_type"
-                      value={formData.related_type}
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="cari_hesap_bakiye">Cari Hesap Bakiye Mutabakatı</option>
-                      <option value="tedarikci">Tedarikçi Mutabakatı</option>
-                      <option value="musteri">Müşteri Mutabakatı</option>
-                      <option value="banka">Banka Mutabakatı</option>
-                    </select>
-                  </div>
                 </div>
 
                 {/* Genel Ayarlar */}
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
                   <h3 className="text-lg font-semibold mb-4 text-gray-900">Genel Ayarlar</h3>
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="reminder_days">
+                    <div className="relative">
+                      <label className="block text-sm font-medium text-gray-600 mb-1">
                         E-posta ile Hatırlatma Günleri
                       </label>
-                      <select
-                        className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
-                        id="reminder_days"
-                        name="reminder_days"
-                        value={formData.reminder_days}
-                        onChange={handleInputChange}
-                      >
-                        <option value="pazartesi_sali_cuma">Pazartesi, Salı, Cuma</option>
-                        <option value="pazartesi">Sadece Pazartesi</option>
-                        <option value="cuma">Sadece Cuma</option>
-                        <option value="her_gun">Her Gün</option>
-                        <option value="hafta_ici">Hafta Sonları Hariç</option>
-                      </select>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2 text-left flex items-center justify-between"
+                          onClick={() => setIsReminderDropdownOpen(!isReminderDropdownOpen)}
+                        >
+                          <span className="text-gray-700">
+                            {formData.reminder_days.length === 0
+                              ? 'Gün seçiniz'
+                              : `${formData.reminder_days.length} gün seçili`}
+                          </span>
+                          <svg className={`w-5 h-5 text-gray-400 transform transition-transform ${isReminderDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+
+                        {isReminderDropdownOpen && (
+                          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                            <div className="py-1">
+                              {[
+                                { value: 'pazartesi', label: 'Pazartesi' },
+                                { value: 'sali', label: 'Salı' },
+                                { value: 'carsamba', label: 'Çarşamba' },
+                                { value: 'persembe', label: 'Perşembe' },
+                                { value: 'cuma', label: 'Cuma' },
+                                { value: 'cumartesi', label: 'Cumartesi' },
+                                { value: 'pazar', label: 'Pazar' }
+                              ].map((day) => (
+                                <label key={day.value} className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={formData.reminder_days.includes(day.value)}
+                                    onChange={(e) => {
+                                      const { checked } = e.target
+                                      const updatedDays = checked
+                                        ? [...formData.reminder_days, day.value]
+                                        : formData.reminder_days.filter(d => d !== day.value)
+                                      setFormData(prev => ({ ...prev, reminder_days: updatedDays }))
+                                    }}
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                  />
+                                  <span className="ml-2 text-sm text-gray-900">{day.label}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -537,90 +550,45 @@ export default function NewReconciliationPage() {
               {/* Özel Ayarlar */}
               <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4 text-gray-900">Özel Ayarlar</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <input
-                        className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        id="auto_request_statement"
-                        name="auto_request_statement"
-                        type="checkbox"
-                        checked={formData.auto_request_statement}
-                        onChange={handleCheckboxChange}
-                      />
-                      <label className="ml-3 block text-sm text-gray-900" htmlFor="auto_request_statement">
-                        Mutabık Olmayanlardan Otomatik Ekstre Talep Et.
-                      </label>
-                    </div>
-                    <div className="flex items-start">
-                      <input
-                        className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        id="email_notification"
-                        name="email_notification"
-                        type="checkbox"
-                        checked={formData.email_notification}
-                        onChange={handleCheckboxChange}
-                      />
-                      <label className="ml-3 block text-sm text-gray-900" htmlFor="email_notification">
-                        Mutabık Olmayanları Bana E-Posta ile Bildir.
-                      </label>
-                    </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="flex items-start">
+                    <input
+                      className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      id="auto_request_statement"
+                      name="auto_request_statement"
+                      type="checkbox"
+                      checked={formData.auto_request_statement}
+                      onChange={handleCheckboxChange}
+                    />
+                    <label className="ml-3 block text-sm text-gray-900" htmlFor="auto_request_statement">
+                      Mutabık Olmayanlardan Ekstre Talep Et.
+                    </label>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <input
-                        className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        id="auto_document_request"
-                        name="auto_document_request"
-                        type="checkbox"
-                        checked={formData.auto_document_request}
-                        onChange={handleCheckboxChange}
-                      />
-                      <label className="ml-3 block text-sm text-gray-900" htmlFor="auto_document_request">
-                        İmzalı Doküman Eksik Yanıtlar İçin Otomatik Doküman Talep Et.
-                      </label>
-                    </div>
-                    <div className="flex items-start">
-                      <input
-                        className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        id="alternative_email_finder"
-                        name="alternative_email_finder"
-                        type="checkbox"
-                        checked={formData.alternative_email_finder}
-                        onChange={handleCheckboxChange}
-                      />
-                      <label className="ml-3 block text-sm text-gray-900" htmlFor="alternative_email_finder">
-                        Alternatif E-posta Bulucu
-                      </label>
-                    </div>
+                  <div className="flex items-start">
+                    <input
+                      className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      id="email_notification"
+                      name="email_notification"
+                      type="checkbox"
+                      checked={formData.email_notification}
+                      onChange={handleCheckboxChange}
+                    />
+                    <label className="ml-3 block text-sm text-gray-900" htmlFor="email_notification">
+                      Mutabık Olmayanları Bana E-Posta ile Bildir.
+                    </label>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex items-start">
-                      <input
-                        className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        id="tolerance_level"
-                        name="tolerance_level"
-                        type="checkbox"
-                        checked={formData.tolerance_level}
-                        onChange={handleCheckboxChange}
-                      />
-                      <label className="ml-3 block text-sm text-gray-900" htmlFor="tolerance_level">
-                        Mutabakat Farkları İçin Tolerans Seviyesi Belirle.
-                      </label>
-                    </div>
-                    <div className="flex items-start">
-                      <input
-                        className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        id="update_verified_emails"
-                        name="update_verified_emails"
-                        type="checkbox"
-                        checked={formData.update_verified_emails}
-                        onChange={handleCheckboxChange}
-                      />
-                      <label className="ml-3 block text-sm text-gray-900" htmlFor="update_verified_emails">
-                        E-posta adreslerini doğrulanmış e-posta adresi ile güncelle
-                      </label>
-                    </div>
+                  <div className="flex items-start">
+                    <input
+                      className="h-4 w-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      id="auto_document_request"
+                      name="auto_document_request"
+                      type="checkbox"
+                      checked={formData.auto_document_request}
+                      onChange={handleCheckboxChange}
+                    />
+                    <label className="ml-3 block text-sm text-gray-900" htmlFor="auto_document_request">
+                      İmzalı Dokümanı Otomatik Doküman Talep Et.
+                    </label>
                   </div>
                 </div>
               </div>
@@ -749,7 +717,7 @@ export default function NewReconciliationPage() {
                     </div>
                     <div className="ml-4">
                       <h3 className="text-lg font-semibold text-blue-800">Mutabakat Dönemi</h3>
-                      <p className="text-lg font-bold text-blue-900">{formData.reconciliation_period || '30 Haziran 2025'}</p>
+                      <p className="text-lg font-bold text-blue-900">{formData.reconciliation_period || new Date().toLocaleDateString('tr-TR')}</p>
                     </div>
                   </div>
                 </div>
