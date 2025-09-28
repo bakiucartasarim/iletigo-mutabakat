@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import * as XLSX from 'xlsx'
 
 interface Company {
   id: number
@@ -159,6 +160,52 @@ export default function NewReconciliationPage() {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1)
     }
+  }
+
+  const downloadSampleExcel = () => {
+    // Örnek Excel dosyası için örnek veri
+    const sampleData = [
+      {
+        'Satır No': 1,
+        'Cari Hesap Kodu': '331010012',
+        'Cari Hesap Adı': 'M Müh İnş Taah Tic A.Ş',
+        'Şube': 'Şahin',
+        'Cari Hesap Türü': 'Satıcı',
+        'Tutar': '1.005,00',
+        'Birim': 'TRY',
+        'Borç/Alacak': 'Alacak',
+        'Vergi Dairesi': 'Boğaziçi Kurumlar',
+        'Vergi No': '9199999992',
+        'Fax Numarası': '222222222',
+        'İlgili Kişi e-posta adresi': 'acelanten+test333@gmail.com',
+        'KEP': '',
+        'Hata': ''
+      },
+      {
+        'Satır No': 2,
+        'Cari Hesap Kodu': '331010013',
+        'Cari Hesap Adı': 'Örnek Firma Ltd. Şti.',
+        'Şube': 'Merkez',
+        'Cari Hesap Türü': 'Müşteri',
+        'Tutar': '2.500,00',
+        'Birim': 'TRY',
+        'Borç/Alacak': 'Borç',
+        'Vergi Dairesi': 'İstanbul Kurumlar',
+        'Vergi No': '1234567890',
+        'Fax Numarası': '111111111',
+        'İlgili Kişi e-posta adresi': 'ornek@firma.com',
+        'KEP': '',
+        'Hata': ''
+      }
+    ]
+
+    // Excel workbook oluştur
+    const ws = XLSX.utils.json_to_sheet(sampleData)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Mutabakat Verileri')
+
+    // Excel dosyasını indir
+    XLSX.writeFile(wb, 'ornek_mutabakat_dosyasi.xlsx')
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -617,8 +664,9 @@ export default function NewReconciliationPage() {
                     <button
                       type="button"
                       className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors text-sm"
+                      onClick={() => downloadSampleExcel()}
                     >
-                      Yeni Mutabakat Kaydı
+                      Örnek Excel Dosyası İndir
                     </button>
                   </div>
                 </div>
@@ -630,16 +678,15 @@ export default function NewReconciliationPage() {
                   <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900">Mutabakat Dosyası</h3>
                     <div className="mt-2 flex space-x-4">
-                      <button className="text-blue-600 hover:text-blue-800 font-medium">Dosya Seç</button>
-                      <button className="text-green-600 hover:text-green-800 font-medium">Yeni Mutabakat Kaydı</button>
+                      <button className="text-blue-600 hover:text-blue-800 font-medium" onClick={() => document.getElementById('excel-file')?.click()}>Dosya Seç</button>
+                      <button className="text-green-600 hover:text-green-800 font-medium" onClick={() => downloadSampleExcel()}>Örnek Excel Dosyası İndir</button>
                     </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hata</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sıra No</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Satır No</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cari Hesap Kodu</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cari Hesap Adı</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Şube</th>
@@ -649,28 +696,29 @@ export default function NewReconciliationPage() {
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borç/Alacak</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vergi Dairesi</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vergi No</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faks Numarası</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fax Numarası</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İlgili Kişi e-posta adresi</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notlar</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KEP</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hata</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {excelData.map((row, index) => (
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.siraNo}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.siraNo}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.cariHesapKodu}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.cariHesapAdi}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.sube}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">📋</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.cariHesapTuru}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.tutar}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.birim}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.borcAlacak}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.vergiDairesi}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.vergiNo}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.faksNumarasi}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.faxNumarasi}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">{row.ilgiliKisiEposta}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{row.notlar}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.kep}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">{row.hata}</td>
                           </tr>
                         ))}
                       </tbody>
