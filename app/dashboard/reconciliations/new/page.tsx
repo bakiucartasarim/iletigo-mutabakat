@@ -271,9 +271,9 @@ export default function NewReconciliationPage() {
       )}
 
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4">
         {/* Progress Steps */}
-        <div className="mb-8">
+        <div className="mb-4">
           <div className="grid grid-cols-3 gap-4 items-start">
             {steps.map((step, index) => (
               <div key={step.number} className={`step ${step.active ? 'step-active' : 'step-inactive'}`}>
@@ -295,15 +295,15 @@ export default function NewReconciliationPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Step 1: Mutabakat Ayarları */}
           {currentStep === 1 && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Mutabakat Türü */}
-                <div className="border border-blue-100 rounded-lg p-6" style={{ backgroundColor: '#f0f8ff' }}>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Mutabakat Türü</h3>
-                  <div className="space-y-4">
+                <div className="border border-blue-100 rounded-lg p-4" style={{ backgroundColor: '#f0f8ff' }}>
+                  <h3 className="text-lg font-semibold mb-3 text-gray-900">Mutabakat Türü</h3>
+                  <div className="space-y-3">
                     <div className="flex items-center">
                       <input
                         checked={formData.type === 'cari_mutabakat'}
@@ -370,18 +370,13 @@ export default function NewReconciliationPage() {
                       </label>
                       <div className="relative">
                         <input
-                          className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 px-3 py-2"
+                          className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
                           id="reconciliation_period"
                           name="reconciliation_period"
                           type="date"
                           value={formData.reconciliation_period}
                           onChange={handleInputChange}
                         />
-                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 pointer-events-none">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </span>
                       </div>
                     </div>
                     <div>
@@ -390,18 +385,13 @@ export default function NewReconciliationPage() {
                       </label>
                       <div className="relative">
                         <input
-                          className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 px-3 py-2"
+                          className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
                           id="end_date"
                           name="end_date"
                           type="date"
                           value={formData.end_date}
                           onChange={handleInputChange}
                         />
-                        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 pointer-events-none">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -409,9 +399,9 @@ export default function NewReconciliationPage() {
                 </div>
 
                 {/* Genel Ayarlar */}
-                <div className="border border-blue-100 rounded-lg p-6" style={{ backgroundColor: '#f0f8ff' }}>
-                  <h3 className="text-lg font-semibold mb-4 text-gray-900">Genel Ayarlar</h3>
-                  <div className="space-y-4">
+                <div className="border border-blue-100 rounded-lg p-4" style={{ backgroundColor: '#f0f8ff' }}>
+                  <h3 className="text-lg font-semibold mb-3 text-gray-900">Genel Ayarlar</h3>
+                  <div className="space-y-3">
                     <div className="relative">
                       <label className="block text-sm font-medium text-gray-600 mb-1">
                         E-posta ile Hatırlatma Günleri
@@ -542,7 +532,7 @@ export default function NewReconciliationPage() {
               </div>
 
               {/* Özel Ayarlar */}
-              <div className="border border-blue-100 rounded-lg p-6" style={{ backgroundColor: '#f0f8ff' }}>
+              <div className="border border-blue-100 rounded-lg p-4" style={{ backgroundColor: '#f0f8ff' }}>
                 <h3 className="text-lg font-semibold mb-4 text-gray-900">Özel Ayarlar</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="flex items-start">
