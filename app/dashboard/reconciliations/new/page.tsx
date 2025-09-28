@@ -270,12 +270,6 @@ export default function NewReconciliationPage() {
         </div>
       )}
 
-      {/* Header with Blue Background */}
-      <div className="bg-blue-600 border-b">
-        <div className="container mx-auto px-4 py-2">
-          <h2 className="text-white text-lg font-semibold">Yeni Cari Mutabakat</h2>
-        </div>
-      </div>
 
       <main className="container mx-auto px-4 py-8">
         {/* Progress Steps */}
@@ -307,7 +301,7 @@ export default function NewReconciliationPage() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Mutabakat Türü */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <div className="border border-blue-100 rounded-lg p-6" style={{ backgroundColor: '#f0f8ff' }}>
                   <h3 className="text-lg font-semibold mb-4 text-gray-900">Mutabakat Türü</h3>
                   <div className="space-y-4">
                     <div className="flex items-center">
@@ -415,7 +409,7 @@ export default function NewReconciliationPage() {
                 </div>
 
                 {/* Genel Ayarlar */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                <div className="border border-blue-100 rounded-lg p-6" style={{ backgroundColor: '#f0f8ff' }}>
                   <h3 className="text-lg font-semibold mb-4 text-gray-900">Genel Ayarlar</h3>
                   <div className="space-y-4">
                     <div className="relative">
@@ -548,7 +542,7 @@ export default function NewReconciliationPage() {
               </div>
 
               {/* Özel Ayarlar */}
-              <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+              <div className="border border-blue-100 rounded-lg p-6" style={{ backgroundColor: '#f0f8ff' }}>
                 <h3 className="text-lg font-semibold mb-4 text-gray-900">Özel Ayarlar</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="flex items-start">
