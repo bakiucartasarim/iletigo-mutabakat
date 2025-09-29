@@ -1,6 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Pool } from 'pg'
 
+// Helper function to parse Turkish currency format
+function parseTurkishCurrency(value: string | number): number {
+  if (typeof value === 'number') return value;
+  if (!value || value === '') return 0;
+
+  // Convert to string and clean
+  let cleanValue = value.toString().trim();
+
+  // Remove currency symbols and spaces
+  cleanValue = cleanValue.replace(/[₺\s]/g, '');
+
+  // Handle Turkish format: "2.500,50" -> 2500.50
+  // First remove thousand separators (dots), then replace decimal comma with dot
+  if (cleanValue.includes(',')) {
+    const parts = cleanValue.split(',');
+    if (parts.length === 2) {
+      // Remove dots from integer part and combine with decimal part
+      const integerPart = parts[0].replace(/\./g, '');
+      const decimalPart = parts[1];
+      cleanValue = integerPart + '.' + decimalPart;
+    }
+  } else {
+    // If no comma, just remove dots (assuming they are thousand separators)
+    cleanValue = cleanValue.replace(/\./g, '');
+  }
+
+  const result = parseFloat(cleanValue);
+  return isNaN(result) ? 0 : result;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -17,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate totals
-    const totalAmount = excelData.reduce((sum, row) => sum + parseFloat(row.tutar || 0), 0)
+    const totalAmount = excelData.reduce((sum, row) => sum + parseTurkishCurrency(row.tutar || 0), 0)
     const borcRecords = excelData.filter(row => row.borcAlacak && row.borcAlacak.toUpperCase().includes('BORÇ')).length
     const alacakRecords = excelData.filter(row => row.borcAlacak && row.borcAlacak.toUpperCase().includes('ALACAK')).length
 
@@ -92,8 +122,8 @@ export async function POST(request: NextRequest) {
           INSERT INTO reconciliation_excel_data (
             reconciliation_id, sira_no, cari_hesap_kodu, cari_hesap_adi,
             sube, cari_hesap_turu, tutar, birim, borc_alacak,
-            vergi_dairesi, vergi_no, fax_numarasi, ilgili_kisi_eposta, hata, mail_status
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            vergi_dairesi, vergi_no, fax_numarasi, ilgili_kisi_eposta, hata, mail_status, updated_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
         `, [
           reconciliationId,
           row.siraNo || null,
@@ -101,7 +131,7 @@ export async function POST(request: NextRequest) {
           row.cariHesapAdi || null,
           row.sube || null,
           row.cariHesapTuru || null,
-          parseFloat(row.tutar || 0),
+          parseTurkishCurrency(row.tutar || 0),
           row.birim || 'TRY',
           row.borcAlacak || null,
           row.vergiDairesi || null,

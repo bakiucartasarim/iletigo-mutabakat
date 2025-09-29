@@ -15,20 +15,17 @@ export async function GET(
         period_id: 1,
         period: 'Mutabakat Dönemi - Ocak 2024',
         status: 'pending',
-        total_count: 5,
+        total_count: 2,
         matched: 0,
-        unmatched: 5,
+        unmatched: 2,
         created_at: '2024-01-15T10:00:00Z',
         updated_at: '2024-01-15T10:00:00Z',
-        reconciliation_period: {
-          id: 1,
-          name: 'Mutabakat Dönemi - Ocak 2024',
-          start_date: '2024-01-01',
-          end_date: '2024-01-31',
-          status: 'active',
-          description: 'Ocak ayı mutabakat dönemi',
-          created_at: '2024-01-15T10:00:00Z'
-        },
+        period_name: 'Mutabakat Dönemi - Ocak 2024',
+        period_start_date: '2024-01-01',
+        period_end_date: '2024-01-31',
+        period_status: 'active',
+        period_description: 'Ocak ayı mutabakat dönemi',
+        period_created_at: '2024-01-15T10:00:00Z',
         excel_data: [
           {
             id: 1,
@@ -37,7 +34,7 @@ export async function GET(
             cari_hesap_adi: 'ABC Şirket Ltd.',
             sube: 'Merkez',
             cari_hesap_turu: 'Müşteri',
-            tutar: 15000.00,
+            tutar: 2500.00,
             birim: 'TRY',
             borc_alacak: 'BORÇ',
             vergi_dairesi: 'İstanbul VD',
@@ -47,13 +44,34 @@ export async function GET(
             hata: '',
             mail_status: 'gonderilmedi',
             created_at: '2024-01-15T10:00:00Z'
+          },
+          {
+            id: 2,
+            sira_no: 2,
+            cari_hesap_kodu: 'C002',
+            cari_hesap_adi: 'XYZ Ltd. Şti.',
+            sube: 'Şube 1',
+            cari_hesap_turu: 'Tedarikçi',
+            tutar: 3750.50,
+            birim: 'TRY',
+            borc_alacak: 'ALACAK',
+            vergi_dairesi: 'Ankara VD',
+            vergi_no: '0987654321',
+            fax_numarasi: '0312 987 65 43',
+            ilgili_kisi_eposta: 'info@xyz.com',
+            hata: '',
+            mail_status: 'gonderilmedi',
+            created_at: '2024-01-15T10:00:00Z'
           }
         ],
         company_name: 'İletigo Teknoloji',
         user_name: 'Admin User'
       }
 
-      return NextResponse.json(mockData)
+      return NextResponse.json({
+        success: true,
+        data: mockData
+      })
     }
 
     // Real database operations
@@ -139,21 +157,21 @@ export async function GET(
         unmatched: reconciliation.unmatched,
         created_at: reconciliation.created_at,
         updated_at: reconciliation.updated_at,
-        reconciliation_period: {
-          id: reconciliation.rp_id,
-          name: reconciliation.period_name,
-          start_date: reconciliation.period_start_date,
-          end_date: reconciliation.period_end_date,
-          status: reconciliation.period_status,
-          description: reconciliation.period_description,
-          created_at: reconciliation.period_created_at
-        },
+        period_name: reconciliation.period_name,
+        period_start_date: reconciliation.period_start_date,
+        period_end_date: reconciliation.period_end_date,
+        period_status: reconciliation.period_status,
+        period_description: reconciliation.period_description,
+        period_created_at: reconciliation.period_created_at,
         excel_data: excelDataResult.rows,
         company_name: reconciliation.company_name,
         user_name: reconciliation.user_name
       }
 
-      return NextResponse.json(response)
+      return NextResponse.json({
+        success: true,
+        data: response
+      })
 
     } finally {
       await pool.end()
