@@ -145,22 +145,6 @@ export default function ReconciliationsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mutabakat Kayitlari</h1>
-          <p className="text-gray-600">Tum mutabakat kayitlarini goruntuleyin ve yonetin</p>
-        </div>
-        <Link
-          href="/dashboard/reconciliations/new"
-          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Yeni Mutabakat
-        </Link>
-      </div>
 
       {/* Filters */}
       <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
@@ -367,15 +351,6 @@ export default function ReconciliationsPage() {
           </svg>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Mutabakat kaydi bulunamadi</h3>
           <p className="text-gray-600 mb-6">Filtreleri degistirerek tekrar deneyin veya yeni bir mutabakat olusturun.</p>
-          <Link
-            href="/dashboard/reconciliations/new"
-            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Yeni Mutabakat Olustur
-          </Link>
         </div>
       )}
     </div>

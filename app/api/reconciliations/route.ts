@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Pool } from 'pg'
 
-// Demo reconciliations data
+// Demo reconciliations data (fallback)
 const demoReconciliations = [
   {
     id: 1,
@@ -202,104 +203,135 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const priority = searchParams.get('priority')
     const search = searchParams.get('search')
-    const company_code = searchParams.get('company_code')
-    const year = searchParams.get('year')
-    const month = searchParams.get('month')
-    const date_from = searchParams.get('date_from')
-    const date_to = searchParams.get('date_to')
-    const mail_status = searchParams.get('mail_status')
-    const is_active = searchParams.get('is_active')
-    
-    let filteredData = [...reconciliationsStorage]
-    
-    // Filter by status
-    if (status && status !== 'all') {
-      filteredData = filteredData.filter(item => item.status === status)
-    }
-    
-    // Filter by priority
-    if (priority && priority !== 'all') {
-      filteredData = filteredData.filter(item => item.priority === priority)
-    }
 
-    // Filter by company code
-    if (company_code) {
-      filteredData = filteredData.filter(item => 
-        item.company_code?.toLowerCase().includes(company_code.toLowerCase())
-      )
-    }
+    if (!process.env.DATABASE_URL) {
+      // Fallback to mock data
+      let filteredData = [...reconciliationsStorage]
 
-    // Filter by year
-    if (year) {
-      filteredData = filteredData.filter(item => item.year === parseInt(year))
-    }
-
-    // Filter by month
-    if (month) {
-      filteredData = filteredData.filter(item => item.month === parseInt(month))
-    }
-
-    // Filter by date range
-    if (date_from) {
-      filteredData = filteredData.filter(item => 
-        new Date(item.reconciliation_date) >= new Date(date_from)
-      )
-    }
-
-    if (date_to) {
-      filteredData = filteredData.filter(item => 
-        new Date(item.reconciliation_date) <= new Date(date_to)
-      )
-    }
-
-    // Filter by mail status
-    if (mail_status && mail_status !== 'all') {
-      filteredData = filteredData.filter(item => item.mail_status === mail_status)
-    }
-
-    // Filter by active status
-    if (is_active && is_active !== 'all') {
-      const activeFilter = is_active === 'true'
-      filteredData = filteredData.filter(item => item.is_active === activeFilter)
-    }
-    
-    // Search filter
-    if (search) {
-      const searchLower = search.toLowerCase()
-      filteredData = filteredData.filter(item => 
-        item.title.toLowerCase().includes(searchLower) ||
-        item.company_name.toLowerCase().includes(searchLower) ||
-        item.reference_number.toLowerCase().includes(searchLower) ||
-        item.company_code?.toLowerCase().includes(searchLower)
-      )
-    }
-    
-    // Pagination
-    const startIndex = (page - 1) * limit
-    const endIndex = startIndex + limit
-    const paginatedData = filteredData.slice(startIndex, endIndex)
-    
-    return NextResponse.json({
-      data: paginatedData,
-      pagination: {
-        current_page: page,
-        per_page: limit,
-        total: filteredData.length,
-        total_pages: Math.ceil(filteredData.length / limit)
-      },
-      filters: {
-        status,
-        priority,
-        search,
-        company_code,
-        year,
-        month,
-        date_from,
-        date_to,
-        mail_status,
-        is_active
+      if (status && status !== 'all') {
+        filteredData = filteredData.filter(item => item.status === status)
       }
+
+      if (priority && priority !== 'all') {
+        filteredData = filteredData.filter(item => item.priority === priority)
+      }
+
+      if (search) {
+        const searchLower = search.toLowerCase()
+        filteredData = filteredData.filter(item =>
+          item.title.toLowerCase().includes(searchLower) ||
+          item.company_name.toLowerCase().includes(searchLower) ||
+          item.reference_number.toLowerCase().includes(searchLower)
+        )
+      }
+
+      const startIndex = (page - 1) * limit
+      const endIndex = startIndex + limit
+      const paginatedData = filteredData.slice(startIndex, endIndex)
+
+      return NextResponse.json({
+        data: paginatedData,
+        pagination: {
+          current_page: page,
+          per_page: limit,
+          total: filteredData.length,
+          total_pages: Math.ceil(filteredData.length / limit)
+        },
+        filters: { status, priority, search }
+      })
+    }
+
+    // Real database operations
+    const pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: false
     })
+
+    try {
+      // Build WHERE conditions
+      const conditions = []
+      const params: any[] = []
+      let paramIndex = 1
+
+      if (status && status !== 'all') {
+        conditions.push(`r.status = $${paramIndex}`)
+        params.push(status)
+        paramIndex++
+      }
+
+      if (search) {
+        conditions.push(`(r.period ILIKE $${paramIndex} OR c.name ILIKE $${paramIndex})`)
+        params.push(`%${search}%`)
+        paramIndex++
+      }
+
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+      // Get total count
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM reconciliations r
+        LEFT JOIN companies c ON r.company_id = c.id
+        LEFT JOIN users u ON r.user_id = u.id
+        ${whereClause}
+      `
+      const countResult = await pool.query(countQuery, params)
+      const total = parseInt(countResult.rows[0].total)
+
+      // Get paginated data with Excel data summary
+      const offset = (page - 1) * limit
+      const dataQuery = `
+        SELECT
+          r.id,
+          CONCAT('MUT-', r.id) as reference_number,
+          r.period as title,
+          COALESCE(c.name, 'İletigo Teknoloji') as company_name,
+          COALESCE(
+            (SELECT SUM(red.tutar) FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id),
+            0
+          ) as our_amount,
+          0 as their_amount,
+          COALESCE(
+            (SELECT SUM(red.tutar) FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id),
+            0
+          ) as difference,
+          'TRY' as currency,
+          r.status,
+          'medium' as priority,
+          (CURRENT_DATE + INTERVAL '30 days')::date as due_date,
+          COALESCE(u.first_name || ' ' || u.last_name, 'Admin User') as assigned_to,
+          r.created_at,
+          r.updated_at,
+          r.total_count,
+          r.matched,
+          r.unmatched
+        FROM reconciliations r
+        LEFT JOIN companies c ON r.company_id = c.id
+        LEFT JOIN users u ON r.user_id = u.id
+        ${whereClause}
+        ORDER BY r.created_at DESC
+        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+      `
+
+      params.push(limit, offset)
+      const dataResult = await pool.query(dataQuery, params)
+
+      const totalPages = Math.ceil(total / limit)
+
+      return NextResponse.json({
+        data: dataResult.rows,
+        pagination: {
+          current_page: page,
+          per_page: limit,
+          total,
+          total_pages: totalPages
+        },
+        filters: { status, priority, search }
+      })
+
+    } finally {
+      await pool.end()
+    }
     
   } catch (error) {
     console.error('Reconciliations API error:', error)
