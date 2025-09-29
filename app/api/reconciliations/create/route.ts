@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
           INSERT INTO reconciliation_excel_data (
             reconciliation_id, sira_no, cari_hesap_kodu, cari_hesap_adi,
             sube, cari_hesap_turu, tutar, birim, borc_alacak,
-            vergi_dairesi, vergi_no, fax_numarasi, ilgili_kisi_eposta, hata
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            vergi_dairesi, vergi_no, fax_numarasi, ilgili_kisi_eposta, hata, mail_status
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         `, [
           reconciliationId,
           row.siraNo || null,
@@ -108,7 +108,8 @@ export async function POST(request: NextRequest) {
           row.vergiNo || null,
           row.faxNumarasi || null,
           row.ilgiliKisiEposta || null,
-          row.hata || null
+          row.hata || null,
+          'gonderilmedi'
         ])
       }
 

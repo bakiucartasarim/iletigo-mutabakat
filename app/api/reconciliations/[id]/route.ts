@@ -45,6 +45,7 @@ export async function GET(
             fax_numarasi: '0212 123 45 67',
             ilgili_kisi_eposta: 'info@abc.com',
             hata: '',
+            mail_status: 'gonderilmedi',
             created_at: '2024-01-15T10:00:00Z'
           }
         ],
@@ -118,6 +119,7 @@ export async function GET(
           fax_numarasi,
           ilgili_kisi_eposta,
           hata,
+          COALESCE(mail_status, 'gonderilmedi') as mail_status,
           created_at
         FROM reconciliation_excel_data
         WHERE reconciliation_id = $1

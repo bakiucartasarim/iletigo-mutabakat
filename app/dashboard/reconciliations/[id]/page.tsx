@@ -19,6 +19,7 @@ interface ExcelRecord {
   fax_numarasi: string
   ilgili_kisi_eposta: string
   hata: string
+  mail_status: string
   created_at: string
 }
 
@@ -54,6 +55,7 @@ export default function ReconciliationDetailPage() {
   const [reconciliation, setReconciliation] = useState<ReconciliationDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
+  const [sendingMail, setSendingMail] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -92,6 +94,28 @@ export default function ReconciliationDetailPage() {
     return new Date(dateString).toLocaleDateString('tr-TR')
   }
 
+  const getMailStatusBadge = (status: string) => {
+    const styles = {
+      gonderilmedi: 'bg-gray-100 text-gray-800 border-gray-200',
+      gonderildi: 'bg-green-100 text-green-800 border-green-200',
+      hata: 'bg-red-100 text-red-800 border-red-200',
+      beklemede: 'bg-yellow-100 text-yellow-800 border-yellow-200'
+    }
+
+    const labels = {
+      gonderilmedi: 'Gönderilmedi',
+      gonderildi: 'Gönderildi',
+      hata: 'Hata',
+      beklemede: 'Beklemede'
+    }
+
+    return (
+      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${styles[status as keyof typeof styles] || styles.gonderilmedi}`}>
+        {labels[status as keyof typeof labels] || status}
+      </span>
+    )
+  }
+
   const getStatusBadge = (status: string) => {
     const styles = {
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -112,6 +136,53 @@ export default function ReconciliationDetailPage() {
         {labels[status as keyof typeof labels] || status}
       </span>
     )
+  }
+
+  const handleSendMails = async () => {
+    try {
+      setSendingMail(true)
+
+      // Get email records that haven't been sent yet
+      const unsent = reconciliation?.excel_data?.filter(record =>
+        record.mail_status === 'gonderilmedi' && record.ilgili_kisi_eposta
+      ) || []
+
+      if (unsent.length === 0) {
+        alert('Gönderilmemiş mail adresi bulunamadı!')
+        return
+      }
+
+      const response = await fetch(`/api/reconciliations/${id}/send-mails`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          records: unsent.map(record => ({
+            id: record.id,
+            email: record.ilgili_kisi_eposta,
+            cari_hesap_adi: record.cari_hesap_adi,
+            tutar: record.tutar,
+            borc_alacak: record.borc_alacak
+          }))
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        alert(`${result.sent_count} mail başarıyla gönderildi!`)
+        // Refresh data to show updated mail statuses
+        fetchReconciliation()
+      } else {
+        alert('Mail gönderiminde hata: ' + result.error)
+      }
+    } catch (error) {
+      console.error('Mail gönderim hatası:', error)
+      alert('Mail gönderiminde hata oluştu!')
+    } finally {
+      setSendingMail(false)
+    }
   }
 
   const getTotalAmount = () => {
@@ -174,7 +245,7 @@ export default function ReconciliationDetailPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Mutabakat Detayı #{reconciliation.id}
+              Mutabakat Detayı
             </h1>
             <p className="text-gray-600">{reconciliation.period}</p>
           </div>
@@ -185,7 +256,7 @@ export default function ReconciliationDetailPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white/70 backdrop-blur-lg rounded-xl p-6 border border-white/20">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -196,20 +267,6 @@ export default function ReconciliationDetailPage() {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Toplam Kayıt</p>
               <p className="text-2xl font-bold text-gray-900">{reconciliation.total_count}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white/70 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Toplam Tutar</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(getTotalAmount())}</p>
             </div>
           </div>
         </div>
@@ -273,6 +330,40 @@ export default function ReconciliationDetailPage() {
         <div className="p-6">
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              {/* Mail Actions */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-lg font-medium text-gray-900 mb-4">Mail İşlemleri</h4>
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={handleSendMails}
+                    disabled={sendingMail}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {sendingMail ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Gönderiliyor...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Toplu Mail Gönder
+                      </>
+                    )}
+                  </button>
+                  <div className="text-sm text-gray-600">
+                    {reconciliation.excel_data?.filter(record =>
+                      record.mail_status === 'gonderilmedi' && record.ilgili_kisi_eposta
+                    ).length || 0} gönderilmemiş mail adresi
+                  </div>
+                </div>
+              </div>
+
               {/* Period Information */}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Dönem Bilgileri</h3>
@@ -315,6 +406,7 @@ export default function ReconciliationDetailPage() {
                   <p className="mt-1 text-sm text-gray-900">{reconciliation.reconciliation_period.description}</p>
                 </div>
               )}
+
             </div>
           )}
 
@@ -347,6 +439,9 @@ export default function ReconciliationDetailPage() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           E-posta
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Mail Durumu
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -378,6 +473,9 @@ export default function ReconciliationDetailPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {record.ilgili_kisi_eposta}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {getMailStatusBadge(record.mail_status || 'gonderilmedi')}
                           </td>
                         </tr>
                       ))}
