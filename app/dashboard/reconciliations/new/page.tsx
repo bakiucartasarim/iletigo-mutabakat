@@ -305,11 +305,45 @@ export default function NewReconciliationPage() {
     }
 
     if (currentStep === 3) {
-      // Son adımda direkt olarak mutabakat listesine yönlendir
-      setSuccessMessage('✅ Mutabakat dönemi başarıyla oluşturuldu!')
-      setTimeout(() => {
-        router.push('/dashboard/reconciliations')
-      }, 1500)
+      // Validation
+      if (excelData.length === 0) {
+        alert('Lütfen önce Excel dosyası yükleyin ve verilerinizi kontrol edin.')
+        return
+      }
+
+      setLoading(true)
+
+      try {
+        // API'ye veri gönder
+        const response = await fetch('/api/reconciliations/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            formData,
+            excelData
+          })
+        })
+
+        const result = await response.json()
+
+        if (response.ok && result.success) {
+          setSuccessMessage(`✅ ${result.message} - ${result.data.excelRowsProcessed} kayıt işlendi`)
+          console.log('Reconciliation created:', result.data)
+
+          setTimeout(() => {
+            router.push('/dashboard/reconciliations')
+          }, 2500)
+        } else {
+          throw new Error(result.error || 'Bilinmeyen bir hata oluştu')
+        }
+      } catch (error) {
+        console.error('Error creating reconciliation:', error)
+        alert(`Hata: ${error.message}`)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -836,8 +870,8 @@ export default function NewReconciliationPage() {
                   <div>
                     <h4 className="font-medium text-gray-700 mb-2">İstatistikler</h4>
                     <ul className="space-y-1 text-sm text-gray-600">
-                      <li>• Borç Kayıtları: {excelData.filter(row => row.borcAlacak === 'BORÇ').length}</li>
-                      <li>• Alacak Kayıtları: {excelData.filter(row => row.borcAlacak === 'ALACAK').length}</li>
+                      <li>• Borç Kayıtları: {excelData.filter(row => row.borcAlacak && (row.borcAlacak.toUpperCase() === 'BORÇ' || row.borcAlacak.toUpperCase() === 'BORC')).length}</li>
+                      <li>• Alacak Kayıtları: {excelData.filter(row => row.borcAlacak && row.borcAlacak.toUpperCase() === 'ALACAK').length}</li>
                       <li>• Farklı Para Birimleri: {[...new Set(excelData.map(row => row.birim))].join(', ')}</li>
                       <li>• Oluşturulma Tarihi: {new Date().toLocaleDateString('tr-TR')}</li>
                     </ul>
@@ -873,7 +907,7 @@ export default function NewReconciliationPage() {
                 {loading ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Oluşturuluyor...
+                    {currentStep === 3 ? 'Mutabakat Oluşturuluyor...' : 'Oluşturuluyor...'}
                   </div>
                 ) : (
                   <>
