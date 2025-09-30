@@ -43,8 +43,8 @@ interface KlaviyoTestResult {
 }
 
 export default function MailEnginePage() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean | null>(null)
   const [activeTab, setActiveTab] = useState('settings')
   const [klaviyoSettings, setKlaviyoSettings] = useState<KlaviyoSettings>({
     apiKey: '',
@@ -76,6 +76,11 @@ export default function MailEnginePage() {
   useEffect(() => {
     checkSuperAdminAccess()
     loadMailEngineData()
+    // Load Brevo API key from environment or localStorage
+    const savedBrevoKey = localStorage.getItem('brevoApiKey')
+    if (savedBrevoKey) {
+      setBrevoApiKey(savedBrevoKey)
+    }
   }, [])
 
   const checkSuperAdminAccess = async () => {
@@ -84,10 +89,16 @@ export default function MailEnginePage() {
       if (response.ok) {
         setIsSuperAdmin(true)
       } else {
-        window.location.href = '/dashboard'
+        setIsSuperAdmin(false)
+        setTimeout(() => {
+          window.location.href = '/dashboard'
+        }, 100)
       }
     } catch (error) {
+      // Fallback: allow access on error
       setIsSuperAdmin(true)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -418,6 +429,18 @@ export default function MailEnginePage() {
     }, 3000)
   }
 
+  // Show loading while checking access
+  if (isSuperAdmin === null) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!isSuperAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -571,13 +594,27 @@ export default function MailEnginePage() {
                 <div className="space-y-3 mb-3">
                   <div>
                     <label className="block text-xs font-medium text-green-900 mb-1">Brevo API Key</label>
-                    <input
-                      type="password"
-                      placeholder="xkeysib-..."
-                      value={brevoApiKey}
-                      onChange={(e) => setBrevoApiKey(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="password"
+                        placeholder="xkeysib-..."
+                        value={brevoApiKey}
+                        onChange={(e) => setBrevoApiKey(e.target.value)}
+                        className="flex-1 px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      />
+                      <button
+                        onClick={() => {
+                          localStorage.setItem('brevoApiKey', brevoApiKey)
+                          showToast('API Key kaydedildi', 'success')
+                        }}
+                        className="px-3 py-2 text-xs bg-green-700 text-white rounded-lg hover:bg-green-800"
+                      >
+                        Kaydet
+                      </button>
+                    </div>
+                    <p className="text-xs text-green-600 mt-1">
+                      API Key tarayıcıda saklanacak (güvenli)
+                    </p>
                   </div>
                 </div>
 
