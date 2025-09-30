@@ -24,6 +24,24 @@ interface MailStats {
   lastSentDate: string
 }
 
+interface KlaviyoTestResult {
+  testType: string
+  success: boolean
+  data?: any
+  error?: string
+  duration?: number
+  debug?: {
+    requestUrl?: string
+    requestMethod?: string
+    requestHeaders?: any
+    requestBody?: any
+    responseStatus?: number
+    responseHeaders?: any
+    rawResponse?: string
+    timestamp?: string
+  }
+}
+
 export default function MailEnginePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
@@ -31,7 +49,7 @@ export default function MailEnginePage() {
   const [klaviyoSettings, setKlaviyoSettings] = useState<KlaviyoSettings>({
     apiKey: '',
     fromEmail: '',
-    fromName: 'İletigo Teknoloji',
+    fromName: '',
     isActive: false
   })
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([])
@@ -41,7 +59,11 @@ export default function MailEnginePage() {
     totalPending: 0,
     lastSentDate: ''
   })
-  const [testEmail, setTestEmail] = useState('')
+  const [testEmail, setTestEmail] = useState('bakiucartasarim@gmail.com')
+  const [testType, setTestType] = useState<'connection' | 'profile' | 'email' | 'campaign' | 'client-events' | 'all'>('all')
+  const [testResults, setTestResults] = useState<KlaviyoTestResult[]>([])
+  const [isTestRunning, setIsTestRunning] = useState(false)
+  const [debugMode, setDebugMode] = useState(true)
 
   useEffect(() => {
     checkSuperAdminAccess()
@@ -84,27 +106,7 @@ export default function MailEnginePage() {
       }
     } catch (error) {
       console.error('Mail engine data load error:', error)
-      setKlaviyoSettings({
-        apiKey: '',
-        fromEmail: 'noreply@iletigo.com',
-        fromName: 'İletigo Teknoloji',
-        isActive: false
-      })
-      setEmailTemplates([
-        {
-          id: '1',
-          name: 'Mutabakat Bildirimi',
-          subject: 'Cari Hesap Mutabakat Bilgilendirmesi - {{company_name}}',
-          content: 'Sayın {{customer_name}},\n\nCari hesap mutabakat bilgileriniz ektedir.\n\nTutar: {{amount}} TL\nDurum: {{status}}\n\nSaygılarımızla,\nİletigo Teknoloji',
-          type: 'reconciliation'
-        }
-      ])
-      setMailStats({
-        totalSent: 157,
-        totalFailed: 3,
-        totalPending: 12,
-        lastSentDate: new Date().toISOString()
-      })
+      // Keep empty state if API fails
     } finally {
       setIsLoading(false)
     }
@@ -132,30 +134,44 @@ export default function MailEnginePage() {
     }
   }
 
-  const testKlaviyoConnection = async () => {
+  const runKlaviyoTest = async () => {
     if (!klaviyoSettings.apiKey) {
       showToast('Lütfen API anahtarını girin', 'error')
       return
     }
 
+    if (!testEmail) {
+      showToast('Lütfen test email adresi girin', 'error')
+      return
+    }
+
     try {
-      setIsLoading(true)
-      const response = await fetch('/api/mail-engine/test-connection', {
+      setIsTestRunning(true)
+      setTestResults([])
+
+      const response = await fetch('/api/klaviyo/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ apiKey: klaviyoSettings.apiKey })
+        body: JSON.stringify({
+          apiKey: klaviyoSettings.apiKey,
+          testEmail: testEmail,
+          testType: testType
+        })
       })
 
       if (response.ok) {
-        showToast('Klaviyo bağlantısı başarılı!', 'success')
+        const result = await response.json()
+        setTestResults(result.results || [])
+        showToast(result.message || 'Test tamamlandı', result.success ? 'success' : 'error')
       } else {
-        showToast('Klaviyo bağlantı hatası', 'error')
+        const errorData = await response.json()
+        showToast(errorData.error || 'Test başarısız', 'error')
       }
     } catch (error) {
-      console.error('Connection test error:', error)
-      showToast('Klaviyo bağlantısı başarılı! (Mock Mode)', 'success')
+      console.error('Klaviyo test error:', error)
+      showToast('Test sırasında hata oluştu', 'error')
     } finally {
-      setIsLoading(false)
+      setIsTestRunning(false)
     }
   }
 
@@ -400,14 +416,14 @@ export default function MailEnginePage() {
                   Ayarları Kaydet
                 </button>
                 <button
-                  onClick={testKlaviyoConnection}
+                  onClick={() => setActiveTab('test')}
                   disabled={isLoading}
                   className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Bağlantıyı Test Et
+                  API Testlerini Görüntüle
                 </button>
               </div>
             </div>
@@ -417,18 +433,28 @@ export default function MailEnginePage() {
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Email Şablonları</h3>
               <div className="space-y-4">
-                {emailTemplates.map((template) => (
-                  <div key={template.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold">{template.name}</h4>
-                      <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                        {template.type}
-                      </span>
+                {emailTemplates.length > 0 ? (
+                  emailTemplates.map((template) => (
+                    <div key={template.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold">{template.name}</h4>
+                        <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                          {template.type}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">Konu: {template.subject}</p>
+                      <p className="text-sm text-gray-800">{template.content.substring(0, 100)}...</p>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">Konu: {template.subject}</p>
-                    <p className="text-sm text-gray-800">{template.content.substring(0, 100)}...</p>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <p>Henüz email şablonu bulunmuyor.</p>
+                    <p className="text-sm mt-1">Email şablonları database'den yüklenecek.</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}
@@ -439,39 +465,230 @@ export default function MailEnginePage() {
                 <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h3 className="text-lg font-semibold">Test Email Gönderimi</h3>
+                <h3 className="text-lg font-semibold">Klaviyo API Test Sistemi</h3>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Test Email Adresi</label>
-                  <input
-                    type="email"
-                    placeholder="test@example.com"
-                    value={testEmail}
-                    onChange={(e) => setTestEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Test Configuration */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900">Test Ayarları</h4>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Test Email Adresi</label>
+                    <input
+                      type="email"
+                      value={testEmail}
+                      onChange={(e) => setTestEmail(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="test@example.com"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Test Türü</label>
+                    <select
+                      value={testType}
+                      onChange={(e) => setTestType(e.target.value as typeof testType)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="all">Tüm Testler</option>
+                      <option value="connection">Sadece Bağlantı Testi</option>
+                      <option value="profile">Sadece Profil Yönetimi</option>
+                      <option value="email">Sadece Email Gönderimi</option>
+                      <option value="campaign">Sadece Campaigns Access</option>
+                      <option value="client-events">Sadece Client Events API</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="debugMode"
+                      checked={debugMode}
+                      onChange={(e) => setDebugMode(e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor="debugMode" className="text-sm font-medium text-gray-700">Debug Modunu Aç</label>
+                  </div>
+
+                  <button
+                    onClick={runKlaviyoTest}
+                    disabled={isTestRunning || !klaviyoSettings.apiKey || !testEmail}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isTestRunning ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Test Çalışıyor...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Klaviyo API Test Et
+                      </>
+                    )}
+                  </button>
+
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h5 className="font-medium mb-2">Mevcut Ayarlar</h5>
+                    <div className="text-sm space-y-1">
+                      <p><strong>API Key:</strong> {klaviyoSettings.apiKey ? '***' + klaviyoSettings.apiKey.slice(-4) : 'Tanımlanmamış'}</p>
+                      <p><strong>From Email:</strong> {klaviyoSettings.fromEmail || 'Tanımlanmamış'}</p>
+                      <p><strong>From Name:</strong> {klaviyoSettings.fromName || 'Tanımlanmamış'}</p>
+                      <p><strong>Durum:</strong> <span className={klaviyoSettings.isActive ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>{klaviyoSettings.isActive ? 'Aktif' : 'Pasif'}</span></p>
+                    </div>
+                  </div>
+
+                  {debugMode && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                      <h5 className="font-medium mb-2 text-blue-900">Sistem Debug Bilgileri</h5>
+                      <div className="text-sm space-y-1 text-blue-800">
+                        <p><strong>Browser:</strong> {navigator.userAgent}</p>
+                        <p><strong>Timestamp:</strong> {new Date().toISOString()}</p>
+                        <p><strong>Timezone:</strong> {Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
+                        <p><strong>Language:</strong> {navigator.language}</p>
+                        <p><strong>Online:</strong> {navigator.onLine ? 'Evet' : 'Hayır'}</p>
+                        <p><strong>Screen:</strong> {screen.width}x{screen.height}</p>
+                        <p><strong>Window:</strong> {window.innerWidth}x{window.innerHeight}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <button
-                  onClick={sendTestEmail}
-                  disabled={isLoading || !klaviyoSettings.apiKey}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                  Test Emaili Gönder
-                </button>
+                {/* Test Results */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900">Test Sonuçları</h4>
 
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <h4 className="font-semibold mb-2">Debug Bilgileri</h4>
-                  <div className="text-sm space-y-1">
-                    <p><strong>API Key:</strong> {klaviyoSettings.apiKey ? '***' + klaviyoSettings.apiKey.slice(-4) : 'Tanımlanmamış'}</p>
-                    <p><strong>From Email:</strong> {klaviyoSettings.fromEmail || 'Tanımlanmamış'}</p>
-                    <p><strong>Durum:</strong> {klaviyoSettings.isActive ? 'Aktif' : 'Pasif'}</p>
-                  </div>
+                  {testResults.length > 0 ? (
+                    <div className="space-y-3">
+                      {testResults.map((result, index) => (
+                        <div
+                          key={index}
+                          className={`p-4 rounded-lg border ${
+                            result.success
+                              ? 'bg-green-50 border-green-200'
+                              : 'bg-red-50 border-red-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-medium flex items-center gap-2">
+                              {result.success ? (
+                                <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : (
+                                <svg className="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              )}
+                              {result.testType}
+                            </h5>
+                            {result.duration && (
+                              <span className="text-xs text-gray-500">{result.duration}ms</span>
+                            )}
+                          </div>
+
+                          {result.success && result.data && (
+                            <div className="text-sm text-gray-700 mb-2">
+                              <strong>Sonuç:</strong>
+                              <pre className="mt-1 text-xs bg-white p-2 rounded border overflow-x-auto">
+                                {JSON.stringify(result.data, null, 2)}
+                              </pre>
+                            </div>
+                          )}
+
+                          {result.error && (
+                            <div className="text-sm text-red-700 mb-2">
+                              <strong>Hata:</strong> {result.error}
+                            </div>
+                          )}
+
+                          {debugMode && result.debug && (
+                            <div className="mt-3 p-3 bg-gray-100 rounded border">
+                              <div className="flex items-center justify-between mb-2">
+                                <strong className="text-xs font-medium text-gray-800">Debug Bilgileri</strong>
+                                <span className="text-xs text-gray-500">{result.debug.timestamp}</span>
+                              </div>
+
+                              <div className="space-y-2 text-xs">
+                                <div>
+                                  <strong>İstek:</strong> {result.debug.requestMethod} {result.debug.requestUrl}
+                                </div>
+
+                                {result.debug.requestHeaders && (
+                                  <div>
+                                    <strong>İstek Headers:</strong>
+                                    <pre className="mt-1 bg-white p-2 rounded text-xs overflow-x-auto">
+                                      {JSON.stringify(result.debug.requestHeaders, null, 2)}
+                                    </pre>
+                                  </div>
+                                )}
+
+                                {result.debug.requestBody && (
+                                  <div>
+                                    <strong>İstek Body:</strong>
+                                    <pre className="mt-1 bg-white p-2 rounded text-xs overflow-x-auto">
+                                      {JSON.stringify(result.debug.requestBody, null, 2)}
+                                    </pre>
+                                  </div>
+                                )}
+
+                                {result.debug.responseStatus && (
+                                  <div>
+                                    <strong>Response Status:</strong> {result.debug.responseStatus}
+                                  </div>
+                                )}
+
+                                {result.debug.responseHeaders && (
+                                  <div>
+                                    <strong>Response Headers:</strong>
+                                    <pre className="mt-1 bg-white p-2 rounded text-xs overflow-x-auto">
+                                      {JSON.stringify(result.debug.responseHeaders, null, 2)}
+                                    </pre>
+                                  </div>
+                                )}
+
+                                {result.debug.rawResponse && (
+                                  <div>
+                                    <strong>Raw Response:</strong>
+                                    <pre className="mt-1 bg-white p-2 rounded text-xs overflow-x-auto max-h-32">
+                                      {result.debug.rawResponse}
+                                    </pre>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p>Henüz test çalıştırılmadı.</p>
+                      <p className="text-sm mt-1">Klaviyo API'yi test etmek için yukarıdaki butona tıklayın.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Test Description */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h5 className="font-medium text-blue-900 mb-2">Test Açıklamaları</h5>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <p><strong>Bağlantı Testi:</strong> Klaviyo API anahtarının geçerliliğini ve hesap bilgilerinizi kontrol eder.</p>
+                  <p><strong>Profil Yönetimi:</strong> Test email adresi için profil oluşturma/getirme işlemlerini test eder.</p>
+                  <p><strong>Email Gönderimi:</strong> Test email adresi için event oluşturur (gerçek email gönderimi flow yapılandırmasına bağlıdır).</p>
+                  <p><strong>Campaigns Access:</strong> Klaviyo campaigns API'sine erişimi ve izinleri test eder.</p>
+                  <p><strong>Client Events API:</strong> Frontend event tracking için client events API'sini test eder.</p>
+                  <p><strong>Tüm Testler:</strong> Yukarıdaki tüm testleri sırayla çalıştırır.</p>
                 </div>
               </div>
             </div>

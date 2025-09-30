@@ -11,17 +11,17 @@ interface KlaviyoSettings {
 export async function GET() {
   try {
     if (!process.env.DATABASE_URL) {
-      // Mock data fallback
-      const mockSettings: KlaviyoSettings = {
+      // Return empty settings if no database
+      const emptySettings: KlaviyoSettings = {
         apiKey: '',
-        fromEmail: 'noreply@iletigo.com',
+        fromEmail: '',
         fromName: 'İletigo Teknoloji',
         isActive: false
       }
 
       return NextResponse.json({
         success: true,
-        data: mockSettings
+        data: emptySettings
       })
     }
 

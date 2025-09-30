@@ -10,7 +10,10 @@
     "db:migrate": "node scripts/migrate.js",
     "db:seed": "node scripts/seed.js",
     "setup-db": "node scripts/setup-db.js",
-    "check-tables": "node scripts/check-tables.js"
+    "check-tables": "node scripts/check-tables.js",
+    "create-super-admin": "node scripts/run_super_admin_migration.js",
+    "add-super-admin": "node scripts/add_super_admin_simple.js",
+    "reset-db": "node scripts/reset_and_setup_database.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.0",

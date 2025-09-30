@@ -11,17 +11,17 @@ interface MailStats {
 export async function GET() {
   try {
     if (!process.env.DATABASE_URL) {
-      // Mock data fallback
-      const mockStats: MailStats = {
-        totalSent: 157,
-        totalFailed: 3,
-        totalPending: 12,
-        lastSentDate: new Date().toISOString()
+      // Return empty stats if no database
+      const emptyStats: MailStats = {
+        totalSent: 0,
+        totalFailed: 0,
+        totalPending: 0,
+        lastSentDate: ''
       }
 
       return NextResponse.json({
         success: true,
-        data: mockStats
+        data: emptyStats
       })
     }
 

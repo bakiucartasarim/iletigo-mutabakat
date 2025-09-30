@@ -12,46 +12,10 @@ interface EmailTemplate {
 export async function GET() {
   try {
     if (!process.env.DATABASE_URL) {
-      // Mock data fallback
-      const mockTemplates: EmailTemplate[] = [
-        {
-          id: '1',
-          name: 'Mutabakat Bildirimi',
-          subject: 'Cari Hesap Mutabakat Bilgilendirmesi - {{company_name}}',
-          content: `Sayın {{customer_name}},
-
-Cari hesap mutabakat bilgileriniz aşağıdaki gibidir:
-
-Hesap Kodu: {{account_code}}
-Tutar: {{amount}} TL
-Durum: {{status}}
-Dönem: {{period}}
-
-Bu bilgileri kontrol ederek, varsa farklılıkları bize bildiriniz.
-
-Saygılarımızla,
-{{from_name}}`,
-          type: 'reconciliation'
-        },
-        {
-          id: '2',
-          name: 'Hatırlatma Emaili',
-          subject: 'Mutabakat Onayı Bekliyor - {{company_name}}',
-          content: `Sayın {{customer_name}},
-
-Daha önce göndermiş olduğumuz mutabakat bilgileriniz henüz onaylanmamıştır.
-
-Lütfen en kısa sürede kontrol ederek onayınızı iletiniz.
-
-Teşekkürler,
-{{from_name}}`,
-          type: 'reminder'
-        }
-      ]
-
+      // Return empty templates if no database
       return NextResponse.json({
         success: true,
-        data: mockTemplates
+        data: []
       })
     }
 
