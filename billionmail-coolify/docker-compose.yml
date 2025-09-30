@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  billionmail:
+    image: ghcr.io/aapanel/billionmail:latest
+    container_name: billionmail
+    restart: unless-stopped
+    ports:
+      - "8888:8888"   # Web UI
+      - "25:25"       # SMTP
+      - "587:587"     # SMTP TLS
+      - "465:465"     # SMTP SSL
+      - "993:993"     # IMAP SSL
+      - "995:995"     # POP3 SSL
+    volumes:
+      - billionmail_data:/opt/billionmail/data
+      - billionmail_logs:/opt/billionmail/logs
+      - billionmail_mail:/var/mail
+      - billionmail_mysql:/var/lib/mysql
+    environment:
+      - TZ=Europe/Istanbul
+      - DOMAIN=${DOMAIN:-mail.example.com}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-changeme}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-billionmail_root_pass}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-billionmail}
+      - MYSQL_USER=${MYSQL_USER:-billionmail}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-billionmail_pass}
+    networks:
+      - billionmail_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  billionmail_data:
+    driver: local
+  billionmail_logs:
+    driver: local
+  billionmail_mail:
+    driver: local
+  billionmail_mysql:
+    driver: local
+
+networks:
+  billionmail_network:
+    driver: bridge
