@@ -214,8 +214,8 @@ async function testProfileManagement(apiKey: string, email: string): Promise<Kla
   try {
     console.log('👤 Testing profile management...')
 
-    // First, try to get existing profile
-    const getResponse = await fetch(`https://a.klaviyo.com/api/profiles/?filter=equals(email,"${email}")`, {
+    // First, try to get existing profile with additional fields
+    const getResponse = await fetch(`https://a.klaviyo.com/api/profiles/?filter=equals(email,"${email}")&additional-fields[profile]=properties`, {
       method: 'GET',
       headers: {
         'Authorization': `Klaviyo-API-Key ${apiKey}`,
@@ -236,12 +236,17 @@ async function testProfileManagement(apiKey: string, email: string): Promise<Kla
 
     const existingData = await getResponse.json()
     let profileId = null
+    let profileData = null
+    let companyId = null
 
     if (existingData.data && existingData.data.length > 0) {
       profileId = existingData.data[0].id
+      profileData = existingData.data[0].attributes
+      companyId = profileData?.properties?.company_id || null
       console.log('📋 Profile already exists:', profileId)
+      console.log('🏢 Company ID from profile:', companyId)
     } else {
-      // Create new profile
+      // Create new profile with company_id in properties
       const createResponse = await fetch('https://a.klaviyo.com/api/profiles/', {
         method: 'POST',
         headers: {
@@ -259,7 +264,8 @@ async function testProfileManagement(apiKey: string, email: string): Promise<Kla
               last_name: 'User',
               properties: {
                 'test_account': true,
-                'created_by': 'İletigo Mail Engine'
+                'created_by': 'İletigo Mail Engine',
+                'company_id': 1 // Default test company ID
               }
             }
           }
@@ -269,6 +275,8 @@ async function testProfileManagement(apiKey: string, email: string): Promise<Kla
       if (createResponse.ok) {
         const newProfile = await createResponse.json()
         profileId = newProfile.data.id
+        profileData = newProfile.data.attributes
+        companyId = 1 // Set default company_id for new profiles
         console.log('✅ Profile created:', profileId)
       } else {
         const duration = Date.now() - startTime
@@ -290,7 +298,12 @@ async function testProfileManagement(apiKey: string, email: string): Promise<Kla
       data: {
         profileId,
         email,
-        action: existingData.data?.length > 0 ? 'found_existing' : 'created_new'
+        companyId,
+        firstName: profileData?.first_name,
+        lastName: profileData?.last_name,
+        properties: profileData?.properties,
+        action: existingData.data?.length > 0 ? 'found_existing' : 'created_new',
+        note: 'company_id is stored in profile properties and can be used for filtering'
       },
       duration
     }
