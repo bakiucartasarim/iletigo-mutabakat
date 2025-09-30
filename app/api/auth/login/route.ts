@@ -15,12 +15,14 @@ export async function POST(request: NextRequest) {
 
     console.log('Login attempt for email:', email)
 
-    // E-mail adresinden şirketi bul (geçici çözüm: companies tablosundan giriş)
+    // Kullanıcıyı bul
     const userQuery = `
-      SELECT id, email, password_hash, contact_person as first_name,
-             name as company_name, 'admin' as role, is_active
-      FROM companies
-      WHERE email = $1 AND is_active = true
+      SELECT u.id, u.email, u.password_hash, u.first_name, u.last_name,
+             u.role, u.company_id, u.is_active,
+             c.name as company_name
+      FROM users u
+      LEFT JOIN companies c ON u.company_id = c.id
+      WHERE u.email = $1 AND u.is_active = true
     `
 
     const result = await query(userQuery, [email])
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = result.rows[0]
-    console.log('Company found:', { id: user.id, email: user.email, company_name: user.company_name })
+    console.log('User found:', { id: user.id, email: user.email, role: user.role, company_name: user.company_name })
 
     // Şifre doğrulama
     console.log('Comparing password with hash...')
@@ -50,9 +52,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Son giriş zamanını güncelle (companies tablosuna ekleyelim)
+    // Son giriş zamanını güncelle
     await query(
-      "UPDATE companies SET updated_at = CURRENT_TIMESTAMP WHERE id = $1",
+      "UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = $1",
       [user.id]
     )
 
@@ -64,9 +66,9 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
           firstName: user.first_name,
-          lastName: '',
+          lastName: user.last_name,
           role: user.role,
-          companyId: user.id,
+          companyId: user.company_id,
           companyName: user.company_name
         }
       },
