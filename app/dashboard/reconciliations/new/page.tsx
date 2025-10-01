@@ -14,6 +14,22 @@ interface Company {
   mobile_phone?: string
 }
 
+interface CompanyTemplate {
+  id: number
+  company_id: number
+  template_name: string
+  header_text: string
+  intro_text: string
+  note1: string
+  note2: string
+  note3: string
+  note4: string
+  note5: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 export default function NewReconciliationPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -22,6 +38,8 @@ export default function NewReconciliationPage() {
   const [currentStep, setCurrentStep] = useState(1) // Progress step indicator
   const [excelData, setExcelData] = useState<any[]>([]) // Excel data storage
   const [isReminderDropdownOpen, setIsReminderDropdownOpen] = useState(false)
+  const [companyTemplate, setCompanyTemplate] = useState<CompanyTemplate | null>(null)
+  const [templateLoading, setTemplateLoading] = useState(false)
   const [formData, setFormData] = useState({
     company_code: '',
     company_name: '',
@@ -66,6 +84,34 @@ export default function NewReconciliationPage() {
     updateTime()
     const timeInterval = setInterval(updateTime, 60000)
     return () => clearInterval(timeInterval)
+  }, [])
+
+  useEffect(() => {
+    // Şirket şablonunu yükle
+    const fetchCompanyTemplate = async () => {
+      try {
+        setTemplateLoading(true)
+        const response = await fetch('/api/company-templates')
+
+        if (response.ok) {
+          const data = await response.json()
+          setCompanyTemplate(data)
+          // Default olarak şirket şablonunu seç
+          if (data) {
+            setFormData(prev => ({
+              ...prev,
+              template: `sirket_sablonu_${data.id}`
+            }))
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching company template:', error)
+      } finally {
+        setTemplateLoading(false)
+      }
+    }
+
+    fetchCompanyTemplate()
   }, [])
 
   useEffect(() => {
@@ -606,11 +652,23 @@ export default function NewReconciliationPage() {
                           value={formData.template}
                           onChange={handleInputChange}
                           required
+                          disabled={templateLoading}
                         >
-                          <option value="cari_mutabakat_tr">Cari Mutabakat (TR)</option>
-                          <option value="detayli_mutabakat_tr">Detaylı Mutabakat (TR)</option>
-                          <option value="ozet_mutabakat_tr">Özet Mutabakat (TR)</option>
-                          <option value="international_en">International Template (EN)</option>
+                          {templateLoading ? (
+                            <option value="">Şablonlar yükleniyor...</option>
+                          ) : (
+                            <>
+                              {companyTemplate && (
+                                <option value={`sirket_sablonu_${companyTemplate.id}`}>
+                                  {companyTemplate.template_name} (Şirket Şablonu)
+                                </option>
+                              )}
+                              <option value="cari_mutabakat_tr">Cari Mutabakat (TR)</option>
+                              <option value="detayli_mutabakat_tr">Detaylı Mutabakat (TR)</option>
+                              <option value="ozet_mutabakat_tr">Özet Mutabakat (TR)</option>
+                              <option value="international_en">International Template (EN)</option>
+                            </>
+                          )}
                         </select>
                       </div>
                     </div>
@@ -623,10 +681,11 @@ export default function NewReconciliationPage() {
                         Ön İzleme
                       </button>
                       <button
-                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                         type="button"
+                        onClick={() => router.push('/dashboard/company-templates')}
                       >
-                        Şablon Editörü
+                        Şirket Şablonları
                       </button>
                     </div>
                   </div>
