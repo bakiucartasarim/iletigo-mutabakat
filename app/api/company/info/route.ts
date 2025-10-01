@@ -45,6 +45,9 @@ export async function GET(request: NextRequest) {
 
     const company = result.rows[0]
 
+    console.log('📸 Company logo_url:', company.logo_url)
+    console.log('📸 Company stamp_url:', company.stamp_url)
+
     return NextResponse.json({
       id: company.id,
       name: company.name,

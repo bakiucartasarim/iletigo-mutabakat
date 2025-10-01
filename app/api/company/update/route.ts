@@ -31,9 +31,7 @@ export async function PUT(request: NextRequest) {
       address,
       contact_person,
       website,
-      description,
-      logo_url,
-      stamp_url
+      description
     } = await request.json()
 
     // Validate required fields
@@ -79,7 +77,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Update company information
+    // Update company information (logo_url and stamp_url are managed separately via upload API)
     await query(
       `UPDATE companies
        SET name = $1,
@@ -90,11 +88,9 @@ export async function PUT(request: NextRequest) {
            contact_person = $6,
            website = $7,
            description = $8,
-           logo_url = $9,
-           stamp_url = $10,
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $11`,
-      [name, tax_number, email, phone, address, contact_person, website, description, logo_url || '', stamp_url || '', companyId]
+       WHERE id = $9`,
+      [name, tax_number, email, phone, address, contact_person, website, description, companyId]
     )
 
     return NextResponse.json(
