@@ -22,7 +22,8 @@ interface Company {
 
 export default function MailTemplatesPage() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
-  const [isLoading, setIsLoading] = useState(true) // Start with true
+  const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [showEditor, setShowEditor] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
   const [company, setCompany] = useState<Company | null>(null)
@@ -51,12 +52,10 @@ export default function MailTemplatesPage() {
         const data = await response.json()
         setCompany(data)
       } else {
-        // Fallback to mock company for testing
         setCompany({ id: 1, name: 'Test Şirketi', tax_number: '1234567890' })
       }
     } catch (error) {
       console.error('Error fetching company info:', error)
-      // Fallback to mock company
       setCompany({ id: 1, name: 'Test Şirketi', tax_number: '1234567890' })
     }
   }
@@ -70,6 +69,9 @@ export default function MailTemplatesPage() {
       if (response.ok) {
         const data = await response.json()
         setTemplates(data.data || [])
+        if (data.data && data.data.length > 0) {
+          setSelectedTemplate(data.data[0])
+        }
       } else {
         showToast('Şablonlar yüklenemedi', 'error')
       }
@@ -151,6 +153,9 @@ export default function MailTemplatesPage() {
 
         if (response.ok) {
           showToast('Şablon silindi', 'success')
+          if (selectedTemplate?.id === id) {
+            setSelectedTemplate(null)
+          }
           loadTemplates()
         } else {
           const error = await response.json()
@@ -186,7 +191,7 @@ export default function MailTemplatesPage() {
   ]
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="h-screen flex flex-col bg-gray-50">
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-lg">
@@ -196,182 +201,266 @@ export default function MailTemplatesPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-            </svg>
-            Cari Şablon
-          </h1>
-          <p className="text-gray-600 mt-2">
-            {company ? `${company.name} için email şablonları` : 'Email şablonlarını yönetin'}
-          </p>
-        </div>
+      {/* Header */}
+      <div className="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
+        <h1 className="text-xl font-semibold">CARİ ŞABLONLAR</h1>
         <button
           onClick={() => {
             setEditingTemplate(null)
             setFormData({ name: '', subject: '', content: '', isActive: true })
             setShowEditor(true)
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
         >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Yeni Şablon
+          <span>Yeni Şablon Ekle</span>
         </button>
       </div>
 
-      {/* Templates List */}
-      {!showEditor && (
-        <div className="grid grid-cols-1 gap-6">
-          {templates.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-              <svg className="h-16 w-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Henüz şablon oluşturulmamış</h3>
-              <p className="text-gray-600 mb-4">İlk email şablonunuzu oluşturmak için "Yeni Şablon" butonuna tıklayın</p>
+      {!showEditor ? (
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Sidebar - Templates List */}
+          <div className="w-80 bg-white border-r border-gray-300 flex flex-col">
+            <div className="bg-blue-500 text-white px-4 py-3 font-medium">
+              ÜSTTE ŞABLONLAR
             </div>
-          ) : (
-            templates.map((template) => (
-              <div key={template.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">{template.name}</h3>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        template.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {template.is_active ? 'Aktif' : 'Pasif'}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-4">
-                      <strong>Konu:</strong> {template.subject}
-                    </p>
-                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4 max-h-48 overflow-y-auto">
-                      <div className="text-sm text-gray-800 whitespace-pre-wrap break-words" dangerouslySetInnerHTML={{ __html: template.content }} />
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {Array.isArray(template.variables) && template.variables.map((variable) => (
-                        <span key={variable} className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded border border-blue-200">
-                          {`{{${variable}}}`}
+            <div className="flex-1 overflow-y-auto">
+              {templates.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  <p>Henüz şablon oluşturulmamış</p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {templates.map((template) => (
+                    <div
+                      key={template.id}
+                      onClick={() => setSelectedTemplate(template)}
+                      className={`p-4 cursor-pointer hover:bg-blue-50 transition-colors ${
+                        selectedTemplate?.id === template.id ? 'bg-blue-100 border-l-4 border-blue-600' : ''
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 truncate">{template.name}</h3>
+                          <p className="text-xs text-gray-500 mt-1">
+                            <strong>Giriş Metni:</strong>
+                          </p>
+                          <div
+                            className="text-xs text-gray-600 mt-1 line-clamp-2"
+                            dangerouslySetInnerHTML={{ __html: template.content.substring(0, 80) + '...' }}
+                          />
+                        </div>
+                        <div className="flex gap-1 ml-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEdit(template)
+                            }}
+                            className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                            title="Düzenle"
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDelete(template.id)
+                            }}
+                            className="p-1 text-red-600 hover:bg-red-100 rounded"
+                            title="Sil"
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <span className={`inline-block px-2 py-1 text-xs rounded ${
+                          template.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {template.is_active ? 'Aktif' : 'Pasif'}
                         </span>
-                      ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Panel - Preview */}
+          <div className="flex-1 flex flex-col bg-gray-100">
+            <div className="bg-gray-200 px-4 py-3 font-medium text-gray-700 flex items-center justify-between border-b">
+              <span>ÖNİZLEME ŞABLONLARI</span>
+              {selectedTemplate && (
+                <button
+                  onClick={() => setSelectedTemplate(null)}
+                  className="text-gray-600 hover:text-gray-800 text-sm"
+                >
+                  Önizlemeyi Kapat
+                </button>
+              )}
+            </div>
+            <div className="flex-1 overflow-auto p-6">
+              {selectedTemplate ? (
+                <div className="max-w-4xl mx-auto">
+                  {/* Preview Card */}
+                  <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 text-center">
+                      <div className="mb-4">
+                        <img src="/logo.png" alt="Logo" className="h-12 mx-auto" onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }} />
+                      </div>
+                      <h2 className="text-2xl font-bold">MUTABAKAT MEKTUBU</h2>
+                      <p className="text-sm mt-2">Referans Kodu: {selectedTemplate.subject.includes('{{referansKodu}}') ? 'TMPL' : selectedTemplate.name}</p>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-8">
+                      <div
+                        className="text-gray-800 leading-relaxed space-y-4"
+                        dangerouslySetInnerHTML={{ __html: selectedTemplate.content }}
+                      />
+                    </div>
+
+                    {/* Footer */}
+                    <div className="bg-gray-50 p-6 border-t">
+                      <div className="text-sm text-gray-600">
+                        <p className="font-semibold">{company?.name || 'Şirket Adı'}</p>
+                        <p>Vergi No: {company?.tax_number || '0000000000'}</p>
+                        <p className="mt-2 text-xs text-gray-500">
+                          Bu email otomatik olarak oluşturulmuştur.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                <div className="flex gap-2 ml-4">
-                  <button
-                    onClick={() => handleEdit(template)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                  >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+
+                  {/* Template Info */}
+                  <div className="mt-6 bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <h3 className="font-semibold text-blue-900 mb-2">Şablon Bilgileri</h3>
+                    <div className="text-sm text-blue-800 space-y-1">
+                      <p><strong>Şablon Adı:</strong> {selectedTemplate.name}</p>
+                      <p><strong>Email Konusu:</strong> {selectedTemplate.subject}</p>
+                      <p><strong>Durum:</strong> {selectedTemplate.is_active ? 'Aktif' : 'Pasif'}</p>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-sm font-medium text-blue-900 mb-2">Kullanılan Değişkenler:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {Array.isArray(selectedTemplate.variables) && selectedTemplate.variables.map((variable) => (
+                          <span key={variable} className="px-2 py-1 text-xs bg-white text-blue-700 rounded border border-blue-300">
+                            {`{{${variable}}}`}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <svg className="h-24 w-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                  </button>
-                  <button
-                    onClick={() => handleDelete(template.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                  >
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                    <p className="text-lg">Önizlemek için sol taraftan bir şablon seçin</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Editor Modal */
+        <div className="flex-1 overflow-auto p-6">
+          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
+            <div className="p-6 border-b border-gray-200 bg-blue-600 text-white rounded-t-lg">
+              <h2 className="text-xl font-semibold">
+                {editingTemplate ? 'Şablonu Düzenle' : 'Yeni Şablon Oluştur'}
+              </h2>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Şablon Adı *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Örn: Cari Mutabakat Mektubu"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Şablon Aktif</label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Konusu *</label>
+                <input
+                  type="text"
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Örn: Mutabakat Mektubu - {{referansKodu}}"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email İçeriği (HTML) *</label>
+                <textarea
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  rows={12}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                  placeholder="HTML email içeriği..."
+                />
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-blue-900 mb-3">Kullanılabilir Değişkenler</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {availableVariables.map((variable) => (
+                    <button
+                      key={variable.key}
+                      onClick={() => setFormData({ ...formData, content: formData.content + ' ' + variable.key })}
+                      className="text-left px-3 py-2 bg-white border border-blue-200 rounded hover:bg-blue-100 text-sm"
+                    >
+                      <div className="font-mono text-blue-700">{variable.key}</div>
+                      <div className="text-xs text-gray-600">{variable.desc}</div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
-          ))
-          )}
-        </div>
-      )}
 
-      {/* Template Editor */}
-      {showEditor && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold">
-              {editingTemplate ? 'Şablonu Düzenle' : 'Yeni Şablon Oluştur'}
-            </h2>
-          </div>
-
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Şablon Adı</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Örn: Cari Mutabakat Mektubu"
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Şablon Aktif</label>
-              </div>
+            <div className="p-6 border-t border-gray-200 flex gap-3 bg-gray-50 rounded-b-lg">
+              <button
+                onClick={handleSave}
+                disabled={isLoading}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              >
+                {isLoading ? 'Kaydediliyor...' : 'ŞABLONU GÜNCELLE'}
+              </button>
+              <button
+                onClick={() => setShowEditor(false)}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+              >
+                ŞABLONU SİL
+              </button>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email Konusu</label>
-              <input
-                type="text"
-                value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Örn: Mutabakat Mektubu - {{referansKodu}}"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email İçeriği (HTML)</label>
-              <textarea
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows={12}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
-                placeholder="HTML email içeriği..."
-              />
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-blue-900 mb-3">Kullanılabilir Değişkenler</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {availableVariables.map((variable) => (
-                  <button
-                    key={variable.key}
-                    onClick={() => setFormData({ ...formData, content: formData.content + ' ' + variable.key })}
-                    className="text-left px-3 py-2 bg-white border border-blue-200 rounded hover:bg-blue-100 text-sm"
-                  >
-                    <div className="font-mono text-blue-700">{variable.key}</div>
-                    <div className="text-xs text-gray-600">{variable.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6 border-t border-gray-200 flex gap-3">
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Kaydet
-            </button>
-            <button
-              onClick={() => setShowEditor(false)}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              İptal
-            </button>
           </div>
         </div>
       )}
