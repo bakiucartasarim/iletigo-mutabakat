@@ -20,7 +20,7 @@ interface Company {
   tax_number: string
 }
 
-export default function MailTemplatesPage() {
+export default function MailContentTemplatesPage() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -188,10 +188,11 @@ export default function MailTemplatesPage() {
     { key: '{{bakiyeTipi}}', desc: 'Bakiye Tipi (ALACAK/BORÇ)' },
     { key: '{{adres}}', desc: 'Adres' },
     { key: '{{vergiNo}}', desc: 'Vergi No' },
+    { key: '{{linkUrl}}', desc: 'Mutabakat Görüntüleme Linki' },
   ]
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-[calc(100vh-120px)] flex flex-col bg-gray-50">
       {isLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg shadow-lg">
@@ -203,7 +204,7 @@ export default function MailTemplatesPage() {
 
       {/* Header */}
       <div className="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">CARİ ŞABLONLAR</h1>
+        <h1 className="text-xl font-semibold">MAİL METİN ŞABLONLARI</h1>
         <button
           onClick={() => {
             setEditingTemplate(null)
@@ -212,6 +213,9 @@ export default function MailTemplatesPage() {
           }}
           className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
         >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
           <span>Yeni Şablon Ekle</span>
         </button>
       </div>
@@ -221,12 +225,16 @@ export default function MailTemplatesPage() {
           {/* Left Sidebar - Templates List */}
           <div className="w-80 bg-white border-r border-gray-300 flex flex-col">
             <div className="bg-blue-500 text-white px-4 py-3 font-medium">
-              ÜSTTE ŞABLONLAR
+              ŞABLON LİSTESİ
             </div>
             <div className="flex-1 overflow-y-auto">
               {templates.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
+                  <svg className="h-16 w-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
                   <p>Henüz şablon oluşturulmamış</p>
+                  <p className="text-sm mt-2">Yukarıdaki "Yeni Şablon Ekle" butonuna tıklayarak başlayın</p>
                 </div>
               ) : (
                 <div className="divide-y">
@@ -242,7 +250,7 @@ export default function MailTemplatesPage() {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-gray-900 truncate">{template.name}</h3>
                           <p className="text-xs text-gray-500 mt-1">
-                            <strong>Giriş Metni:</strong>
+                            <strong>Konu:</strong> {template.subject}
                           </p>
                           <div
                             className="text-xs text-gray-600 mt-1 line-clamp-2"
@@ -293,7 +301,7 @@ export default function MailTemplatesPage() {
           {/* Right Panel - Preview */}
           <div className="flex-1 flex flex-col bg-gray-100">
             <div className="bg-gray-200 px-4 py-3 font-medium text-gray-700 flex items-center justify-between border-b">
-              <span>ÖNİZLEME ŞABLONLARI</span>
+              <span>ÖNİZLEME</span>
               {selectedTemplate && (
                 <button
                   onClick={() => setSelectedTemplate(null)}
@@ -306,38 +314,28 @@ export default function MailTemplatesPage() {
             <div className="flex-1 overflow-auto p-6">
               {selectedTemplate ? (
                 <div className="max-w-4xl mx-auto">
-                  {/* Preview Card */}
+                  {/* Email Preview Card */}
                   <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 text-center relative">
-                      <div className="mb-4">
-                        {company?.logo_url ? (
-                          <img src={company.logo_url} alt="Logo" className="h-16 mx-auto object-contain" />
-                        ) : (
-                          <div className="h-16 mx-auto flex items-center justify-center text-white text-2xl font-bold">
-                            {company?.name?.substring(0, 2).toUpperCase()}
-                          </div>
-                        )}
+                    {/* Email Header */}
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 border-b">
+                      <div className="flex items-center gap-2 text-sm">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span className="font-semibold">Konu:</span>
+                        <span>{selectedTemplate.subject}</span>
                       </div>
-                      <h2 className="text-2xl font-bold">MUTABAKAT MEKTUBU</h2>
-                      <p className="text-sm mt-2">Referans Kodu: {selectedTemplate.subject.includes('{{referansKodu}}') ? 'TMPL-001' : selectedTemplate.name}</p>
-                      {/* Stamp in top right corner */}
-                      {company?.stamp_url && (
-                        <div className="absolute top-4 right-4">
-                          <img src={company.stamp_url} alt="Kaşe" className="h-20 w-20 object-contain opacity-90" />
-                        </div>
-                      )}
                     </div>
 
-                    {/* Content */}
+                    {/* Email Body */}
                     <div className="p-8">
                       <div
-                        className="text-gray-800 leading-relaxed space-y-4"
+                        className="text-gray-800 leading-relaxed space-y-4 prose prose-sm max-w-none"
                         dangerouslySetInnerHTML={{ __html: selectedTemplate.content }}
                       />
                     </div>
 
-                    {/* Footer */}
+                    {/* Email Footer */}
                     <div className="bg-gray-50 p-6 border-t">
                       <div className="text-sm text-gray-600">
                         <p className="font-semibold">{company?.name || 'Şirket Adı'}</p>
@@ -373,7 +371,7 @@ export default function MailTemplatesPage() {
                 <div className="flex items-center justify-center h-full text-gray-500">
                   <div className="text-center">
                     <svg className="h-24 w-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <p className="text-lg">Önizlemek için sol taraftan bir şablon seçin</p>
                   </div>
@@ -385,7 +383,7 @@ export default function MailTemplatesPage() {
       ) : (
         /* Editor Modal */
         <div className="flex-1 overflow-auto p-6">
-          <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
+          <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-lg">
             <div className="p-6 border-b border-gray-200 bg-blue-600 text-white rounded-t-lg">
               <h2 className="text-xl font-semibold">
                 {editingTemplate ? 'Şablonu Düzenle' : 'Yeni Şablon Oluştur'}
@@ -401,7 +399,7 @@ export default function MailTemplatesPage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Örn: Cari Mutabakat Mektubu"
+                    placeholder="Örn: Cari Mutabakat Mail Şablonu"
                   />
                 </div>
 
@@ -433,7 +431,7 @@ export default function MailTemplatesPage() {
                 <textarea
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={12}
+                  rows={15}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
                   placeholder="HTML email içeriği..."
                 />
@@ -441,14 +439,14 @@ export default function MailTemplatesPage() {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-blue-900 mb-3">Kullanılabilir Değişkenler</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {availableVariables.map((variable) => (
                     <button
                       key={variable.key}
                       onClick={() => setFormData({ ...formData, content: formData.content + ' ' + variable.key })}
                       className="text-left px-3 py-2 bg-white border border-blue-200 rounded hover:bg-blue-100 text-sm"
                     >
-                      <div className="font-mono text-blue-700">{variable.key}</div>
+                      <div className="font-mono text-blue-700 text-xs">{variable.key}</div>
                       <div className="text-xs text-gray-600">{variable.desc}</div>
                     </button>
                   ))}
@@ -460,15 +458,27 @@ export default function MailTemplatesPage() {
               <button
                 onClick={handleSave}
                 disabled={isLoading}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2"
               >
-                {isLoading ? 'Kaydediliyor...' : 'ŞABLONU GÜNCELLE'}
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Kaydediliyor...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    KAYDET
+                  </>
+                )}
               </button>
               <button
                 onClick={() => setShowEditor(false)}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium"
               >
-                ŞABLONU SİL
+                İPTAL
               </button>
             </div>
           </div>
