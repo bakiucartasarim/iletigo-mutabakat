@@ -181,14 +181,14 @@ export default function MailContentTemplatesPage() {
   }
 
   const availableVariables = [
-    { key: '{{sirketAdi}}', desc: 'Şirket Adı' },
+    { key: '{{sirketAdi}}', desc: 'Karşı Taraf Şirket Adı (Excel)' },
+    { key: '{{gonderenSirket}}', desc: 'Sizin Şirket Adınız' },
     { key: '{{referansKodu}}', desc: 'Referans Kodu' },
     { key: '{{tarih}}', desc: 'Tarih' },
     { key: '{{tutar}}', desc: 'Tutar' },
     { key: '{{bakiyeTipi}}', desc: 'Bakiye Tipi (ALACAK/BORÇ)' },
-    { key: '{{adres}}', desc: 'Adres' },
-    { key: '{{vergiNo}}', desc: 'Vergi No' },
     { key: '{{linkUrl}}', desc: 'Mutabakat Görüntüleme Linki' },
+    { key: '{{vergiNo}}', desc: 'Vergi No' },
   ]
 
   return (

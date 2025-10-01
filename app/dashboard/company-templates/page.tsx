@@ -205,7 +205,10 @@ export default function CompanyTemplatesPage() {
               placeholder="Giriş metnini buraya yazın..."
             />
             <p className="mt-1 text-xs text-gray-500">
-              Değişkenler: %DÖNEM%, %TUTAR%, %BORÇALACAK%
+              Değişkenler: %DÖNEM% (tarih), %TUTAR% (miktar), %BORÇALACAK% (ALACAK/BORÇ)
+            </p>
+            <p className="text-xs text-blue-600 mt-1">
+              Not: "Sayın, [Şirket Adı]" kısmı Excel'den otomatik gelecek
             </p>
           </div>
 
@@ -345,13 +348,13 @@ export default function CompanyTemplatesPage() {
               {/* Company Info */}
               <div className="mb-6">
                 <p className="text-sm text-gray-700">
-                  <strong>Sayın,</strong> {company?.name || 'kolaymutabakat.com'}
+                  <strong>Sayın,</strong> [Karşı Taraf Şirketi - Excel'den gelecek]
                 </p>
                 <p className="text-sm text-gray-600 mt-2">
                   <strong>TARİH:</strong> 24 Temmuz 2020
                 </p>
                 <p className="text-sm text-gray-600">
-                  Şirketimiz nezdindeki cari hesabınız 24 Temmuz 2020 tarihi itibarıyle 10.000,00 ALACAK bakiyesi vermektedir.
+                  {templateData.introText || 'Şirketimiz nezdindeki cari hesabınız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir.'}
                 </p>
               </div>
 
@@ -379,11 +382,13 @@ export default function CompanyTemplatesPage() {
                 </table>
               </div>
 
-              {/* Company Details */}
+              {/* Company Details - SENDER (Your Company) */}
               <div className="mb-6 pb-4 border-b border-gray-300">
-                <p className="text-sm font-semibold text-gray-900">{company?.name || 'Yeni Mutabakat Şirketi A.Ş.'}</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {company?.name || 'Yeni Mutabakat Şirketi A.Ş.'} <span className="text-xs text-gray-500">(Gönderen Şirket)</span>
+                </p>
                 <p className="text-sm text-gray-700">
-                  <strong>Ticaret Sicil Numarası:</strong> {company?.tax_number || '808070'}
+                  <strong>Vergi Numarası:</strong> {company?.tax_number || '808070'}
                 </p>
                 <p className="text-sm text-gray-700">
                   <strong>Adres:</strong>
