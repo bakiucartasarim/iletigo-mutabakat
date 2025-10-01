@@ -62,7 +62,7 @@ export default function NewReconciliationPage() {
     reminder_days: [],
     sender_branch: 'merkez',
     language: 'tr',
-    template: 'cari_mutabakat_tr',
+    template: '', // Will be set from company template or default
     // Özel ayarlar
     auto_request_statement: false,
     email_notification: false,
@@ -97,15 +97,27 @@ export default function NewReconciliationPage() {
           const data = await response.json()
           setCompanyTemplate(data)
           // Default olarak şirket şablonunu seç
-          if (data) {
+          if (data && data.id) {
             setFormData(prev => ({
               ...prev,
               template: `sirket_sablonu_${data.id}`
             }))
           }
+        } else {
+          // Eğer şirket şablonu yoksa, standart şablonu seç
+          console.log('No company template found, using default')
+          setFormData(prev => ({
+            ...prev,
+            template: 'cari_mutabakat_tr'
+          }))
         }
       } catch (error) {
         console.error('Error fetching company template:', error)
+        // Hata durumunda da standart şablonu seç
+        setFormData(prev => ({
+          ...prev,
+          template: 'cari_mutabakat_tr'
+        }))
       } finally {
         setTemplateLoading(false)
       }
