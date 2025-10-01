@@ -57,7 +57,11 @@ export default function NewReconciliationPage() {
     reconciliation_date: new Date().toISOString().split('T')[0],
     // Yeni alanlar HTML'e uygun olarak
     reconciliation_period: new Date().toISOString().split('T')[0],
-    end_date: new Date().toISOString().split('T')[0],
+    end_date: (() => {
+      const date = new Date()
+      date.setDate(date.getDate() + 10)
+      return date.toISOString().split('T')[0]
+    })(),
     related_type: 'cari_hesap_bakiye',
     reminder_days: [],
     sender_branch: 'merkez',
@@ -128,6 +132,20 @@ export default function NewReconciliationPage() {
       }))
     }
   }, [formData.reconciliation_date])
+
+  useEffect(() => {
+    // Mutabakat dönemi değiştiğinde bitiş tarihini 10 gün ileri al
+    if (formData.reconciliation_period) {
+      const startDate = new Date(formData.reconciliation_period)
+      const endDate = new Date(startDate)
+      endDate.setDate(endDate.getDate() + 10)
+
+      setFormData(prev => ({
+        ...prev,
+        end_date: endDate.toISOString().split('T')[0]
+      }))
+    }
+  }, [formData.reconciliation_period])
 
   const handleCompanyCodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const code = e.target.value.toUpperCase()
