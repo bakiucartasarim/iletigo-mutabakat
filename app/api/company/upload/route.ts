@@ -5,8 +5,11 @@ import { query } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('📤 Upload request received')
+
     // Get auth token from cookies
     const authToken = request.cookies.get('auth-token')?.value
+    console.log('🔑 Auth token:', authToken ? 'present' : 'missing')
 
     if (!authToken) {
       return NextResponse.json(
@@ -25,10 +28,13 @@ export async function POST(request: NextRequest) {
     }
 
     const companyId = tokenParts[1]
+    console.log('🏢 Company ID:', companyId)
 
     const formData = await request.formData()
     const file = formData.get('file') as File
     const type = formData.get('type') as string // 'logo' or 'stamp'
+
+    console.log('📁 File received:', file?.name, 'Type:', type, 'Size:', file?.size)
 
     if (!file) {
       return NextResponse.json(
@@ -62,6 +68,7 @@ export async function POST(request: NextRequest) {
 
     // Create uploads directory if it doesn't exist
     const uploadsDir = join(process.cwd(), 'public', 'uploads', 'companies', companyId)
+    console.log('📂 Creating directory:', uploadsDir)
     await mkdir(uploadsDir, { recursive: true })
 
     // Generate unique filename
@@ -70,10 +77,14 @@ export async function POST(request: NextRequest) {
     const filename = `${type}-${timestamp}.${extension}`
     const filepath = join(uploadsDir, filename)
 
+    console.log('💾 Saving file to:', filepath)
+
     // Save file
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     await writeFile(filepath, buffer)
+
+    console.log('✅ File saved successfully')
 
     // Generate public URL
     const publicUrl = `/uploads/companies/${companyId}/${filename}`
@@ -87,6 +98,7 @@ export async function POST(request: NextRequest) {
       RETURNING id, ${updateField}
     `
 
+    console.log('🗄️ Updating database...')
     const result = await query(updateQuery, [publicUrl, companyId])
 
     if (result.rows.length === 0) {
@@ -96,6 +108,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    console.log('✅ Database updated:', publicUrl)
+
     return NextResponse.json({
       success: true,
       url: publicUrl,
@@ -103,7 +117,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Upload error:', error)
+    console.error('❌ Upload error:', error)
     return NextResponse.json(
       { error: 'Upload failed', details: error.message },
       { status: 500 }
