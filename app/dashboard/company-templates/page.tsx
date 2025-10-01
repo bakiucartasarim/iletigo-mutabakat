@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import QRCode from 'qrcode'
 
 interface Company {
   id: number
@@ -21,25 +20,29 @@ interface TemplateData {
   introText: string
   note1: string
   note2: string
+  note3: string
+  note4: string
+  note5: string
 }
 
 export default function CompanyTemplatesPage() {
   const [company, setCompany] = useState<Company | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('')
 
   const [templateData, setTemplateData] = useState<TemplateData>({
     templateName: 'Cari Mutabakat',
     headerText: '',
     introText: 'Giriş metnindeki cari hesabımız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir.',
     note1: 'Hata ve Unutma Müstesnadır.',
-    note2: 'Mutabakat veya itirazınız 30 gün içinde bildirmedığiniz takdirde TTK\'nın 94. maddesi uyarınca mutabık sayılacağınızı hatırlatırız.'
+    note2: 'Mutabakat veya itirazınız 30 gün içinde bildirmedığiniz takdirde TTK\'nın 94. maddesi uyarınca mutabık sayılacağınızı hatırlatırız.',
+    note3: 'Mutabakat ile ilgili sorunlarınız için nolu telefondan Sayın ile görüşebilirsiniz.',
+    note4: 'Mutabık olmanızız durumunda cari hesap ekstrenizi www.kolaymutabakat.com sitesine yüklemenizi yada asım.koc@dorufinansol.com adresine e-posta olarak göndermenizi rica ederiz.',
+    note5: ''
   })
 
   useEffect(() => {
     fetchCompanyInfo()
-    generateQRCode()
   }, [])
 
   const fetchCompanyInfo = async () => {
@@ -48,6 +51,8 @@ export default function CompanyTemplatesPage() {
       if (response.ok) {
         const data = await response.json()
         setCompany(data)
+        // Load template data
+        await loadTemplateData()
       } else {
         setCompany({
           id: 1,
@@ -66,29 +71,52 @@ export default function CompanyTemplatesPage() {
     }
   }
 
-  const generateQRCode = async () => {
+  const loadTemplateData = async () => {
     try {
-      const qrData = 'https://www.kolaymutabakat.com'
-      const dataUrl = await QRCode.toDataURL(qrData, {
-        width: 120,
-        margin: 1,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
-        }
-      })
-      setQrCodeDataUrl(dataUrl)
+      const response = await fetch('/api/company-templates')
+      if (response.ok) {
+        const data = await response.json()
+        setTemplateData({
+          templateName: data.template_name || 'Cari Mutabakat',
+          headerText: data.header_text || '',
+          introText: data.intro_text || '',
+          note1: data.note1 || '',
+          note2: data.note2 || '',
+          note3: data.note3 || '',
+          note4: data.note4 || '',
+          note5: data.note5 || ''
+        })
+      }
     } catch (error) {
-      console.error('QR code generation error:', error)
+      console.error('Error loading template:', error)
     }
   }
+
 
   const handleSave = async () => {
     setIsSaving(true)
     try {
-      // TODO: Save to database
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      showToast('Şablon başarıyla güncellendi', 'success')
+      const response = await fetch('/api/company-templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template_name: templateData.templateName,
+          header_text: templateData.headerText,
+          intro_text: templateData.introText,
+          note1: templateData.note1,
+          note2: templateData.note2,
+          note3: templateData.note3,
+          note4: templateData.note4,
+          note5: templateData.note5
+        })
+      })
+
+      if (response.ok) {
+        showToast('Şablon başarıyla kaydedildi', 'success')
+      } else {
+        const error = await response.json()
+        showToast(error.error || 'Şablon kaydedilemedi', 'error')
+      }
     } catch (error) {
       console.error('Save error:', error)
       showToast('Şablon kaydedilirken hata oluştu', 'error')
@@ -130,8 +158,8 @@ export default function CompanyTemplatesPage() {
   return (
     <div className="h-[calc(100vh-120px)] flex bg-gray-100">
       {/* Left Side - Template Editor */}
-      <div className="w-1/3 bg-white border-r border-gray-300 flex flex-col">
-        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-3 font-semibold">
+      <div className="w-1/3 bg-white border-r border-blue-200 flex flex-col">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-3 font-semibold">
           CARİ ŞABLONLARI
         </div>
 
@@ -208,37 +236,79 @@ export default function CompanyTemplatesPage() {
               placeholder="2. Not"
             />
           </div>
+
+          {/* Note 3 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Not Satırı 3
+            </label>
+            <textarea
+              value={templateData.note3}
+              onChange={(e) => setTemplateData({ ...templateData, note3: e.target.value })}
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder="3. Not"
+            />
+          </div>
+
+          {/* Note 4 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Not Satırı 4
+            </label>
+            <textarea
+              value={templateData.note4}
+              onChange={(e) => setTemplateData({ ...templateData, note4: e.target.value })}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder="4. Not"
+            />
+          </div>
+
+          {/* Note 5 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Not Satırı 5
+            </label>
+            <textarea
+              value={templateData.note5}
+              onChange={(e) => setTemplateData({ ...templateData, note5: e.target.value })}
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              placeholder="5. Not (opsiyonel)"
+            />
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200 flex gap-3">
+        <div className="p-3 bg-blue-50 border-t border-blue-200 flex gap-2">
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
           >
             {isSaving ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                Kaydediliyor...
+                <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div>
+                <span>Kaydediliyor...</span>
               </>
             ) : (
               <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                ŞABLONU GÜNCELLE
+                <span>Güncelle</span>
               </>
             )}
           </button>
           <button
             onClick={handleDelete}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-md font-medium transition-colors flex items-center gap-2"
+            className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium transition-colors flex items-center gap-1.5"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            ŞABLONU SİL
+            <span>Sil</span>
           </button>
         </div>
       </div>
@@ -259,15 +329,6 @@ export default function CompanyTemplatesPage() {
                     <div className="h-16 w-32 bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
                       Logo
                     </div>
-                  )}
-                </div>
-
-                {/* QR Code */}
-                <div className="ml-4">
-                  {qrCodeDataUrl ? (
-                    <img src={qrCodeDataUrl} alt="QR Code" className="w-24 h-24" />
-                  ) : (
-                    <div className="w-24 h-24 bg-gray-200"></div>
                   )}
                 </div>
               </div>
@@ -336,11 +397,11 @@ export default function CompanyTemplatesPage() {
               <div className="bg-gray-50 border border-gray-300 p-4">
                 <h3 className="text-sm font-bold text-gray-900 mb-2">Mutabakat Notları</h3>
                 <div className="space-y-2 text-sm text-gray-700">
-                  <p>1. {templateData.note1}</p>
-                  <p>2. {templateData.note2}</p>
-                  {/* Additional pre-defined notes */}
-                  <p>3. 1. Mutabakat ile ilgili sorunlarınız için nolu telefondan Sayın ile görüşebilirsiniz.</p>
-                  <p>4. 2. Mutabık olmanızız durumunda cari hesap ekstrenizi www.kolaymutabakat.com sitesine yüklemenizi yada asım.koc@dorufinansol.com adresine e-posta olarak göndermenizi rica ederiz.</p>
+                  {templateData.note1 && <p>1. {templateData.note1}</p>}
+                  {templateData.note2 && <p>2. {templateData.note2}</p>}
+                  {templateData.note3 && <p>3. {templateData.note3}</p>}
+                  {templateData.note4 && <p>4. {templateData.note4}</p>}
+                  {templateData.note5 && <p>5. {templateData.note5}</p>}
                 </div>
               </div>
 
