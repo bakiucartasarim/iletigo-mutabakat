@@ -70,6 +70,13 @@ export default function CompanySettingsPage() {
           website: data.website || '',
           description: data.description || ''
         })
+        // Set existing logo and stamp previews
+        if (data.logo_url) {
+          setLogoPreview(data.logo_url)
+        }
+        if (data.stamp_url) {
+          setStampPreview(data.stamp_url)
+        }
       }
     } catch (error) {
       console.error('Error fetching company info:', error)
@@ -86,7 +93,7 @@ export default function CompanySettingsPage() {
     }))
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'stamp') => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'stamp') => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -102,16 +109,46 @@ export default function CompanySettingsPage() {
       return
     }
 
-    if (type === 'logo') {
-      setLogoFile(file)
-      const reader = new FileReader()
-      reader.onload = (e) => setLogoPreview(e.target?.result as string)
-      reader.readAsDataURL(file)
-    } else {
-      setStampFile(file)
-      const reader = new FileReader()
-      reader.onload = (e) => setStampPreview(e.target?.result as string)
-      reader.readAsDataURL(file)
+    // Upload file
+    setSaving(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('type', type)
+
+      const response = await fetch('/api/company/upload', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        alert(data.message)
+
+        // Update preview
+        if (type === 'logo') {
+          setLogoFile(file)
+          const reader = new FileReader()
+          reader.onload = (e) => setLogoPreview(e.target?.result as string)
+          reader.readAsDataURL(file)
+        } else {
+          setStampFile(file)
+          const reader = new FileReader()
+          reader.onload = (e) => setStampPreview(e.target?.result as string)
+          reader.readAsDataURL(file)
+        }
+
+        // Refresh company info
+        fetchCompanyInfo()
+      } else {
+        const error = await response.json()
+        alert('Hata: ' + (error.error || 'Yükleme başarısız'))
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Dosya yüklenirken bir hata oluştu')
+    } finally {
+      setSaving(false)
     }
   }
 

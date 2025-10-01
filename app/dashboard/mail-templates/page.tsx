@@ -309,14 +309,24 @@ export default function MailTemplatesPage() {
                   {/* Preview Card */}
                   <div className="bg-white shadow-lg rounded-lg overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 text-center">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 text-center relative">
                       <div className="mb-4">
-                        <img src="/logo.png" alt="Logo" className="h-12 mx-auto" onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none'
-                        }} />
+                        {company?.logo_url ? (
+                          <img src={company.logo_url} alt="Logo" className="h-16 mx-auto object-contain" />
+                        ) : (
+                          <div className="h-16 mx-auto flex items-center justify-center text-white text-2xl font-bold">
+                            {company?.name?.substring(0, 2).toUpperCase()}
+                          </div>
+                        )}
                       </div>
                       <h2 className="text-2xl font-bold">MUTABAKAT MEKTUBU</h2>
-                      <p className="text-sm mt-2">Referans Kodu: {selectedTemplate.subject.includes('{{referansKodu}}') ? 'TMPL' : selectedTemplate.name}</p>
+                      <p className="text-sm mt-2">Referans Kodu: {selectedTemplate.subject.includes('{{referansKodu}}') ? 'TMPL-001' : selectedTemplate.name}</p>
+                      {/* Stamp in top right corner */}
+                      {company?.stamp_url && (
+                        <div className="absolute top-4 right-4">
+                          <img src={company.stamp_url} alt="Kaşe" className="h-20 w-20 object-contain opacity-90" />
+                        </div>
+                      )}
                     </div>
 
                     {/* Content */}
