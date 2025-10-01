@@ -96,28 +96,20 @@ export default function NewReconciliationPage() {
         if (response.ok) {
           const data = await response.json()
           setCompanyTemplate(data)
-          // Default olarak şirket şablonunu seç
+          // Şirket şablonunu seç
           if (data && data.id) {
             setFormData(prev => ({
               ...prev,
               template: `sirket_sablonu_${data.id}`
             }))
+          } else {
+            console.log('No company template found')
           }
         } else {
-          // Eğer şirket şablonu yoksa, standart şablonu seç
-          console.log('No company template found, using default')
-          setFormData(prev => ({
-            ...prev,
-            template: 'cari_mutabakat_tr'
-          }))
+          console.log('Company template not found - user should create one')
         }
       } catch (error) {
         console.error('Error fetching company template:', error)
-        // Hata durumunda da standart şablonu seç
-        setFormData(prev => ({
-          ...prev,
-          template: 'cari_mutabakat_tr'
-        }))
       } finally {
         setTemplateLoading(false)
       }
@@ -668,18 +660,12 @@ export default function NewReconciliationPage() {
                         >
                           {templateLoading ? (
                             <option value="">Şablonlar yükleniyor...</option>
+                          ) : companyTemplate ? (
+                            <option value={`sirket_sablonu_${companyTemplate.id}`}>
+                              {companyTemplate.template_name}
+                            </option>
                           ) : (
-                            <>
-                              {companyTemplate && (
-                                <option value={`sirket_sablonu_${companyTemplate.id}`}>
-                                  {companyTemplate.template_name} (Şirket Şablonu)
-                                </option>
-                              )}
-                              <option value="cari_mutabakat_tr">Cari Mutabakat (TR)</option>
-                              <option value="detayli_mutabakat_tr">Detaylı Mutabakat (TR)</option>
-                              <option value="ozet_mutabakat_tr">Özet Mutabakat (TR)</option>
-                              <option value="international_en">International Template (EN)</option>
-                            </>
+                            <option value="">Şablon bulunamadı - Lütfen Şirket Şablonları sayfasından şablon oluşturun</option>
                           )}
                         </select>
                       </div>
