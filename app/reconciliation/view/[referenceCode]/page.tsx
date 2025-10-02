@@ -47,6 +47,16 @@ export default function ReconciliationViewPage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
+  // Verification states
+  const [verificationStep, setVerificationStep] = useState<'tax' | 'otp' | 'verified'>('tax')
+  const [taxNumber, setTaxNumber] = useState('')
+  const [otpCode, setOtpCode] = useState('')
+  const [verifying, setVerifying] = useState(false)
+  const [verificationError, setVerificationError] = useState<string | null>(null)
+  const [attemptsRemaining, setAttemptsRemaining] = useState(3)
+  const [maskedEmail, setMaskedEmail] = useState<string | null>(null)
+  const [otpExpiresIn, setOtpExpiresIn] = useState(300)
+
   useEffect(() => {
     fetchReconciliationData()
   }, [referenceCode])
@@ -69,6 +79,97 @@ export default function ReconciliationViewPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleTaxVerification = async () => {
+    if (taxNumber.length !== 4) {
+      setVerificationError('Lütfen 4 haneli sayı giriniz')
+      return
+    }
+
+    try {
+      setVerifying(true)
+      setVerificationError(null)
+
+      const response = await fetch(`/api/reconciliation/verify-tax/${referenceCode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taxNumberLast4: taxNumber })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setVerificationError(result.error)
+        if (result.attemptsRemaining !== undefined) {
+          setAttemptsRemaining(result.attemptsRemaining)
+        }
+        return
+      }
+
+      // Success - move to OTP step
+      setMaskedEmail(result.email)
+      setOtpExpiresIn(result.expiresIn || 300)
+      setVerificationStep('otp')
+      setVerificationError(null)
+
+      // Start countdown timer
+      const timer = setInterval(() => {
+        setOtpExpiresIn(prev => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+    } catch (err) {
+      setVerificationError('Bağlantı hatası oluştu')
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  const handleOtpVerification = async () => {
+    if (otpCode.length !== 6) {
+      setVerificationError('Lütfen 6 haneli kodu giriniz')
+      return
+    }
+
+    try {
+      setVerifying(true)
+      setVerificationError(null)
+
+      const response = await fetch(`/api/reconciliation/verify-otp/${referenceCode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ otpCode })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setVerificationError(result.error)
+        return
+      }
+
+      // Success - show reconciliation content
+      setVerificationStep('verified')
+      setVerificationError(null)
+
+    } catch (err) {
+      setVerificationError('Bağlantı hatası oluştu')
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  const handleResendOtp = async () => {
+    setTaxNumber('')
+    setOtpCode('')
+    setVerificationStep('tax')
+    setVerificationError(null)
   }
 
   const handleSubmit = async () => {
@@ -123,6 +224,171 @@ export default function ReconciliationViewPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 font-medium">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show verification screens if not verified
+  if (data && verificationStep !== 'verified') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Güvenlik Doğrulama</h2>
+            <p className="text-gray-600 text-sm">
+              {verificationStep === 'tax'
+                ? 'Mutabakat mektubunuzu görüntülemek için lütfen vergi numaranızın son 4 hanesini giriniz'
+                : 'Email adresinize gönderilen 6 haneli doğrulama kodunu giriniz'
+              }
+            </p>
+          </div>
+
+          {verificationStep === 'tax' && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Vergi Numarası Son 4 Hane
+                </label>
+                <input
+                  type="text"
+                  maxLength={4}
+                  value={taxNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '')
+                    setTaxNumber(value)
+                    setVerificationError(null)
+                  }}
+                  placeholder="****"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-center text-2xl font-mono tracking-widest"
+                  disabled={verifying}
+                />
+              </div>
+
+              {verificationError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                  <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm text-red-600">{verificationError}</p>
+                </div>
+              )}
+
+              {attemptsRemaining < 3 && attemptsRemaining > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-sm text-yellow-700">
+                    ⚠️ Kalan deneme hakkı: {attemptsRemaining}
+                  </p>
+                </div>
+              )}
+
+              <button
+                onClick={handleTaxVerification}
+                disabled={verifying || taxNumber.length !== 4}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {verifying ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <span>Doğrulanıyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    <span>Devam Et</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {verificationStep === 'otp' && (
+            <div className="space-y-4">
+              {maskedEmail && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-blue-700 text-center">
+                    📧 Doğrulama kodu <strong>{maskedEmail}</strong> adresine gönderildi
+                  </p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  6 Haneli Doğrulama Kodu
+                </label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '')
+                    setOtpCode(value)
+                    setVerificationError(null)
+                  }}
+                  placeholder="000000"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-center text-2xl font-mono tracking-widest"
+                  disabled={verifying}
+                />
+              </div>
+
+              {otpExpiresIn > 0 && (
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">
+                    ⏰ Kod geçerlilik süresi: <span className="font-semibold text-blue-600">{Math.floor(otpExpiresIn / 60)}:{(otpExpiresIn % 60).toString().padStart(2, '0')}</span>
+                  </p>
+                </div>
+              )}
+
+              {verificationError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                  <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm text-red-600">{verificationError}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handleOtpVerification}
+                disabled={verifying || otpCode.length !== 6}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {verifying ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                    <span>Doğrulanıyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Doğrula</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleResendOtp}
+                className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium py-2"
+              >
+                Yeni kod gönder
+              </button>
+            </div>
+          )}
+
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-500">
+              🔒 Kişisel verilerinizin güvenliği için iki aşamalı doğrulama yapılmaktadır
+            </p>
+          </div>
         </div>
       </div>
     )
