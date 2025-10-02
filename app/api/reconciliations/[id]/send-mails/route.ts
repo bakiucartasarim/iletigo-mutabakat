@@ -298,7 +298,9 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
           }
         ],
         subject: emailSubject,
-        htmlContent: fullHtmlContent
+        htmlContent: fullHtmlContent,
+        // Tags for tracking (optional)
+        tags: ['mutabakat', `reconciliation-${reconciliationId}`]
       })
     })
 
