@@ -20,6 +20,7 @@ interface ExcelRecord {
   ilgili_kisi_eposta: string
   hata: string
   mail_status: string
+  reconciliation_status: string
   created_at: string
 }
 
@@ -172,6 +173,26 @@ export default function ReconciliationDetailPage() {
     )
   }
 
+  const getReconciliationStatusBadge = (status: string) => {
+    const styles = {
+      beklemede: 'bg-gray-100 text-gray-800 border-gray-200',
+      onaylandi: 'bg-green-100 text-green-800 border-green-200',
+      itiraz: 'bg-orange-100 text-orange-800 border-orange-200'
+    }
+
+    const labels = {
+      beklemede: 'Beklemede',
+      onaylandi: 'Mutabık',
+      itiraz: 'İtiraz'
+    }
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[status] || styles.beklemede}`}>
+        {labels[status] || 'Beklemede'}
+      </span>
+    )
+  }
+
   const getMailStatusStats = () => {
     if (!reconciliation?.excel_data) {
       return {
@@ -190,10 +211,38 @@ export default function ReconciliationDetailPage() {
     }
 
     reconciliation.excel_data.forEach(record => {
-      if (record.mail_status && stats.hasOwnProperty(record.mail_status)) {
-        stats[record.mail_status]++
+      const status = record.mail_status || 'gonderilmedi'
+      if (stats.hasOwnProperty(status)) {
+        stats[status]++
       } else {
         stats.gonderilmedi++
+      }
+    })
+
+    return stats
+  }
+
+  const getReconciliationStatusStats = () => {
+    if (!reconciliation?.excel_data) {
+      return {
+        beklemede: 0,
+        onaylandi: 0,
+        itiraz: 0
+      }
+    }
+
+    const stats = {
+      beklemede: 0,
+      onaylandi: 0,
+      itiraz: 0
+    }
+
+    reconciliation.excel_data.forEach(record => {
+      const status = record.reconciliation_status || 'beklemede'
+      if (stats.hasOwnProperty(status)) {
+        stats[status]++
+      } else {
+        stats.beklemede++
       }
     })
 
@@ -466,31 +515,59 @@ export default function ReconciliationDetailPage() {
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Mail İşlemleri</h3>
 
-                {/* Mail Status Summary */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                  {(() => {
-                    const mailStats = getMailStatusStats()
-                    return (
-                      <>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-gray-600">{mailStats.gonderilmedi}</div>
-                          <div className="text-sm text-gray-500">Gönderilmemiş</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">{mailStats.gonderildi}</div>
-                          <div className="text-sm text-gray-500">Gönderildi</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-red-600">{mailStats.hata}</div>
-                          <div className="text-sm text-gray-500">Hata</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-yellow-600">{mailStats.beklemede}</div>
-                          <div className="text-sm text-gray-500">Beklemede</div>
-                        </div>
-                      </>
-                    )
-                  })()}
+                {/* Status Summary - Side by Side */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
+                  {/* Mail Status Summary */}
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200">
+                    <div className="text-xs font-medium text-gray-700">Mail:</div>
+                    {(() => {
+                      const mailStats = getMailStatusStats()
+                      return (
+                        <>
+                          <div className="flex items-center gap-1">
+                            <div className="text-lg font-bold text-gray-600">{mailStats.gonderilmedi}</div>
+                            <div className="text-xs text-gray-500">Gönderilmemiş</div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="text-lg font-bold text-green-600">{mailStats.gonderildi}</div>
+                            <div className="text-xs text-gray-500">Gönderildi</div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="text-lg font-bold text-red-600">{mailStats.hata}</div>
+                            <div className="text-xs text-gray-500">Hata</div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="text-lg font-bold text-yellow-600">{mailStats.beklemede}</div>
+                            <div className="text-xs text-gray-500">Beklemede</div>
+                          </div>
+                        </>
+                      )
+                    })()}
+                  </div>
+
+                  {/* Reconciliation Status Summary */}
+                  <div className="flex items-center gap-3 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                    <div className="text-xs font-medium text-gray-700">Mutabakat:</div>
+                    {(() => {
+                      const reconStats = getReconciliationStatusStats()
+                      return (
+                        <>
+                          <div className="flex items-center gap-1">
+                            <div className="text-lg font-bold text-gray-600">{reconStats.beklemede}</div>
+                            <div className="text-xs text-gray-500">Beklemede</div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="text-lg font-bold text-green-600">{reconStats.onaylandi}</div>
+                            <div className="text-xs text-gray-500">Mutabık</div>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="text-lg font-bold text-orange-600">{reconStats.itiraz}</div>
+                            <div className="text-xs text-gray-500">İtiraz</div>
+                          </div>
+                        </>
+                      )
+                    })()}
+                  </div>
                 </div>
 
                 {/* Toplu Mail Gönder Button */}
@@ -527,6 +604,9 @@ export default function ReconciliationDetailPage() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Mail Durumu
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Mutabakat Durumu
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -556,6 +636,9 @@ export default function ReconciliationDetailPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {getMailStatusBadge(record.mail_status || 'gonderilmedi')}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {getReconciliationStatusBadge(record.reconciliation_status || 'beklemede')}
                           </td>
                         </tr>
                       ))}

@@ -140,10 +140,10 @@ export async function POST(
     await query(`
       UPDATE reconciliation_excel_data
       SET
-        mail_status = CASE
+        reconciliation_status = CASE
           WHEN $1 = 'mutabik' THEN 'onaylandi'
           WHEN $1 = 'itiraz' THEN 'itiraz'
-          ELSE mail_status
+          ELSE reconciliation_status
         END,
         updated_at = NOW()
       WHERE id = $2 AND reconciliation_id = $3

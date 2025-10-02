@@ -138,6 +138,7 @@ export async function GET(
           ilgili_kisi_eposta,
           hata,
           COALESCE(mail_status, 'gonderilmedi') as mail_status,
+          COALESCE(reconciliation_status, 'beklemede') as reconciliation_status,
           created_at
         FROM reconciliation_excel_data
         WHERE reconciliation_id = $1
