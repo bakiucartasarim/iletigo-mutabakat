@@ -17,8 +17,11 @@ interface CompanyTemplate {
 interface ReconciliationData {
   reference_code: string
   company_name: string
+  company_tax_number: string | null
+  company_address: string | null
   recipient_name: string
   amount: number
+  currency: string
   balance_type: string
   reconciliation_period: string
   is_expired: boolean
@@ -147,9 +150,14 @@ export default function ReconciliationViewPage() {
   // Helper function to replace template variables
   const replaceVariables = (text: string) => {
     if (!text) return ''
+    const formattedAmount = data.amount.toLocaleString('tr-TR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ' ' + (data.currency || 'TRY')
+
     return text
       .replace(/%DÖNEM%/g, new Date(data.reconciliation_period).toLocaleDateString('tr-TR'))
-      .replace(/%TUTAR%/g, data.amount.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }))
+      .replace(/%TUTAR%/g, formattedAmount)
       .replace(/%BORÇALACAK%/g, data.balance_type)
       .replace(/%CARİ_HESAP%/g, data.recipient_name)
       .replace(/%ŞİRKET%/g, data.company_name)
@@ -238,18 +246,14 @@ export default function ReconciliationViewPage() {
                       {new Date(data.reconciliation_period).toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' })}
                     </td>
                   </tr>
-                  <tr className="border-b border-gray-300">
+                  <tr>
                     <td className="bg-gray-50 px-4 py-3 font-semibold">Bakiye</td>
                     <td className="px-4 py-3">
-                      {data.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TRY -
+                      {data.amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {data.currency || 'TRY'} -
                       <span className={`ml-2 font-semibold ${data.balance_type === 'Borç' ? 'text-red-600' : 'text-green-600'}`}>
                         {data.balance_type?.toUpperCase()}
                       </span>
                     </td>
-                  </tr>
-                  <tr>
-                    <td className="bg-gray-50 px-4 py-3 font-semibold">Gönderen Şirket Vergi No</td>
-                    <td className="px-4 py-3">-</td>
                   </tr>
                 </tbody>
               </table>
@@ -258,8 +262,12 @@ export default function ReconciliationViewPage() {
             {/* Company Info */}
             <div className="border-l-4 border-blue-600 pl-4">
               <p className="font-semibold text-gray-800">{data.company_name}</p>
-              <p className="text-sm text-gray-600">Vergi Numarası: -</p>
-              <p className="text-sm text-gray-600">Adres: -</p>
+              {data.company_tax_number && (
+                <p className="text-sm text-gray-600">Vergi Numarası: {data.company_tax_number}</p>
+              )}
+              {data.company_address && (
+                <p className="text-sm text-gray-600">Adres: {data.company_address}</p>
+              )}
             </div>
 
             {/* Notes Section */}

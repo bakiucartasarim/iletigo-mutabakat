@@ -22,6 +22,8 @@ export async function GET(
         rl.*,
         r.period as reconciliation_period,
         c.name as company_name,
+        c.tax_number as company_tax_number,
+        c.address as company_address,
         ct.template_name,
         ct.header_text,
         ct.intro_text,
@@ -29,11 +31,13 @@ export async function GET(
         ct.note2,
         ct.note3,
         ct.note4,
-        ct.note5
+        ct.note5,
+        red.birim as currency
       FROM reconciliation_links rl
       JOIN reconciliations r ON rl.reconciliation_id = r.id
       JOIN companies c ON r.company_id = c.id
       LEFT JOIN company_templates ct ON c.id = ct.company_id AND ct.is_active = true
+      LEFT JOIN reconciliation_excel_data red ON rl.record_id = red.id
       WHERE rl.reference_code = $1
     `, [referenceCode])
 
@@ -64,8 +68,11 @@ export async function GET(
     return NextResponse.json({
       reference_code: linkData.reference_code,
       company_name: linkData.company_name,
+      company_tax_number: linkData.company_tax_number,
+      company_address: linkData.company_address,
       recipient_name: linkData.recipient_name,
       amount: parseFloat(linkData.amount),
+      currency: linkData.currency || 'TRY',
       balance_type: linkData.balance_type,
       reconciliation_period: linkData.reconciliation_period,
       is_expired: isExpired || linkData.is_expired,
