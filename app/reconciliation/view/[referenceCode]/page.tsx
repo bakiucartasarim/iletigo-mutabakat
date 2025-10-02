@@ -18,6 +18,7 @@ interface ReconciliationData {
   reference_code: string
   company_name: string
   company_tax_number: string | null
+  company_tax_office: string | null
   company_address: string | null
   recipient_name: string
   amount: number
@@ -264,6 +265,9 @@ export default function ReconciliationViewPage() {
               <p className="font-semibold text-gray-800">{data.company_name}</p>
               {data.company_tax_number && (
                 <p className="text-sm text-gray-600">Vergi Numarası: {data.company_tax_number}</p>
+              )}
+              {data.company_tax_office && (
+                <p className="text-sm text-gray-600">Vergi Dairesi: {data.company_tax_office}</p>
               )}
               {data.company_address && (
                 <p className="text-sm text-gray-600">Adres: {data.company_address}</p>
