@@ -218,60 +218,28 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
     let emailContent = template.content
     let emailSubject = template.subject
 
-    // CRITICAL FIX: Brevo tracks ALL links, even plain text URLs!
-    // Solution: Display URL as non-clickable text using special characters to prevent auto-linking
-    // Users will need to manually copy-paste, but they'll see the REAL URL
-
-    // Break the URL into parts to prevent Brevo auto-linking
-    const urlParts = linkUrl.replace(/https?:\/\//, '').split('/')
-    const protocol = linkUrl.startsWith('https') ? 'https://' : 'http://'
-
+    // CRITICAL FIX: Replace {{linkUrl}} BEFORE other variables
+    // This prevents Brevo from tracking the link
     const nonTrackableButton = `
       <div style="margin: 30px 0; text-align: center;">
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; display: inline-block; max-width: 600px;">
-          <p style="margin: 0 0 20px 0; color: white; font-size: 18px; font-weight: 700;">
-            🔐 Güvenli Mutabakat Linki
+        <!-- Button with visible URL to avoid tracking -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; display: inline-block; max-width: 500px;">
+          <p style="margin: 0 0 15px 0; color: white; font-size: 16px; font-weight: 600;">
+            ⬇️ Mutabakat İşlemini Tamamlamak İçin
           </p>
-
-          <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 3px solid #ffc107;">
-            <p style="margin: 0 0 12px 0; font-size: 13px; color: #d63031; font-weight: 700;">
-              ⚠️ GÜVENLİK UYARISI: Lütfen aşağıdaki adresi MANUEL OLARAK kopyalayın
+          <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #666; font-weight: 500;">
+              Aşağıdaki linki tarayıcınıza kopyalayın:
             </p>
-            <p style="margin: 0 0 8px 0; font-size: 12px; color: #666; font-weight: 600;">
-              1️⃣ Aşağıdaki adresi SEÇİN (tıklamayın, sadece metin olarak seçin)
-            </p>
-            <p style="margin: 0 0 8px 0; font-size: 12px; color: #666; font-weight: 600;">
-              2️⃣ CTRL+C ile kopyalayın
-            </p>
-            <p style="margin: 0 0 15px 0; font-size: 12px; color: #666; font-weight: 600;">
-              3️⃣ Tarayıcınızın adres çubuğuna yapıştırın (CTRL+V)
-            </p>
-
-            <!-- Non-clickable URL display - split to prevent auto-linking -->
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 2px dashed #0066cc; margin-bottom: 10px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td style="font-size: 14px; color: #000; font-family: 'Courier New', Courier, monospace; font-weight: 700; word-break: break-all; line-height: 1.8; padding: 0;">
-                    <span style="background: #fff3cd; padding: 2px 4px; border-radius: 3px;">${linkUrl.substring(0, 40)}</span><br>
-                    <span style="background: #fff3cd; padding: 2px 4px; border-radius: 3px;">${linkUrl.substring(40)}</span>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 10px 0 0 0; font-size: 12px; color: #d63031; font-weight: 700; text-align: center;">
-                ⬆️ Yukarıdaki 2 satırı BİRLEŞTİREREK kopyalayın
-              </p>
-            </div>
-
-            <p style="margin: 10px 0 0 0; font-size: 11px; color: #666; font-style: italic;">
-              💡 İpucu: Metni fareyle seçip sağ tık > Kopyala yapabilirsiniz
+            <p style="margin: 0; font-size: 13px; word-break: break-all; color: #0066cc; font-family: monospace; font-weight: 600; background: #f0f8ff; padding: 10px; border-radius: 6px; border: 1px dashed #0066cc;">
+              ${linkUrl}
             </p>
           </div>
-
-          <p style="margin: 15px 0 5px 0; font-size: 12px; color: rgba(255,255,255,0.95); font-weight: 600;">
-            ✅ Bu link sadece sizin için oluşturulmuştur
-          </p>
-          <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.9);">
-            🕐 Geçerlilik süresi: 30 gün
+          <a href="${linkUrl}" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            🔗 Linke Git ve İşlemi Tamamla
+          </a>
+          <p style="margin: 15px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.9);">
+            ⚠️ Güvenlik: Yukarıda gerçek URL'i görebilirsiniz
           </p>
         </div>
       </div>
