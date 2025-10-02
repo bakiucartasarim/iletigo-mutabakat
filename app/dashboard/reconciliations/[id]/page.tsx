@@ -109,13 +109,41 @@ export default function ReconciliationDetailPage() {
     }
   }
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number, currency: string = 'TRY') => {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'TRY',
+      currency: currency || 'TRY',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount)
+  }
+
+  const formatCurrencyWithTL = (amount: number, currency: string = 'TRY', exchangeRate: number = 1) => {
+    // Default exchange rates (should be fetched from TCMB API in production)
+    const exchangeRates: { [key: string]: number } = {
+      'USD': 34.50,
+      'EUR': 37.80,
+      'GBP': 44.20,
+      'TRY': 1,
+      'TL': 1
+    }
+
+    const rate = exchangeRates[currency?.toUpperCase()] || 1
+    const originalAmount = formatCurrency(amount, currency)
+
+    // If not TRY, also show TL equivalent
+    if (currency && currency !== 'TRY' && currency !== 'TL') {
+      const tlAmount = amount * rate
+      const tlFormatted = formatCurrency(tlAmount, 'TRY')
+      return (
+        <div>
+          <div className="font-semibold">{originalAmount}</div>
+          <div className="text-xs text-gray-500">≈ {tlFormatted}</div>
+        </div>
+      )
+    }
+
+    return originalAmount
   }
 
   const formatDate = (dateString: string) => {
@@ -497,7 +525,7 @@ export default function ReconciliationDetailPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {formatCurrency(record.tutar)}
+                            {formatCurrencyWithTL(record.tutar, record.birim, 1)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {record.borc_alacak}
