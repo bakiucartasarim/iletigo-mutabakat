@@ -20,6 +20,8 @@ interface ReconciliationData {
   company_tax_number: string | null
   company_tax_office: string | null
   company_address: string | null
+  company_logo_url: string | null
+  company_stamp_url: string | null
   recipient_name: string
   amount: number
   currency: string
@@ -200,10 +202,20 @@ export default function ReconciliationViewPage() {
           {/* Logo Header */}
           <div className="border-b-2 border-gray-200 p-6">
             <div className="flex items-center">
-              <svg className="w-12 h-12 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
-              </svg>
-              <span className="ml-3 text-xl font-bold text-gray-800">iletigo</span>
+              {data.company_logo_url ? (
+                <img
+                  src={data.company_logo_url}
+                  alt={data.company_name}
+                  className="h-16 w-auto object-contain"
+                />
+              ) : (
+                <>
+                  <svg className="w-12 h-12 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/>
+                  </svg>
+                  <span className="ml-3 text-xl font-bold text-gray-800">{data.company_name}</span>
+                </>
+              )}
             </div>
           </div>
 
@@ -311,6 +323,20 @@ export default function ReconciliationViewPage() {
                     </li>
                   )}
                 </ol>
+              </div>
+            )}
+
+            {/* Company Stamp - Bottom Right */}
+            {data.company_stamp_url && (
+              <div className="flex justify-end mt-8">
+                <div className="text-center">
+                  <img
+                    src={data.company_stamp_url}
+                    alt="Şirket Kaşesi"
+                    className="h-32 w-auto object-contain"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">{data.company_name}</p>
+                </div>
               </div>
             )}
           </div>
