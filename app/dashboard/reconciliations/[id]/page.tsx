@@ -471,104 +471,34 @@ export default function ReconciliationDetailPage() {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Excel Data Section */}
       <div className="bg-white rounded-lg border border-gray-200">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`py-4 px-6 border-b-2 font-medium text-sm ${
-                activeTab === 'overview'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Genel Bilgiler
-            </button>
-            <button
-              onClick={() => setActiveTab('excel-data')}
-              className={`py-4 px-6 border-b-2 font-medium text-sm ${
-                activeTab === 'excel-data'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Excel Verileri
-            </button>
-          </nav>
-        </div>
-
         <div className="p-6">
-          {activeTab === 'overview' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Mutabakat Bilgileri</h3>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Dönem</dt>
-                      <dd className="text-sm text-gray-900">{reconciliation.period}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Durum</dt>
-                      <dd className="text-sm text-gray-900">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                          {reconciliation.status}
-                        </span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Oluşturulma Tarihi</dt>
-                      <dd className="text-sm text-gray-900">{formatDate(reconciliation.created_at)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Güncelleme Tarihi</dt>
-                      <dd className="text-sm text-gray-900">{formatDate(reconciliation.updated_at)}</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Dönem Bilgileri</h3>
-                  <dl className="space-y-3">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Dönem Adı</dt>
-                      <dd className="text-sm text-gray-900">{reconciliation.period_name}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Başlangıç Tarihi</dt>
-                      <dd className="text-sm text-gray-900">{formatDate(reconciliation.period_start_date)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Bitiş Tarihi</dt>
-                      <dd className="text-sm text-gray-900">{formatDate(reconciliation.period_end_date)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Açıklama</dt>
-                      <dd className="text-sm text-gray-900">{reconciliation.period_description}</dd>
-                    </div>
-                  </dl>
+          <div className="space-y-6">
+              {/* Genel Bilgiler - Kompakt */}
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-3 border border-indigo-100">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  <div>
+                    <span className="text-gray-500 block">Dönem:</span>
+                    <span className="font-medium text-gray-900">{reconciliation.period_name}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block">Tarih:</span>
+                    <span className="font-medium text-gray-900">{formatDate(reconciliation.period_start_date)} - {formatDate(reconciliation.period_end_date)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block">Şirket:</span>
+                    <span className="font-medium text-gray-900">{reconciliation.company_name}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block">Durum:</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      {reconciliation.status}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Organizasyon Bilgileri</h3>
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Şirket</dt>
-                    <dd className="text-sm text-gray-900">{reconciliation.company_name}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Kullanıcı</dt>
-                    <dd className="text-sm text-gray-900">{reconciliation.user_name}</dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'excel-data' && (
-            <div className="space-y-6">
               {/* Mail İşlemleri Section */}
               <div className="bg-gray-50 rounded-lg p-4">
                 {/* Status Summary - Side by Side */}
@@ -627,13 +557,13 @@ export default function ReconciliationDetailPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   <button
                     onClick={sendAllMails}
                     disabled={sendingMail}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="bg-indigo-600 text-white px-3 py-1.5 text-sm rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     {sendingMail ? 'Gönderiliyor...' : `Toplu Mail Gönder (${getMailStatusStats().gonderilmedi})`}
@@ -641,9 +571,9 @@ export default function ReconciliationDetailPage() {
 
                   <button
                     onClick={downloadExcel}
-                    className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+                    className="bg-green-600 text-white px-3 py-1.5 text-sm rounded-md hover:bg-green-700 flex items-center gap-1.5"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     Excel İndir
