@@ -691,7 +691,6 @@ export default function ReconciliationDetailPage() {
                 </div>
               )}
             </div>
-          )}
         </div>
       </div>
     </div>
