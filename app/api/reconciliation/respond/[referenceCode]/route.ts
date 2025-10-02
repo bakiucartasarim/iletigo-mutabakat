@@ -29,7 +29,7 @@ export async function POST(
 ) {
   try {
     const { referenceCode } = params
-    const { response_status, response_note } = await request.json()
+    const { response_status, response_note, disputed_amount, disputed_currency } = await request.json()
 
     // Get IP address for security logging and rate limiting
     const ip = request.headers.get('x-forwarded-for') ||
@@ -63,12 +63,20 @@ export async function POST(
       )
     }
 
-    // If itiraz, note is required
-    if (response_status === 'itiraz' && (!response_note || !response_note.trim())) {
-      return NextResponse.json(
-        { error: 'İtiraz nedeni zorunludur' },
-        { status: 400 }
-      )
+    // If itiraz, note and disputed amount are required
+    if (response_status === 'itiraz') {
+      if (!disputed_amount || isNaN(parseFloat(disputed_amount))) {
+        return NextResponse.json(
+          { error: 'Doğru tutar zorunludur' },
+          { status: 400 }
+        )
+      }
+      if (!response_note || !response_note.trim()) {
+        return NextResponse.json(
+          { error: 'İtiraz nedeni zorunludur' },
+          { status: 400 }
+        )
+      }
     }
 
     // Fetch reconciliation link with security checks
@@ -112,11 +120,21 @@ export async function POST(
         used_at = NOW(),
         response_status = $1,
         response_note = $2,
-        ip_address = $3,
-        user_agent = $4,
+        disputed_amount = $3,
+        disputed_currency = $4,
+        ip_address = $5,
+        user_agent = $6,
         updated_at = NOW()
-      WHERE id = $5
-    `, [response_status, response_note || null, ip, userAgent, linkData.id])
+      WHERE id = $7
+    `, [
+      response_status,
+      response_note || null,
+      disputed_amount ? parseFloat(disputed_amount) : null,
+      disputed_currency || null,
+      ip,
+      userAgent,
+      linkData.id
+    ])
 
     // Update reconciliation_excel_data with response status
     await query(`

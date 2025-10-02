@@ -16,15 +16,24 @@ export async function GET(
       )
     }
 
-    // Fetch reconciliation link with security checks
+    // Fetch reconciliation link with security checks and company template
     const result = await query(`
       SELECT
         rl.*,
         r.period as reconciliation_period,
-        c.name as company_name
+        c.name as company_name,
+        ct.template_name,
+        ct.header_text,
+        ct.intro_text,
+        ct.note1,
+        ct.note2,
+        ct.note3,
+        ct.note4,
+        ct.note5
       FROM reconciliation_links rl
       JOIN reconciliations r ON rl.reconciliation_id = r.id
       JOIN companies c ON r.company_id = c.id
+      LEFT JOIN company_templates ct ON c.id = ct.company_id AND ct.is_active = true
       WHERE rl.reference_code = $1
     `, [referenceCode])
 
@@ -51,7 +60,7 @@ export async function GET(
       `, [linkData.id])
     }
 
-    // Return reconciliation data
+    // Return reconciliation data with company template
     return NextResponse.json({
       reference_code: linkData.reference_code,
       company_name: linkData.company_name,
@@ -61,7 +70,17 @@ export async function GET(
       reconciliation_period: linkData.reconciliation_period,
       is_expired: isExpired || linkData.is_expired,
       is_used: linkData.is_used,
-      response_status: linkData.response_status
+      response_status: linkData.response_status,
+      company_template: {
+        template_name: linkData.template_name,
+        header_text: linkData.header_text,
+        intro_text: linkData.intro_text,
+        note1: linkData.note1,
+        note2: linkData.note2,
+        note3: linkData.note3,
+        note4: linkData.note4,
+        note5: linkData.note5
+      }
     })
 
   } catch (error) {
