@@ -295,7 +295,10 @@ export async function GET(request: NextRequest) {
             (SELECT SUM(red.tutar) FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id),
             0
           ) as difference,
-          'TRY' as currency,
+          COALESCE(
+            (SELECT red.birim FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id LIMIT 1),
+            'TRY'
+          ) as currency,
           r.status,
           'medium' as priority,
           (CURRENT_DATE + INTERVAL '30 days')::date as due_date,
