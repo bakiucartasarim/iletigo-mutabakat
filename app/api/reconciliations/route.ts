@@ -299,7 +299,12 @@ export async function GET(request: NextRequest) {
             (SELECT red.birim FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id LIMIT 1),
             'TRY'
           ) as currency,
-          r.status,
+          CASE
+            WHEN EXISTS(SELECT 1 FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id AND red.reconciliation_status = 'itiraz') THEN 'disputed'
+            WHEN (SELECT COUNT(*) FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id AND red.reconciliation_status = 'onaylandi') =
+                 (SELECT COUNT(*) FROM reconciliation_excel_data red WHERE red.reconciliation_id = r.id) THEN 'resolved'
+            ELSE 'pending'
+          END as status,
           'medium' as priority,
           (CURRENT_DATE + INTERVAL '30 days')::date as due_date,
           COALESCE(u.first_name || ' ' || u.last_name, 'Admin User') as assigned_to,
