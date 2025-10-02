@@ -323,7 +323,6 @@ export default function DashboardLayout({
               <div className="flex items-center space-x-2">
                 <a className="flex items-center text-gray-600 hover:text-blue-600" href="#">
                   <span className="text-sm">🇹🇷</span>
-                  <span className="text-sm ml-1 hidden sm:inline">TR</span>
                   <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
