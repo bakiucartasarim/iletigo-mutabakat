@@ -286,12 +286,18 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
     console.log(`📧 Sending email to: ${record.email}`)
     console.log(`📄 Subject: ${emailSubject}`)
 
+    // CRITICAL FIX: Brevo API doesn't support disabling link tracking per email
+    // We need to use Brevo's transactional email API v3 with specific parameters
+    // Or switch to a different email provider that doesn't force link tracking
+
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'api-key': brevoApiKey
+        'api-key': brevoApiKey,
+        // Try to disable tracking at header level
+        'X-Sib-Disable-Link-Tracking': '1'
       },
       body: JSON.stringify({
         sender: {
@@ -306,12 +312,10 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
         ],
         subject: emailSubject,
         htmlContent: fullHtmlContent,
-        // CRITICAL: Disable Brevo link tracking to prevent phishing-like URLs
-        // This ensures recipients see the real URL (localhost:3000 or your domain)
-        // instead of Brevo's tracking domain (sendibt2.com)
-        headers: {
-          'X-Mailin-custom': 'Mutabakat-Email',
-          'charset': 'utf-8'
+        // Attempt to disable all tracking features
+        params: {
+          DISABLE_CLICK_TRACKING: '1',
+          DISABLE_OPEN_TRACKING: '1'
         },
         // Tags for internal tracking only (optional)
         tags: ['mutabakat', `reconciliation-${reconciliationId}`]
