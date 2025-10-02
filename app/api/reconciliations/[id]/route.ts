@@ -120,29 +120,33 @@ export async function GET(
 
       const reconciliation = reconciliationResult.rows[0]
 
-      // Get Excel data for this reconciliation
+      // Get Excel data for this reconciliation with dispute info
       const excelDataQuery = `
         SELECT
-          id,
-          sira_no,
-          cari_hesap_kodu,
-          cari_hesap_adi,
-          sube,
-          cari_hesap_turu,
-          tutar,
-          birim,
-          borc_alacak,
-          vergi_dairesi,
-          vergi_no,
-          fax_numarasi,
-          ilgili_kisi_eposta,
-          hata,
-          COALESCE(mail_status, 'gonderilmedi') as mail_status,
-          COALESCE(reconciliation_status, 'beklemede') as reconciliation_status,
-          created_at
-        FROM reconciliation_excel_data
-        WHERE reconciliation_id = $1
-        ORDER BY sira_no ASC, id ASC
+          red.id,
+          red.sira_no,
+          red.cari_hesap_kodu,
+          red.cari_hesap_adi,
+          red.sube,
+          red.cari_hesap_turu,
+          red.tutar,
+          red.birim,
+          red.borc_alacak,
+          red.vergi_dairesi,
+          red.vergi_no,
+          red.fax_numarasi,
+          red.ilgili_kisi_eposta,
+          red.hata,
+          COALESCE(red.mail_status, 'gonderilmedi') as mail_status,
+          COALESCE(red.reconciliation_status, 'beklemede') as reconciliation_status,
+          red.created_at,
+          rl.disputed_amount,
+          rl.disputed_currency,
+          rl.response_note
+        FROM reconciliation_excel_data red
+        LEFT JOIN reconciliation_links rl ON rl.record_id = red.id AND rl.reconciliation_id = red.reconciliation_id
+        WHERE red.reconciliation_id = $1
+        ORDER BY red.sira_no ASC, red.id ASC
       `
 
       const excelDataResult = await pool.query(excelDataQuery, [id])

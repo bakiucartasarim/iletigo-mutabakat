@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import * as XLSX from 'xlsx'
 
 interface ExcelRecord {
   id: number
@@ -21,6 +22,9 @@ interface ExcelRecord {
   hata: string
   mail_status: string
   reconciliation_status: string
+  disputed_amount: number | null
+  disputed_currency: string | null
+  response_note: string | null
   created_at: string
 }
 
@@ -62,6 +66,7 @@ export default function ReconciliationDetailPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('overview')
   const [sendingMail, setSendingMail] = useState(false)
+  const [sendingMailId, setSendingMailId] = useState<number | null>(null)
 
   const getBorcAlacakStats = () => {
     if (!reconciliation?.excel_data) return { borc: 0, alacak: 0 }
@@ -249,6 +254,51 @@ export default function ReconciliationDetailPage() {
     return stats
   }
 
+  const sendSingleMail = async (record: ExcelRecord) => {
+    if (!record.ilgili_kisi_eposta || !record.ilgili_kisi_eposta.includes('@')) {
+      alert('Geçerli bir e-posta adresi bulunamadı!')
+      return
+    }
+
+    if (!confirm(`${record.cari_hesap_adi} için mail gönderilecek. Devam edilsin mi?`)) {
+      return
+    }
+
+    try {
+      setSendingMailId(record.id)
+
+      const response = await fetch(`/api/reconciliations/${id}/send-mails`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          records: [{
+            id: record.id,
+            email: record.ilgili_kisi_eposta,
+            cari_hesap_adi: record.cari_hesap_adi,
+            tutar: record.tutar,
+            borc_alacak: record.borc_alacak
+          }]
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        alert('Mail başarıyla gönderildi!')
+        fetchReconciliation()
+      } else {
+        alert('Mail gönderiminde hata: ' + result.error)
+      }
+    } catch (error) {
+      console.error('Mail gönderim hatası:', error)
+      alert('Mail gönderiminde hata oluştu!')
+    } finally {
+      setSendingMailId(null)
+    }
+  }
+
   const sendAllMails = async () => {
     if (!reconciliation?.excel_data) return
 
@@ -327,6 +377,54 @@ export default function ReconciliationDetailPage() {
     return totals
   }
 
+  const downloadExcel = () => {
+    if (!reconciliation?.excel_data || reconciliation.excel_data.length === 0) {
+      alert('İndirilecek veri bulunamadı!')
+      return
+    }
+
+    // Reconciliation status label mapping
+    const getReconciliationStatusLabel = (status: string) => {
+      const labels = {
+        beklemede: 'Beklemede',
+        onaylandi: 'Mutabık',
+        itiraz: 'İtiraz'
+      }
+      return labels[status] || 'Beklemede'
+    }
+
+    // Prepare data for Excel - Mutabakat Durumu should be first column
+    const excelData = reconciliation.excel_data.map(record => ({
+      'Mutabakat Durumu': getReconciliationStatusLabel(record.reconciliation_status || 'beklemede'),
+      'Sıra No': record.sira_no,
+      'Cari Hesap Kodu': record.cari_hesap_kodu,
+      'Cari Hesap Adı': record.cari_hesap_adi,
+      'Şube': record.sube,
+      'Cari Hesap Türü': record.cari_hesap_turu,
+      'Tutar': record.tutar,
+      'Birim': record.birim,
+      'Borç/Alacak': record.borc_alacak,
+      'İtiraz Tutarı': record.disputed_amount || '',
+      'İtiraz Dövizi': record.disputed_currency || '',
+      'İtiraz Notu': record.response_note || '',
+      'Vergi Dairesi': record.vergi_dairesi,
+      'Vergi No': record.vergi_no,
+      'Fax Numarası': record.fax_numarasi,
+      'İlgili Kişi E-posta': record.ilgili_kisi_eposta
+    }))
+
+    // Create workbook
+    const worksheet = XLSX.utils.json_to_sheet(excelData)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Mutabakat Verileri')
+
+    // Generate filename with period name
+    const filename = `Mutabakat_${reconciliation.period_name || 'Veriler'}_${new Date().toISOString().split('T')[0]}.xlsx`
+
+    // Download
+    XLSX.writeFile(workbook, filename)
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -369,46 +467,6 @@ export default function ReconciliationDetailPage() {
             <p className="text-sm text-gray-500">
               {reconciliation.period_name} - {reconciliation.period}
             </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Toplam Kayıt</p>
-              <p className="text-2xl font-bold text-gray-900">{reconciliation.total_count}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Borç Kayıtları</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.borc}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Alacak Kayıtları</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.alacak}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center">
-            <div className="w-full">
-              <p className="text-sm font-medium text-gray-600 mb-2">Toplam Tutar</p>
-              {Object.entries(getTotalsByCurrency()).map(([currency, amount]) => (
-                <div key={currency} className="mb-1">
-                  <span className="text-lg font-bold text-gray-900">{formatCurrency(amount, currency)}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -513,8 +571,6 @@ export default function ReconciliationDetailPage() {
             <div className="space-y-6">
               {/* Mail İşlemleri Section */}
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Mail İşlemleri</h3>
-
                 {/* Status Summary - Side by Side */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
                   {/* Mail Status Summary */}
@@ -570,14 +626,29 @@ export default function ReconciliationDetailPage() {
                   </div>
                 </div>
 
-                {/* Toplu Mail Gönder Button */}
-                <button
-                  onClick={sendAllMails}
-                  disabled={sendingMail}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {sendingMail ? 'Gönderiliyor...' : `Toplu Mail Gönder (${getMailStatusStats().gonderilmedi} gönderilmemiş)`}
-                </button>
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={sendAllMails}
+                    disabled={sendingMail}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {sendingMail ? 'Gönderiliyor...' : `Toplu Mail Gönder (${getMailStatusStats().gonderilmedi})`}
+                  </button>
+
+                  <button
+                    onClick={downloadExcel}
+                    className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Excel İndir
+                  </button>
+                </div>
               </div>
 
               {/* Excel Data Table */}
@@ -626,7 +697,23 @@ export default function ReconciliationDetailPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {formatCurrencyWithTL(record.tutar, record.birim, 1)}
+                            {record.reconciliation_status === 'itiraz' && record.disputed_amount ? (
+                              <div>
+                                <div className="line-through text-gray-400">
+                                  {formatCurrencyWithTL(record.tutar, record.birim, 1)}
+                                </div>
+                                <div className="font-semibold text-orange-600">
+                                  {formatCurrencyWithTL(record.disputed_amount, record.disputed_currency || record.birim, 1)}
+                                </div>
+                                {record.response_note && (
+                                  <div className="text-xs text-gray-500 mt-1 italic">
+                                    "{record.response_note}"
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              formatCurrencyWithTL(record.tutar, record.birim, 1)
+                            )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {record.borc_alacak}
@@ -635,7 +722,30 @@ export default function ReconciliationDetailPage() {
                             {record.ilgili_kisi_eposta || '-'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {getMailStatusBadge(record.mail_status || 'gonderilmedi')}
+                            <div className="flex items-center gap-2">
+                              {getMailStatusBadge(record.mail_status || 'gonderilmedi')}
+                              {(!record.mail_status || record.mail_status === 'gonderilmedi') &&
+                               record.ilgili_kisi_eposta &&
+                               record.ilgili_kisi_eposta.includes('@') && (
+                                <button
+                                  onClick={() => sendSingleMail(record)}
+                                  disabled={sendingMailId === record.id}
+                                  className="p-1 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title="Mail Gönder"
+                                >
+                                  {sendingMailId === record.id ? (
+                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                    </svg>
+                                  ) : (
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                  )}
+                                </button>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {getReconciliationStatusBadge(record.reconciliation_status || 'beklemede')}
