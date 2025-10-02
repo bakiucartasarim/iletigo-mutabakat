@@ -299,6 +299,13 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
         ],
         subject: emailSubject,
         htmlContent: fullHtmlContent,
+        // Disable all Brevo tracking to prevent phishing-like URLs
+        params: {
+          DISABLE_TRACKING: true
+        },
+        // Disable link tracking to show original URLs
+        trackOpens: false,
+        trackClicks: false,
         // Tags for tracking (optional)
         tags: ['mutabakat', `reconciliation-${reconciliationId}`]
       })
