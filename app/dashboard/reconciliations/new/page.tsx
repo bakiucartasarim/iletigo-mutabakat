@@ -400,16 +400,18 @@ export default function NewReconciliationPage() {
           setSuccessMessage(`✅ ${result.message} - ${result.data.excelRowsProcessed} kayıt işlendi`)
           console.log('Reconciliation created:', result.data)
 
+          // Keep loading true to prevent double submission
+          // and redirect to the created reconciliation page
           setTimeout(() => {
-            router.push('/dashboard/reconciliations')
-          }, 2500)
+            router.push(`/dashboard/reconciliations/${result.data.reconciliationId}`)
+          }, 1500)
         } else {
+          setLoading(false)
           throw new Error(result.error || 'Bilinmeyen bir hata oluştu')
         }
       } catch (error) {
         console.error('Error creating reconciliation:', error)
         alert(`Hata: ${error.message}`)
-      } finally {
         setLoading(false)
       }
     }
