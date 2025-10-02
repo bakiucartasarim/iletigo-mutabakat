@@ -242,6 +242,26 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       '<a $1 data-disable-tracking="true">'
     )
 
+    // ADDITIONAL FIX: Add plain text URL below the button for transparency
+    // This ensures users always see the real URL even if Brevo tracking is active
+    const plainTextUrlSection = `
+      <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
+        <p style="margin: 0 0 8px 0; font-size: 13px; color: #666; font-weight: 600;">
+          🔗 Direkt Link (Güvenlik için kopyalayabilirsiniz):
+        </p>
+        <p style="margin: 0; font-size: 12px; word-break: break-all; color: #0066cc; font-family: monospace;">
+          ${linkUrl}
+        </p>
+      </div>
+    `
+
+    // Insert the plain text URL section before the closing body tag or at the end of content
+    if (emailContent.includes('</body>')) {
+      emailContent = emailContent.replace('</body>', plainTextUrlSection + '</body>')
+    } else {
+      emailContent += plainTextUrlSection
+    }
+
     // Wrap content in proper HTML structure for better email client compatibility
     const fullHtmlContent = `
 <!DOCTYPE html>
