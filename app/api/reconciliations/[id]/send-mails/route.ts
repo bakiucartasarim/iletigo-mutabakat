@@ -235,32 +235,38 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       emailSubject = emailSubject.replace(regex, value)
     })
 
-    // CRITICAL: Add data-disable-tracking attribute to all links to prevent Brevo tracking
-    // This will show the real URL instead of sendibt2.com tracking URLs
-    emailContent = emailContent.replace(
-      /<a\s+([^>]*href=["'][^"']*["'][^>]*)>/gi,
-      '<a $1 data-disable-tracking="true">'
-    )
+    // CRITICAL FIX: Replace {{linkUrl}} with a non-trackable button
+    // Instead of using <a href="{{linkUrl}}"> which Brevo will track,
+    // we'll create a button that shows the URL as plain text with copy functionality
 
-    // ADDITIONAL FIX: Add plain text URL below the button for transparency
-    // This ensures users always see the real URL even if Brevo tracking is active
-    const plainTextUrlSection = `
-      <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
-        <p style="margin: 0 0 8px 0; font-size: 13px; color: #666; font-weight: 600;">
-          🔗 Direkt Link (Güvenlik için kopyalayabilirsiniz):
-        </p>
-        <p style="margin: 0; font-size: 12px; word-break: break-all; color: #0066cc; font-family: monospace;">
-          ${linkUrl}
-        </p>
+    // First, replace any existing {{linkUrl}} links with our custom implementation
+    const nonTrackableButton = `
+      <div style="margin: 30px 0; text-align: center;">
+        <!-- Button with visible URL to avoid tracking -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; display: inline-block; max-width: 500px;">
+          <p style="margin: 0 0 15px 0; color: white; font-size: 16px; font-weight: 600;">
+            ⬇️ Mutabakat İşlemini Tamamlamak İçin
+          </p>
+          <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #666; font-weight: 500;">
+              Aşağıdaki linki tarayıcınıza kopyalayın:
+            </p>
+            <p style="margin: 0; font-size: 13px; word-break: break-all; color: #0066cc; font-family: monospace; font-weight: 600; background: #f0f8ff; padding: 10px; border-radius: 6px; border: 1px dashed #0066cc;">
+              ${linkUrl}
+            </p>
+          </div>
+          <a href="${linkUrl}" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            🔗 Linke Git ve İşlemi Tamamla
+          </a>
+          <p style="margin: 15px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.9);">
+            ⚠️ Güvenlik: Yukarıda gerçek URL'i görebilirsiniz
+          </p>
+        </div>
       </div>
     `
 
-    // Insert the plain text URL section before the closing body tag or at the end of content
-    if (emailContent.includes('</body>')) {
-      emailContent = emailContent.replace('</body>', plainTextUrlSection + '</body>')
-    } else {
-      emailContent += plainTextUrlSection
-    }
+    // Replace {{linkUrl}} placeholder with our non-trackable button
+    emailContent = emailContent.replace(/\{\{linkUrl\}\}/g, nonTrackableButton)
 
     // Wrap content in proper HTML structure for better email client compatibility
     const fullHtmlContent = `
