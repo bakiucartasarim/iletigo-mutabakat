@@ -214,6 +214,39 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       emailSubject = emailSubject.replace(regex, value)
     })
 
+    // Wrap content in proper HTML structure for better email client compatibility
+    const fullHtmlContent = `
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>${emailSubject}</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td {font-family: Arial, Helvetica, sans-serif !important;}
+  </style>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 20px 0;">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding: 40px 30px;">
+              ${emailContent}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `.trim()
+
     // Send email via Brevo API
     const brevoApiKey = process.env.BREVO_API_KEY
 
@@ -244,7 +277,7 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
           }
         ],
         subject: emailSubject,
-        htmlContent: emailContent
+        htmlContent: fullHtmlContent
       })
     })
 
