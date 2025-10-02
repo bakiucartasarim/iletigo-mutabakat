@@ -22,7 +22,7 @@ export async function POST(
       SELECT
         rl.*,
         red.vergi_no as recipient_tax_number,
-        red.email as recipient_email
+        red.ilgili_kisi_eposta as recipient_email
       FROM reconciliation_links rl
       JOIN reconciliation_excel_data red ON rl.record_id = red.id
       WHERE rl.reference_code = $1
