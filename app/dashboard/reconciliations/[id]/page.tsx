@@ -261,6 +261,23 @@ export default function ReconciliationDetailPage() {
     }, 0)
   }
 
+  const getTotalsByCurrency = () => {
+    if (!reconciliation?.excel_data || reconciliation.excel_data.length === 0) return {}
+
+    const totals: { [key: string]: number } = {}
+
+    reconciliation.excel_data.forEach(record => {
+      const amount = typeof record.tutar === 'string' ? parseFloat(record.tutar) : record.tutar
+      const currency = record.birim || 'TRY'
+
+      if (!isNaN(amount)) {
+        totals[currency] = (totals[currency] || 0) + amount
+      }
+    })
+
+    return totals
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -335,9 +352,13 @@ export default function ReconciliationDetailPage() {
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Toplam Tutar</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(getTotalAmount())}</p>
+            <div className="w-full">
+              <p className="text-sm font-medium text-gray-600 mb-2">Toplam Tutar</p>
+              {Object.entries(getTotalsByCurrency()).map(([currency, amount]) => (
+                <div key={currency} className="mb-1">
+                  <span className="text-lg font-bold text-gray-900">{formatCurrency(amount, currency)}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

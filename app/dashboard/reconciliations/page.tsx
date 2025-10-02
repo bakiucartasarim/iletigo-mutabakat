@@ -116,10 +116,10 @@ export default function ReconciliationsPage() {
     )
   }
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number, currency: string = 'TRY') => {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'TRY',
+      currency: currency || 'TRY',
       minimumFractionDigits: 2
     }).format(amount)
   }
@@ -257,13 +257,13 @@ export default function ReconciliationsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm">
-                      <div className="text-gray-900">Bizim: {formatCurrency(reconciliation.our_amount)}</div>
-                      <div className="text-gray-600">Onlarin: {formatCurrency(reconciliation.their_amount)}</div>
+                      <div className="text-gray-900">Bizim: {formatCurrency(reconciliation.our_amount, reconciliation.currency)}</div>
+                      <div className="text-gray-600">Onlarin: {formatCurrency(reconciliation.their_amount, reconciliation.currency)}</div>
                       <div className={`font-medium ${
                         reconciliation.difference > 0 ? 'text-green-600' :
                         reconciliation.difference < 0 ? 'text-red-600' : 'text-gray-600'
                       }`}>
-                        Fark: {formatCurrency(reconciliation.difference)}
+                        Fark: {formatCurrency(reconciliation.difference, reconciliation.currency)}
                       </div>
                     </div>
                   </td>
