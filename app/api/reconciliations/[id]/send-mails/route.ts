@@ -218,28 +218,8 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
     let emailContent = template.content
     let emailSubject = template.subject
 
-    const variables = {
-      sirketAdi: record.cari_hesap_adi,
-      gonderenSirket: recon.company_name,
-      referansKodu: referenceCode,
-      tarih: new Date().toLocaleDateString('tr-TR'),
-      tutar: record.tutar.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }),
-      bakiyeTipi: record.borc_alacak,
-      linkUrl: linkUrl
-    }
-
-    // Replace all variables in content and subject
-    Object.entries(variables).forEach(([key, value]) => {
-      const regex = new RegExp(`{{${key}}}`, 'g')
-      emailContent = emailContent.replace(regex, value)
-      emailSubject = emailSubject.replace(regex, value)
-    })
-
-    // CRITICAL FIX: Replace {{linkUrl}} with a non-trackable button
-    // Instead of using <a href="{{linkUrl}}"> which Brevo will track,
-    // we'll create a button that shows the URL as plain text with copy functionality
-
-    // First, replace any existing {{linkUrl}} links with our custom implementation
+    // CRITICAL FIX: Replace {{linkUrl}} BEFORE other variables
+    // This prevents Brevo from tracking the link
     const nonTrackableButton = `
       <div style="margin: 30px 0; text-align: center;">
         <!-- Button with visible URL to avoid tracking -->
@@ -265,8 +245,26 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       </div>
     `
 
-    // Replace {{linkUrl}} placeholder with our non-trackable button
+    // Replace {{linkUrl}} placeholder FIRST with our non-trackable button
     emailContent = emailContent.replace(/\{\{linkUrl\}\}/g, nonTrackableButton)
+
+    // Now replace other variables (but NOT linkUrl since we already handled it)
+    const variables = {
+      sirketAdi: record.cari_hesap_adi,
+      gonderenSirket: recon.company_name,
+      referansKodu: referenceCode,
+      tarih: new Date().toLocaleDateString('tr-TR'),
+      tutar: record.tutar.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }),
+      bakiyeTipi: record.borc_alacak
+      // linkUrl is NOT included here - we handle it separately above
+    }
+
+    // Replace all variables in content and subject
+    Object.entries(variables).forEach(([key, value]) => {
+      const regex = new RegExp(`{{${key}}}`, 'g')
+      emailContent = emailContent.replace(regex, value)
+      emailSubject = emailSubject.replace(regex, value)
+    })
 
     // Wrap content in proper HTML structure for better email client compatibility
     const fullHtmlContent = `
