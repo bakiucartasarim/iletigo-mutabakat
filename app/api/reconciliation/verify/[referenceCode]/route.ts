@@ -20,7 +20,7 @@ export async function GET(
     const result = await query(`
       SELECT
         rl.*,
-        r.reconciliation_period,
+        r.period as reconciliation_period,
         c.name as company_name
       FROM reconciliation_links rl
       JOIN reconciliations r ON rl.reconciliation_id = r.id
