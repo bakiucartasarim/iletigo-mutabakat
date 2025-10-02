@@ -235,6 +235,13 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       emailSubject = emailSubject.replace(regex, value)
     })
 
+    // CRITICAL: Add data-disable-tracking attribute to all links to prevent Brevo tracking
+    // This will show the real URL instead of sendibt2.com tracking URLs
+    emailContent = emailContent.replace(
+      /<a\s+([^>]*href=["'][^"']*["'][^>]*)>/gi,
+      '<a $1 data-disable-tracking="true">'
+    )
+
     // Wrap content in proper HTML structure for better email client compatibility
     const fullHtmlContent = `
 <!DOCTYPE html>
@@ -299,14 +306,14 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
         ],
         subject: emailSubject,
         htmlContent: fullHtmlContent,
-        // Disable all Brevo tracking to prevent phishing-like URLs
-        params: {
-          DISABLE_TRACKING: true
+        // CRITICAL: Disable Brevo link tracking to prevent phishing-like URLs
+        // This ensures recipients see the real URL (localhost:3000 or your domain)
+        // instead of Brevo's tracking domain (sendibt2.com)
+        headers: {
+          'X-Mailin-custom': 'Mutabakat-Email',
+          'charset': 'utf-8'
         },
-        // Disable link tracking to show original URLs
-        trackOpens: false,
-        trackClicks: false,
-        // Tags for tracking (optional)
+        // Tags for internal tracking only (optional)
         tags: ['mutabakat', `reconciliation-${reconciliationId}`]
       })
     })
