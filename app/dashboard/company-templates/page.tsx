@@ -410,19 +410,6 @@ export default function CompanyTemplatesPage() {
                 </div>
               </div>
 
-              {/* Footer DORU Section */}
-              <div className="mt-6 flex justify-end">
-                <div className="border-2 border-gray-800 p-3 text-center">
-                  <p className="text-xs font-bold text-gray-900">DORU</p>
-                  <p className="text-[10px] text-gray-600 leading-tight">
-                    cari hesabınızın mükellef<br />
-                    olacağı için asım.koc@dorufinansol.com<br />
-                    ile iletişime geçiniz<br />
-                    Adres: Vişne SK. P+068 Nişantaşı
-                  </p>
-                </div>
-              </div>
-
               {/* Stamp */}
               {company?.stamp_url && (
                 <div className="mt-6 flex justify-end">
