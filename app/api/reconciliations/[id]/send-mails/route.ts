@@ -190,6 +190,27 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
     // Generate unique reference code
     const referenceCode = `MUT-${reconciliationId}-${record.id}-${Date.now()}`
 
+    // Calculate expiry date (30 days from now)
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + 30)
+
+    // Save reference code to database for security
+    await query(`
+      INSERT INTO reconciliation_links (
+        reference_code, reconciliation_id, record_id, recipient_email,
+        recipient_name, amount, balance_type, expires_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `, [
+      referenceCode,
+      reconciliationId,
+      record.id,
+      record.email,
+      record.cari_hesap_adi,
+      record.tutar,
+      record.borc_alacak,
+      expiresAt
+    ])
+
     // Generate link URL (this will be the page to view reconciliation)
     const linkUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reconciliation/view/${referenceCode}`
 
