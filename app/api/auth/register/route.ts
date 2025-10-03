@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
     // Şirket oluştur (şifreyi de companies tablosuna ekleyelim geçici olarak)
     const companyCode = `COMP-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`
 
+    // Create company and user in a transaction
     const companyResult = await query(
       `INSERT INTO companies (code, name, tax_number, contact_person, email, phone, address, password_hash, require_tax_verification, require_otp_verification, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -84,8 +85,28 @@ export async function POST(request: NextRequest) {
 
     const company = companyResult.rows[0]
 
+    // Create first user (company admin) with same email and password
+    const nameParts = contactPerson.trim().split(' ')
+    const firstName = nameParts[0] || 'Admin'
+    const lastName = nameParts.slice(1).join(' ') || 'User'
+
+    await query(
+      `INSERT INTO users (email, password_hash, first_name, last_name, phone, role, company_id, is_active, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      [
+        email.toLowerCase(),
+        passwordHash,
+        firstName,
+        lastName,
+        (phone && phone.trim() !== '') ? phone.trim() : null,
+        'company_admin', // İlk kullanıcı company admin
+        company.id,
+        true
+      ]
+    )
+
     return NextResponse.json({
-      message: 'Şirket başarıyla kaydedildi',
+      message: 'Şirket ve kullanıcı başarıyla kaydedildi',
       company: {
         id: company.id,
         code: company.code,
