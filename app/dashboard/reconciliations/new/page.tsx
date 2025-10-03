@@ -99,6 +99,15 @@ export default function NewReconciliationPage() {
       try {
         setTemplateLoading(true)
 
+        // Önce kullanıcı bilgisini al
+        const userResponse = await fetch('/api/auth/verify')
+        let companyId = null
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          companyId = userData.user?.companyId
+        }
+
         // Company template kontrolü
         const companyTemplateResponse = await fetch('/api/company-templates')
         if (companyTemplateResponse.ok) {
@@ -116,11 +125,17 @@ export default function NewReconciliationPage() {
         }
 
         // Email template kontrolü
-        const emailTemplateResponse = await fetch('/api/mail-templates')
-        if (emailTemplateResponse.ok) {
-          const emailData = await emailTemplateResponse.json()
-          if (emailData.data && emailData.data.length > 0) {
-            setHasEmailTemplate(true)
+        let emailTemplateOk = false
+        if (companyId) {
+          const emailTemplateResponse = await fetch(`/api/mail-templates?company_id=${companyId}`)
+          if (emailTemplateResponse.ok) {
+            const emailData = await emailTemplateResponse.json()
+            if (emailData.data && emailData.data.length > 0) {
+              setHasEmailTemplate(true)
+              emailTemplateOk = true
+            } else {
+              setHasEmailTemplate(false)
+            }
           } else {
             setHasEmailTemplate(false)
           }
@@ -129,11 +144,11 @@ export default function NewReconciliationPage() {
         }
 
         // Uyarı mesajı oluştur
-        if (!companyTemplateResponse.ok && !emailTemplateResponse.ok) {
+        if (!companyTemplateResponse.ok && !emailTemplateOk) {
           setTemplateWarning('⚠️ Mutabakat PDF şablonu ve Mail metin şablonu bulunamadı. Lütfen önce şablonları oluşturun.')
         } else if (!companyTemplateResponse.ok) {
           setTemplateWarning('⚠️ Mutabakat PDF şablonu bulunamadı. Lütfen "Cari Şablonları" sayfasından şablon oluşturun.')
-        } else if (!emailTemplateResponse.ok) {
+        } else if (!emailTemplateOk) {
           setTemplateWarning('⚠️ Mail metin şablonu bulunamadı. Lütfen "Mail Metin Şablonları" sayfasından şablon oluşturun.')
         }
 

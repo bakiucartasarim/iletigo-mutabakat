@@ -32,15 +32,28 @@ export default function DashboardPage() {
 
   const checkTemplates = async () => {
     try {
+      // Önce kullanıcı bilgisini al
+      const userResponse = await fetch('/api/auth/verify')
+      let companyId = null
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        companyId = userData.user?.companyId
+      }
+
       // Company template kontrolü
       const companyTemplateResponse = await fetch('/api/company-templates')
       setHasCompanyTemplate(companyTemplateResponse.ok)
 
       // Email template kontrolü
-      const emailTemplateResponse = await fetch('/api/mail-templates')
-      if (emailTemplateResponse.ok) {
-        const emailData = await emailTemplateResponse.json()
-        setHasEmailTemplate(emailData.data && emailData.data.length > 0)
+      if (companyId) {
+        const emailTemplateResponse = await fetch(`/api/mail-templates?company_id=${companyId}`)
+        if (emailTemplateResponse.ok) {
+          const emailData = await emailTemplateResponse.json()
+          setHasEmailTemplate(emailData.data && emailData.data.length > 0)
+        } else {
+          setHasEmailTemplate(false)
+        }
       } else {
         setHasEmailTemplate(false)
       }
