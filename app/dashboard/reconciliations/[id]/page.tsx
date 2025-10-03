@@ -465,7 +465,7 @@ export default function ReconciliationDetailPage() {
               Mutabakat Detayı
             </h1>
             <p className="text-sm text-gray-500">
-              {reconciliation.period_name} - {reconciliation.period}
+              {reconciliation.period}
             </p>
           </div>
         </div>
