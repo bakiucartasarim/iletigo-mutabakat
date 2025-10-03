@@ -187,33 +187,50 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
 
     const recon = reconData.rows[0]
 
-    // Generate secure unique reference code using crypto hash
-    const crypto = require('crypto')
-    const randomBytes = crypto.randomBytes(32)
-    const dataString = `${reconciliationId}-${record.id}-${Date.now()}-${record.email}`
-    const hash = crypto.createHash('sha256').update(dataString + randomBytes.toString('hex')).digest('hex')
-    const referenceCode = hash.toUpperCase()
+    // Check if there's already an existing link for this record
+    const existingLinkResult = await query(`
+      SELECT reference_code, expires_at FROM reconciliation_links
+      WHERE reconciliation_id = $1 AND record_id = $2
+      ORDER BY created_at DESC
+      LIMIT 1
+    `, [reconciliationId, record.id])
 
-    // Calculate expiry date (30 days from now)
-    const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + 30)
+    let referenceCode: string
 
-    // Save reference code to database for security
-    await query(`
-      INSERT INTO reconciliation_links (
-        reference_code, reconciliation_id, record_id, recipient_email,
-        recipient_name, amount, balance_type, expires_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    `, [
-      referenceCode,
-      reconciliationId,
-      record.id,
-      record.email,
-      record.cari_hesap_adi,
-      record.tutar,
-      record.borc_alacak,
-      expiresAt
-    ])
+    if (existingLinkResult.rows.length > 0) {
+      // Reuse existing link
+      referenceCode = existingLinkResult.rows[0].reference_code
+      console.log(`📎 Reusing existing link for record ${record.id}: ${referenceCode}`)
+    } else {
+      // Generate new secure unique reference code using crypto hash
+      const crypto = require('crypto')
+      const randomBytes = crypto.randomBytes(32)
+      const dataString = `${reconciliationId}-${record.id}-${Date.now()}-${record.email}`
+      const hash = crypto.createHash('sha256').update(dataString + randomBytes.toString('hex')).digest('hex')
+      referenceCode = hash.toUpperCase()
+
+      // Calculate expiry date (30 days from now)
+      const expiresAt = new Date()
+      expiresAt.setDate(expiresAt.getDate() + 30)
+
+      // Save reference code to database for security
+      await query(`
+        INSERT INTO reconciliation_links (
+          reference_code, reconciliation_id, record_id, recipient_email,
+          recipient_name, amount, balance_type, expires_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [
+        referenceCode,
+        reconciliationId,
+        record.id,
+        record.email,
+        record.cari_hesap_adi,
+        record.tutar,
+        record.borc_alacak,
+        expiresAt
+      ])
+      console.log(`🔗 Created new link for record ${record.id}: ${referenceCode}`)
+    }
 
     // Generate link URL (this will be the page to view reconciliation)
     const linkUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reconciliation/view/${referenceCode}`

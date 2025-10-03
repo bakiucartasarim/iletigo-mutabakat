@@ -654,14 +654,18 @@ export default function ReconciliationDetailPage() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               {getMailStatusBadge(record.mail_status || 'gonderilmedi')}
-                              {(!record.mail_status || record.mail_status === 'gonderilmedi') &&
+                              {(!record.mail_status || record.mail_status === 'gonderilmedi' || record.mail_status === 'hata') &&
                                record.ilgili_kisi_eposta &&
                                record.ilgili_kisi_eposta.includes('@') && (
                                 <button
                                   onClick={() => sendSingleMail(record)}
                                   disabled={sendingMailId === record.id}
-                                  className="p-1 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                  title="Mail Gönder"
+                                  className={`p-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                                    record.mail_status === 'hata'
+                                      ? 'text-red-600 hover:text-red-800 hover:bg-red-50'
+                                      : 'text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50'
+                                  }`}
+                                  title={record.mail_status === 'hata' ? 'Yeniden Gönder' : 'Mail Gönder'}
                                 >
                                   {sendingMailId === record.id ? (
                                     <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
