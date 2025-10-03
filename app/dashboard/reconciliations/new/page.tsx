@@ -908,7 +908,12 @@ export default function NewReconciliationPage() {
                     </div>
                     <div className="ml-3">
                       <h3 className="text-sm font-semibold text-blue-800">Mutabakat Dönemi</h3>
-                      <p className="text-sm font-bold text-blue-900">{formData.reconciliation_period || new Date().toLocaleDateString('tr-TR')}</p>
+                      <p className="text-sm font-bold text-blue-900">
+                        {formData.reconciliation_period ?
+                          new Date(formData.reconciliation_period).toLocaleDateString('tr-TR') :
+                          new Date().toLocaleDateString('tr-TR')
+                        }
+                      </p>
                     </div>
                   </div>
                 </div>
