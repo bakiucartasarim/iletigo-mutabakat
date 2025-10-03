@@ -299,7 +299,12 @@ export async function GET(request: NextRequest) {
       }
 
       if (search) {
-        conditions.push(`(r.period ILIKE $${paramIndex} OR c.name ILIKE $${paramIndex})`)
+        conditions.push(`(
+          r.period ILIKE $${paramIndex}
+          OR c.name ILIKE $${paramIndex}
+          OR CONCAT(COALESCE(c.reconciliation_code_prefix, 'MUT'), '-', r.id) ILIKE $${paramIndex}
+          OR CAST(r.id AS TEXT) ILIKE $${paramIndex}
+        )`)
         params.push(`%${search}%`)
         paramIndex++
       }
