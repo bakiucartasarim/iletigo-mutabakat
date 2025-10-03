@@ -199,7 +199,7 @@ export default function MailContentTemplatesPage() {
   <p style="margin: 20px 0;">Sayın {{sirketAdi}} Yetkilileri,</p>
 
   <p style="line-height: 1.6; color: #374151;">
-    Şirketimiz nezdindeki cari hesabınız <strong>{{tarih}}</strong> tarihi itibarıyla
+    Şirketimiz nezdindeki cari hesabınız <strong>{{donem}}</strong> tarihi itibarıyla
     <strong style="color: #059669;">{{tutar}} TL {{bakiyeTipi}}</strong> bakiyesi vermektedir.
   </p>
 
