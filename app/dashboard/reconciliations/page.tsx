@@ -154,27 +154,27 @@ export default function ReconciliationsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
 
       {/* Filters */}
-      <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white rounded-lg shadow border p-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Arama</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Arama</label>
             <input
               type="text"
               placeholder="Baslik, sirket veya referans..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Durum</label>
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value, page: 1 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-transparent"
             >
               <option value="all">Tum Durumlar</option>
               <option value="pending">Beklemede</option>
@@ -183,11 +183,11 @@ export default function ReconciliationsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Oncelik</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Oncelik</label>
             <select
               value={filters.priority}
               onChange={(e) => setFilters({ ...filters, priority: e.target.value, page: 1 })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-transparent"
             >
               <option value="all">Tum Oncelikler</option>
               <option value="low">Dusuk</option>
@@ -202,7 +202,7 @@ export default function ReconciliationsPage() {
                 setSearchInput('')
                 setFilters({ status: 'all', priority: 'all', search: '', page: 1 })
               }}
-              className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+              className="w-full px-3 py-1.5 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
             >
               Temizle
             </button>
@@ -212,106 +212,78 @@ export default function ReconciliationsPage() {
 
       {/* Results Summary */}
       {reconciliations && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-blue-800">
-            <span className="font-semibold">{reconciliations.pagination.total}</span> mutabakat kaydi bulundu
+        <div className="bg-blue-50 border border-blue-200 rounded px-3 py-2">
+          <p className="text-xs text-blue-800">
+            <span className="font-semibold">{reconciliations.pagination.total}</span> kayit bulundu
             {filters.search && (
-              <span> - "{filters.search}" icin arama sonuclari</span>
+              <span> - "{filters.search}"</span>
             )}
           </p>
         </div>
       )}
 
       {/* Table */}
-      <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+      <div className="bg-white rounded-lg shadow border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50/50">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                   Referans / Baslik
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                   Sirket
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tutarlar
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Tutar
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                   Durum
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Oncelik
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  Tarih
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Son Tarih
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                   Islemler
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white/30 divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200">
               {reconciliations?.data.map((reconciliation) => (
-                <tr key={reconciliation.id} className="hover:bg-white/50 transition-colors duration-200">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {reconciliation.reference_number}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {reconciliation.title}
-                      </div>
+                <tr key={reconciliation.id} className="hover:bg-gray-50">
+                  <td className="px-3 py-2">
+                    <div className="text-xs font-medium text-indigo-600">
+                      {reconciliation.reference_number}
+                    </div>
+                    <div className="text-xs text-gray-600 truncate max-w-xs">
+                      {reconciliation.title}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">{reconciliation.company_name}</div>
-                    <div className="text-sm text-gray-500">Atanan: {reconciliation.assigned_to}</div>
+                  <td className="px-3 py-2">
+                    <div className="text-xs text-gray-900">{reconciliation.company_name}</div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm">
-                      <div className="text-gray-900">Bizim: {formatCurrency(reconciliation.our_amount, reconciliation.currency)}</div>
-                      <div className="text-gray-600">Onlarin: {formatCurrency(reconciliation.their_amount, reconciliation.currency)}</div>
-                      <div className={`font-medium ${
-                        reconciliation.difference > 0 ? 'text-green-600' :
-                        reconciliation.difference < 0 ? 'text-red-600' : 'text-gray-600'
-                      }`}>
-                        Fark: {formatCurrency(reconciliation.difference, reconciliation.currency)}
-                      </div>
+                  <td className="px-3 py-2">
+                    <div className="text-xs font-medium text-gray-900">
+                      {formatCurrency(reconciliation.our_amount, reconciliation.currency)}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-3 py-2">
                     {getStatusBadge(reconciliation.status)}
                   </td>
-                  <td className="px-6 py-4">
-                    {getPriorityBadge(reconciliation.priority)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className={`text-sm ${
+                  <td className="px-3 py-2">
+                    <div className={`text-xs ${
                       isOverdue(reconciliation.due_date, reconciliation.status) ? 'text-red-600 font-medium' : 'text-gray-900'
                     }`}>
                       {formatDate(reconciliation.due_date)}
-                      {isOverdue(reconciliation.due_date, reconciliation.status) && (
-                        <div className="text-xs text-red-500">Gecikti!</div>
-                      )}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center space-x-2">
-                      <Link
-                        href={`/dashboard/reconciliations/${reconciliation.id}`}
-                        className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
-                      >
-                        Goruntule
-                      </Link>
-                      <span className="text-gray-300">|</span>
-                      <Link
-                        href={`/dashboard/reconciliations/${reconciliation.id}/edit`}
-                        className="text-blue-600 hover:text-blue-900 text-sm font-medium"
-                      >
-                        Duzenle
-                      </Link>
-                    </div>
+                  <td className="px-3 py-2">
+                    <Link
+                      href={`/dashboard/reconciliations/${reconciliation.id}`}
+                      className="text-indigo-600 hover:text-indigo-900 text-xs font-medium"
+                    >
+                      Detay
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -321,34 +293,34 @@ export default function ReconciliationsPage() {
 
         {/* Pagination */}
         {reconciliations && reconciliations.pagination.total_pages > 1 && (
-          <div className="bg-white/50 px-6 py-4 border-t border-gray-200">
+          <div className="bg-gray-50 px-3 py-2 border-t border-gray-200">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+              <div className="text-xs text-gray-700">
                 <span className="font-medium">{(reconciliations.pagination.current_page - 1) * reconciliations.pagination.per_page + 1}</span>
-                {' '}-{' '}
+                -
                 <span className="font-medium">
                   {Math.min(reconciliations.pagination.current_page * reconciliations.pagination.per_page, reconciliations.pagination.total)}
                 </span>
-                {' '}arasi, toplam{' '}
-                <span className="font-medium">{reconciliations.pagination.total}</span> kayit
+                {' / '}
+                <span className="font-medium">{reconciliations.pagination.total}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setFilters({ ...filters, page: Math.max(1, filters.page - 1) })}
                   disabled={reconciliations.pagination.current_page <= 1}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="px-2 py-1 border border-gray-300 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
-                  Onceki
+                  ‹
                 </button>
-                <span className="text-sm text-gray-700">
-                  Sayfa {reconciliations.pagination.current_page} / {reconciliations.pagination.total_pages}
+                <span className="text-xs text-gray-700">
+                  {reconciliations.pagination.current_page} / {reconciliations.pagination.total_pages}
                 </span>
                 <button
                   onClick={() => setFilters({ ...filters, page: Math.min(reconciliations.pagination.total_pages, filters.page + 1) })}
                   disabled={reconciliations.pagination.current_page >= reconciliations.pagination.total_pages}
-                  className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="px-2 py-1 border border-gray-300 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
-                  Sonraki
+                  ›
                 </button>
               </div>
             </div>

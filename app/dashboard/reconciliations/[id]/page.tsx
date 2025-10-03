@@ -458,28 +458,25 @@ export default function ReconciliationDetailPage() {
             href="/dashboard/reconciliations"
             className="text-gray-400 hover:text-gray-600"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-base font-semibold text-gray-900">
               Mutabakat Detayı
             </h1>
-            <p className="text-sm text-gray-500">
-              {reconciliation.period}
-            </p>
           </div>
         </div>
       </div>
 
       {/* Excel Data Section */}
       <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-6">
-          <div className="space-y-6">
+        <div className="p-3">
+          <div className="space-y-3">
               {/* Genel Bilgiler - Kompakt */}
-              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-3 border border-indigo-100">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded p-2 border border-indigo-100">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                   <div>
                     <span className="text-gray-500 block">Dönem:</span>
                     <span className="font-medium text-gray-900">
@@ -507,30 +504,30 @@ export default function ReconciliationDetailPage() {
               </div>
 
               {/* Mail İşlemleri Section */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 rounded p-2">
                 {/* Status Summary - Side by Side */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-2">
                   {/* Mail Status Summary */}
-                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-2 bg-white p-2 rounded border border-gray-200">
                     <div className="text-xs font-medium text-gray-700">Mail:</div>
                     {(() => {
                       const mailStats = getMailStatusStats()
                       return (
                         <>
                           <div className="flex items-center gap-1">
-                            <div className="text-lg font-bold text-gray-600">{mailStats.gonderilmedi}</div>
+                            <div className="text-sm font-bold text-gray-600">{mailStats.gonderilmedi}</div>
                             <div className="text-xs text-gray-500">Gönderilmemiş</div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <div className="text-lg font-bold text-green-600">{mailStats.gonderildi}</div>
+                            <div className="text-sm font-bold text-green-600">{mailStats.gonderildi}</div>
                             <div className="text-xs text-gray-500">Gönderildi</div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <div className="text-lg font-bold text-red-600">{mailStats.hata}</div>
+                            <div className="text-sm font-bold text-red-600">{mailStats.hata}</div>
                             <div className="text-xs text-gray-500">Hata</div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <div className="text-lg font-bold text-yellow-600">{mailStats.beklemede}</div>
+                            <div className="text-sm font-bold text-yellow-600">{mailStats.beklemede}</div>
                             <div className="text-xs text-gray-500">Beklemede</div>
                           </div>
                         </>
@@ -539,22 +536,22 @@ export default function ReconciliationDetailPage() {
                   </div>
 
                   {/* Reconciliation Status Summary */}
-                  <div className="flex items-center gap-3 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-2 bg-blue-50 p-2 rounded border border-blue-200">
                     <div className="text-xs font-medium text-gray-700">Mutabakat:</div>
                     {(() => {
                       const reconStats = getReconciliationStatusStats()
                       return (
                         <>
                           <div className="flex items-center gap-1">
-                            <div className="text-lg font-bold text-gray-600">{reconStats.beklemede}</div>
+                            <div className="text-sm font-bold text-gray-600">{reconStats.beklemede}</div>
                             <div className="text-xs text-gray-500">Beklemede</div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <div className="text-lg font-bold text-green-600">{reconStats.onaylandi}</div>
+                            <div className="text-sm font-bold text-green-600">{reconStats.onaylandi}</div>
                             <div className="text-xs text-gray-500">Mutabık</div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <div className="text-lg font-bold text-orange-600">{reconStats.itiraz}</div>
+                            <div className="text-sm font-bold text-orange-600">{reconStats.itiraz}</div>
                             <div className="text-xs text-gray-500">İtiraz</div>
                           </div>
                         </>
@@ -594,25 +591,25 @@ export default function ReconciliationDetailPage() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           Mutabakat Kodu
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           Cari Hesap
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           Tutar
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           B/A
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           Mail
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           Mail Durumu
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           Mutabakat Durumu
                         </th>
                       </tr>
@@ -624,20 +621,20 @@ export default function ReconciliationDetailPage() {
 
                         return (
                         <tr key={record.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
+                          <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-indigo-600">
                             {mutabakatKodu}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-3 py-2 whitespace-nowrap">
                             <div>
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-xs font-medium text-gray-900">
                                 {record.cari_hesap_adi}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-xs text-gray-500">
                                 {record.cari_hesap_kodu}
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                             {record.reconciliation_status === 'itiraz' && record.disputed_amount ? (
                               <div>
                                 <div className="line-through text-gray-400">
@@ -656,14 +653,14 @@ export default function ReconciliationDetailPage() {
                               formatCurrencyWithTL(record.tutar, record.birim, 1)
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                             {record.borc_alacak}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                             {record.ilgili_kisi_eposta || '-'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
+                          <td className="px-3 py-2 whitespace-nowrap">
+                            <div className="flex items-center gap-1">
                               {getMailStatusBadge(record.mail_status || 'gonderilmedi')}
                               {(!record.mail_status || record.mail_status === 'gonderilmedi' || record.mail_status === 'hata') &&
                                record.ilgili_kisi_eposta &&
@@ -692,7 +689,7 @@ export default function ReconciliationDetailPage() {
                               )}
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-3 py-2 whitespace-nowrap">
                             {getReconciliationStatusBadge(record.reconciliation_status || 'beklemede')}
                           </td>
                         </tr>
