@@ -239,19 +239,7 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
     let emailContent = template.content
     let emailSubject = template.subject
 
-    // Simple button - just use the link variable directly
-    const simpleButton = `
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${linkUrl}" style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-          İşlemi Tamamla
-        </a>
-      </div>
-    `
-
-    // Replace {{linkUrl}} placeholder with simple button
-    emailContent = emailContent.replace(/\{\{linkUrl\}\}/g, simpleButton)
-
-    // Now replace other variables (but NOT linkUrl since we already handled it)
+    // Define all variables including linkUrl
     const variables = {
       sirketAdi: record.cari_hesap_adi,
       gonderenSirket: recon.company_name,
@@ -259,8 +247,8 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       donem: recon.period || new Date().toLocaleDateString('tr-TR'), // Add donem variable
       tarih: new Date().toLocaleDateString('tr-TR'),
       tutar: record.tutar.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }),
-      bakiyeTipi: record.borc_alacak
-      // linkUrl is NOT included here - we handle it separately above
+      bakiyeTipi: record.borc_alacak,
+      linkUrl: linkUrl // Add linkUrl as a simple variable for href usage
     }
 
     // Replace all variables in content and subject

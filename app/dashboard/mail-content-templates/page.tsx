@@ -188,7 +188,7 @@ export default function MailContentTemplatesPage() {
     { key: '{{tarih}}', desc: 'Günün Tarihi' },
     { key: '{{tutar}}', desc: 'Tutar' },
     { key: '{{bakiyeTipi}}', desc: 'Bakiye Tipi (ALACAK/BORÇ)' },
-    { key: '{{linkUrl}}', desc: 'Mutabakat Görüntüleme Linki' },
+    { key: '{{linkUrl}}', desc: 'Mutabakat Görüntüleme Link URL (href içinde kullanın)' },
   ]
 
   const defaultTemplateContent = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -381,6 +381,7 @@ export default function MailContentTemplatesPage() {
                         className="text-gray-800 leading-relaxed space-y-4 prose prose-sm max-w-none"
                         dangerouslySetInnerHTML={{
                           __html: selectedTemplate.content
+                            .replace(/\{\{linkUrl\}\}/g, 'https://ornek-mutabakat-linki.com/XXXXX')
                             .replace(/\{\{gonderenSirket\}\}/g, company?.name || 'Şirket Adı')
                             .replace(/\{\{vergiNo\}\}/g, company?.tax_number || '0000000000')
                             .replace(/\{\{sirketAdi\}\}/g, 'Örnek Cari Hesap')
