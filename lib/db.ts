@@ -33,12 +33,20 @@ if (process.env.DATABASE_URL) {
 
 export default pool
 
+// Helper function to format date in Turkish format (DD.MM.YYYY)
+export function formatTurkishDate(date: Date = new Date()): string {
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}.${month}.${year}`
+}
+
 // Helper function for queries
 export async function query(text: string, params?: any[]) {
   if (!pool) {
     throw new Error('Database connection not available')
   }
-  
+
   try {
     const start = Date.now()
     const res = await pool.query(text, params)

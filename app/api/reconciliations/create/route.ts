@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Pool } from 'pg'
-import { query } from '@/lib/db'
+import { query, formatTurkishDate } from '@/lib/db'
 
 // Helper function to parse Turkish currency format
 function parseTurkishCurrency(value: string | number): number {
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         VALUES ($1, $2, $3, $4)
         RETURNING id
       `, [
-        `Mutabakat Dönemi - ${formData.reconciliation_period || new Date().toLocaleDateString('tr-TR')}`,
+        `Mutabakat Dönemi - ${formData.reconciliation_period || formatTurkishDate()}`,
         formData.start_date || new Date().toISOString().split('T')[0],
         formData.end_date || new Date().toISOString().split('T')[0],
         formData.description || `${formData.type || 'Cari Mutabakat'} dönemi`
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
         periodId,
         userId, // From auth token
         companyId, // From user's company_id
-        formData.reconciliation_period || new Date().toLocaleDateString('tr-TR'),
+        formData.reconciliation_period || formatTurkishDate(),
         'pending',
         excelData.length,
         0,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Pool } from 'pg'
-import { query } from '@/lib/db'
+import { query, formatTurkishDate } from '@/lib/db'
 
 interface MailRecord {
   id: number
@@ -244,8 +244,8 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       sirketAdi: record.cari_hesap_adi,
       gonderenSirket: recon.company_name,
       referansKodu: recon.period || referenceCode, // Use period name instead of reference code
-      donem: recon.period || new Date().toLocaleDateString('tr-TR'), // Add donem variable
-      tarih: new Date().toLocaleDateString('tr-TR'),
+      donem: recon.period || formatTurkishDate(), // Add donem variable with Turkish date format (DD.MM.YYYY)
+      tarih: formatTurkishDate(), // Turkish date format (DD.MM.YYYY)
       tutar: record.tutar.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }),
       bakiyeTipi: record.borc_alacak,
       linkUrl: linkUrl // Add linkUrl as a simple variable for href usage

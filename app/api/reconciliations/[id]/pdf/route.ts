@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { formatTurkishDate } from '@/lib/db';
 
 export async function POST(
   request: NextRequest,
@@ -44,7 +45,7 @@ export async function POST(
         <p><strong>Bizim Tutar:</strong> 10.000 TRY</p>
         <p><strong>Onların Tutarı:</strong> 9.500 TRY</p>
         <p><strong>Fark:</strong> 500 TRY</p>
-        <p><strong>Tarih:</strong> ${new Date().toLocaleDateString('tr-TR')}</p>
+        <p><strong>Tarih:</strong> ${formatTurkishDate()}</p>
     </div>
     
     <div style="margin-top: 50px;">
