@@ -275,6 +275,7 @@ export default function ReconciliationDetailPage() {
         body: JSON.stringify({
           records: [{
             id: record.id,
+            sira_no: record.sira_no,
             email: record.ilgili_kisi_eposta,
             cari_hesap_adi: record.cari_hesap_adi,
             tutar: record.tutar,
@@ -328,6 +329,7 @@ export default function ReconciliationDetailPage() {
         body: JSON.stringify({
           records: unsent.map(record => ({
             id: record.id,
+            sira_no: record.sira_no,
             email: record.ilgili_kisi_eposta,
             cari_hesap_adi: record.cari_hesap_adi,
             tutar: record.tutar,
@@ -618,7 +620,7 @@ export default function ReconciliationDetailPage() {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {reconciliation.excel_data.map((record) => {
                         const codePrefix = reconciliation.reconciliation_code_prefix || 'MUT'
-                        const mutabakatKodu = `${codePrefix}-${reconciliation.id}-${record.id}`
+                        const mutabakatKodu = `${codePrefix}-${reconciliation.id}-${record.sira_no}`
 
                         return (
                         <tr key={record.id}>

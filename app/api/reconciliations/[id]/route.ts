@@ -171,6 +171,7 @@ export async function GET(
         period_created_at: reconciliation.period_created_at,
         excel_data: excelDataResult.rows,
         company_name: reconciliation.company_name,
+        reconciliation_code_prefix: reconciliation.reconciliation_code_prefix,
         user_name: reconciliation.user_name
       }
 

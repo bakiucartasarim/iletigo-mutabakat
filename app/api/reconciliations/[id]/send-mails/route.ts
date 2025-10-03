@@ -4,6 +4,7 @@ import { query, formatTurkishDate } from '@/lib/db'
 
 interface MailRecord {
   id: number
+  sira_no: number
   email: string
   cari_hesap_adi: string
   tutar: number
@@ -249,10 +250,10 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       return period
     }
 
-    // Generate mutabakat code: {companyPrefix}-{reconciliationId}-{recordId}
+    // Generate mutabakat code: {companyPrefix}-{reconciliationId}-{siraNo}
     const mutabakatKodu = recon.reconciliation_code_prefix
-      ? `${recon.reconciliation_code_prefix}-${reconciliationId}-${record.id}`
-      : `MUT-${reconciliationId}-${record.id}`
+      ? `${recon.reconciliation_code_prefix}-${reconciliationId}-${record.sira_no}`
+      : `MUT-${reconciliationId}-${record.sira_no}`
 
     // Define all variables including linkUrl
     const variables = {
