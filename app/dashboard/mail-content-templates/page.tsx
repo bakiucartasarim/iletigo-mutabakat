@@ -254,7 +254,7 @@ export default function MailContentTemplatesPage() {
             setEditingTemplate(null)
             setFormData({
               name: 'Cari Mutabakat Mail Şablonu',
-              subject: 'Mutabakat Mektubu - {{donem}}',
+              subject: 'Mutabakat Mektubu - {{mutabakatKodu}}',
               content: defaultTemplateContent,
               isActive: true
             })
@@ -368,7 +368,11 @@ export default function MailContentTemplatesPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         <span className="font-semibold">Konu:</span>
-                        <span className="text-xs">{selectedTemplate.subject}</span>
+                        <span className="text-xs">{selectedTemplate.subject
+                          .replace(/\{\{mutabakatKodu\}\}/g, 'ATL-72-145')
+                          .replace(/\{\{donem\}\}/g, 'Ocak 2025')
+                          .replace(/\{\{referansKodu\}\}/g, 'XXXXXXXXXXXXX')
+                        }</span>
                       </div>
                     </div>
 
