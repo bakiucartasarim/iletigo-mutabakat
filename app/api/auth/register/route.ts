@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         firstName,
         lastName,
         (phone && phone.trim() !== '') ? phone.trim() : null,
-        'company_admin', // İlk kullanıcı company admin
+        'admin', // İlk kullanıcı admin rolü
         company.id,
         true
       ]
