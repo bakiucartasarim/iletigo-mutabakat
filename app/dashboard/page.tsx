@@ -369,13 +369,6 @@ export default function DashboardPage() {
               </a>
             </div>
           </div>
-
-          {/* Bottom Action Button */}
-          <div className="text-right">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-6 rounded-lg transition duration-200">
-              Tam ekran (f)
-            </button>
-          </div>
         </div>
       </div>
     </div>
