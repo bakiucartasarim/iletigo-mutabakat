@@ -67,7 +67,6 @@ export default function NewReconciliationPage() {
     })(),
     related_type: 'cari_hesap_bakiye',
     reminder_days: [],
-    sender_branch: 'merkez',
     language: 'tr',
     template: '', // Will be set from company template or default
     // Özel ayarlar
@@ -707,25 +706,7 @@ export default function NewReconciliationPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="sender_branch">
-                          Gönderen Şube <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
-                          id="sender_branch"
-                          name="sender_branch"
-                          value={formData.sender_branch}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option value="merkez">Merkez (kredi: 1496)</option>
-                          <option value="ankara">Ankara Şubesi (kredi: 1520)</option>
-                          <option value="istanbul">İstanbul Şubesi (kredi: 1580)</option>
-                          <option value="izmir">İzmir Şubesi (kredi: 1630)</option>
-                        </select>
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1" htmlFor="language">
                           Dil Seçimi <span className="text-red-500">*</span>
@@ -1020,7 +1001,6 @@ export default function NewReconciliationPage() {
                       <li>• Mutabakat Türü: {formData.type === 'cari_mutabakat' ? 'Cari Mutabakat' : formData.type}</li>
                       <li>• Dil: {formData.language === 'tr' ? 'Türkçe' : formData.language}</li>
                       <li>• Şablon: {formData.template}</li>
-                      <li>• Gönderen Şube: {formData.sender_branch}</li>
                     </ul>
                   </div>
                   <div>
