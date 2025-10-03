@@ -480,7 +480,7 @@ export default function ReconciliationDetailPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                   <div>
                     <span className="text-gray-500 block">Dönem:</span>
-                    <span className="font-medium text-gray-900">{reconciliation.period_name}</span>
+                    <span className="font-medium text-gray-900">{reconciliation.period}</span>
                   </div>
                   <div>
                     <span className="text-gray-500 block">Tarih:</span>
