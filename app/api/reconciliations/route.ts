@@ -197,6 +197,38 @@ let nextCompanyId = 6
 
 export async function GET(request: NextRequest) {
   try {
+    // Get authenticated user info from cookie
+    const authToken = request.cookies.get('auth-token')?.value
+    let userCompanyId: number | null = null
+    let userRole: string | null = null
+
+    if (authToken && authToken.startsWith('user-')) {
+      const tokenParts = authToken.split('-')
+      if (tokenParts.length >= 2) {
+        const userId = tokenParts[1]
+
+        // Fetch user info to get company_id and role
+        const pool = new Pool({
+          connectionString: process.env.DATABASE_URL,
+          ssl: false
+        })
+
+        try {
+          const userQuery = `
+            SELECT company_id, role FROM users WHERE id = $1 AND is_active = true
+          `
+          const userResult = await pool.query(userQuery, [userId])
+
+          if (userResult.rows.length > 0) {
+            userCompanyId = userResult.rows[0].company_id
+            userRole = userResult.rows[0].role
+          }
+        } finally {
+          await pool.end()
+        }
+      }
+    }
+
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
@@ -252,6 +284,13 @@ export async function GET(request: NextRequest) {
       const conditions = []
       const params: any[] = []
       let paramIndex = 1
+
+      // Company-based filtering (super_admin sees all, others see only their company)
+      if (userRole !== 'super_admin' && userCompanyId) {
+        conditions.push(`r.company_id = $${paramIndex}`)
+        params.push(userCompanyId)
+        paramIndex++
+      }
 
       if (status && status !== 'all') {
         conditions.push(`r.status = $${paramIndex}`)
