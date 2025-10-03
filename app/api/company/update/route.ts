@@ -44,6 +44,14 @@ export async function PUT(request: NextRequest) {
       )
     }
 
+    // Validate security settings - at least one verification method must be enabled
+    if (!require_tax_verification && !require_otp_verification) {
+      return NextResponse.json(
+        { error: 'En az bir doğrulama yöntemi aktif olmalıdır (Vergi Numarası veya E-posta OTP)' },
+        { status: 400 }
+      )
+    }
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
