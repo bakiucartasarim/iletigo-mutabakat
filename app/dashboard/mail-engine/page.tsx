@@ -70,18 +70,53 @@ export default function MailEnginePage() {
     smtpUser: '',
     smtpPassword: ''
   })
-  const [brevoApiKey, setBrevoApiKey] = useState('')
+  const [brevoSettings, setBrevoSettings] = useState({
+    api_key: '',
+    from_email: '',
+    from_name: '',
+    is_active: false
+  })
   const [bulkEmails, setBulkEmails] = useState('')
 
   useEffect(() => {
     checkSuperAdminAccess()
     loadMailEngineData()
-    // Load Brevo API key from environment or localStorage
-    const savedBrevoKey = localStorage.getItem('brevoApiKey')
-    if (savedBrevoKey) {
-      setBrevoApiKey(savedBrevoKey)
-    }
+    loadBrevoSettings()
   }, [])
+
+  const loadBrevoSettings = async () => {
+    try {
+      const response = await fetch('/api/mail-engine/brevo-settings')
+      if (response.ok) {
+        const data = await response.json()
+        setBrevoSettings(data)
+      }
+    } catch (error) {
+      console.error('Error loading Brevo settings:', error)
+    }
+  }
+
+  const saveBrevoSettings = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/mail-engine/brevo-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(brevoSettings)
+      })
+
+      if (response.ok) {
+        showToast('Brevo ayarları kaydedildi', 'success')
+      } else {
+        showToast('Ayarlar kaydedilemedi', 'error')
+      }
+    } catch (error) {
+      console.error('Brevo settings save error:', error)
+      showToast('Kaydetme hatası', 'error')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const checkSuperAdminAccess = async () => {
     try {
@@ -322,7 +357,7 @@ export default function MailEnginePage() {
       return
     }
 
-    if (!brevoApiKey) {
+    if (!brevoSettings.api_key) {
       showToast('Lütfen Brevo API anahtarını girin', 'error')
       return
     }
@@ -333,9 +368,9 @@ export default function MailEnginePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          apiKey: brevoApiKey,
-          fromEmail: 'socialhub@atalga.com',
-          fromName: 'iletiGo Mutabakat',
+          apiKey: brevoSettings.api_key,
+          fromEmail: brevoSettings.from_email || 'socialhub@atalga.com',
+          fromName: brevoSettings.from_name || 'iletiGo Mutabakat',
           toEmail: testEmail,
           subject: 'Test Email - iletiGo Mutabakat',
         })
@@ -364,7 +399,7 @@ export default function MailEnginePage() {
       return
     }
 
-    if (!brevoApiKey) {
+    if (!brevoSettings.api_key) {
       showToast('Lütfen Brevo API anahtarını girin', 'error')
       return
     }
@@ -388,9 +423,9 @@ export default function MailEnginePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          apiKey: brevoApiKey,
-          fromEmail: 'socialhub@atalga.com',
-          fromName: 'iletiGo Mutabakat',
+          apiKey: brevoSettings.api_key,
+          fromEmail: brevoSettings.from_email || 'socialhub@atalga.com',
+          fromName: brevoSettings.from_name || 'iletiGo Mutabakat',
           subject: 'Bulk Email - iletiGo Mutabakat',
           recipients: recipients,
           batchDelay: 100
@@ -594,28 +629,44 @@ export default function MailEnginePage() {
                 <div className="space-y-3 mb-3">
                   <div>
                     <label className="block text-xs font-medium text-green-900 mb-1">Brevo API Key</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="password"
-                        placeholder="xkeysib-..."
-                        value={brevoApiKey}
-                        onChange={(e) => setBrevoApiKey(e.target.value)}
-                        className="flex-1 px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                      />
-                      <button
-                        onClick={() => {
-                          localStorage.setItem('brevoApiKey', brevoApiKey)
-                          showToast('API Key kaydedildi', 'success')
-                        }}
-                        className="px-3 py-2 text-xs bg-green-700 text-white rounded-lg hover:bg-green-800"
-                      >
-                        Kaydet
-                      </button>
-                    </div>
-                    <p className="text-xs text-green-600 mt-1">
-                      API Key tarayıcıda saklanacak (güvenli)
-                    </p>
+                    <input
+                      type="password"
+                      placeholder="xkeysib-..."
+                      value={brevoSettings.api_key}
+                      onChange={(e) => setBrevoSettings({...brevoSettings, api_key: e.target.value})}
+                      className="w-full px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
                   </div>
+                  <div>
+                    <label className="block text-xs font-medium text-green-900 mb-1">From Email</label>
+                    <input
+                      type="email"
+                      placeholder="noreply@yourdomain.com"
+                      value={brevoSettings.from_email}
+                      onChange={(e) => setBrevoSettings({...brevoSettings, from_email: e.target.value})}
+                      className="w-full px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-green-900 mb-1">From Name</label>
+                    <input
+                      type="text"
+                      placeholder="iletiGo Mutabakat"
+                      value={brevoSettings.from_name}
+                      onChange={(e) => setBrevoSettings({...brevoSettings, from_name: e.target.value})}
+                      className="w-full px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
+                  <button
+                    onClick={saveBrevoSettings}
+                    disabled={isLoading}
+                    className="w-full px-3 py-2 text-sm bg-green-700 text-white rounded-lg hover:bg-green-800 disabled:opacity-50"
+                  >
+                    {isLoading ? 'Kaydediliyor...' : 'Brevo Ayarlarını Kaydet'}
+                  </button>
+                  <p className="text-xs text-green-600 mt-1">
+                    ✅ Ayarlar database'e güvenli şekilde saklanır
+                  </p>
                 </div>
 
                 <div className="flex gap-3">
@@ -628,7 +679,7 @@ export default function MailEnginePage() {
                   />
                   <button
                     onClick={sendBrevoEmail}
-                    disabled={isLoading || !testEmail || !brevoApiKey}
+                    disabled={isLoading || !testEmail || !brevoSettings.api_key}
                     className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -672,7 +723,7 @@ export default function MailEnginePage() {
 
                 <button
                   onClick={sendBrevoBulkEmail}
-                  disabled={isLoading || !bulkEmails || !brevoApiKey}
+                  disabled={isLoading || !bulkEmails || !brevoSettings.api_key}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
