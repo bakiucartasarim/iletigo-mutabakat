@@ -14,7 +14,9 @@ export default function CompanySettingsPage() {
     address: '',
     contact_person: '',
     website: '',
-    description: ''
+    description: '',
+    require_tax_verification: true,
+    require_otp_verification: false
   })
 
   const [logoFile, setLogoFile] = useState<File | null>(null)
@@ -68,7 +70,9 @@ export default function CompanySettingsPage() {
           address: data.address || '',
           contact_person: data.contact_person || '',
           website: data.website || '',
-          description: data.description || ''
+          description: data.description || '',
+          require_tax_verification: data.require_tax_verification ?? true,
+          require_otp_verification: data.require_otp_verification ?? false
         })
         // Set existing logo and stamp previews
         if (data.logo_url) {
@@ -86,10 +90,10 @@ export default function CompanySettingsPage() {
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
     }))
   }
 
@@ -383,6 +387,65 @@ export default function CompanySettingsPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
                     placeholder="Şirketiniz hakkında kısa bir açıklama..."
                   />
+                </div>
+              </div>
+
+              {/* Security Settings */}
+              <div className="border-t pt-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Güvenlik Ayarları</h2>
+                <p className="text-sm text-gray-600 mb-4">Müşterilerinizin mutabakat linklerini görüntülemek için hangi doğrulama yöntemlerini kullanmasını istediğinizi belirleyin.</p>
+
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <div className="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        id="require_tax_verification"
+                        name="require_tax_verification"
+                        checked={formData.require_tax_verification}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="require_tax_verification" className="font-medium text-gray-700 text-sm">
+                        Vergi Numarası Doğrulama
+                      </label>
+                      <p className="text-xs text-gray-500">Müşteriler vergi numarasının son 4 hanesini girerek kimliklerini doğrular</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <div className="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        id="require_otp_verification"
+                        name="require_otp_verification"
+                        checked={formData.require_otp_verification}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label htmlFor="require_otp_verification" className="font-medium text-gray-700 text-sm">
+                        E-posta OTP Doğrulama
+                      </label>
+                      <p className="text-xs text-gray-500">Müşterilere e-posta ile 6 haneli doğrulama kodu gönderilir</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                    <div className="flex">
+                      <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="ml-3">
+                        <p className="text-sm text-blue-800">
+                          <strong>Önerilen:</strong> En az bir doğrulama yöntemi aktif tutun. Her iki yöntem de kapalıysa müşteriler direkt mutabakat formunu görecektir.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
