@@ -31,6 +31,8 @@ interface ReconciliationData {
   is_used: boolean
   response_status: string | null
   company_template: CompanyTemplate
+  require_tax_verification: boolean
+  require_otp_verification: boolean
 }
 
 export default function ReconciliationViewPage() {
@@ -74,6 +76,18 @@ export default function ReconciliationViewPage() {
 
       const result = await response.json()
       setData(result)
+
+      // Set initial verification step based on company settings
+      if (!result.require_tax_verification && !result.require_otp_verification) {
+        // No verification required
+        setVerificationStep('verified')
+      } else if (result.require_tax_verification) {
+        // Tax verification required (already default)
+        setVerificationStep('tax')
+      } else if (result.require_otp_verification) {
+        // Only OTP verification required
+        setVerificationStep('otp')
+      }
     } catch (err) {
       setError('Bağlantı hatası oluştu')
     } finally {
@@ -107,22 +121,29 @@ export default function ReconciliationViewPage() {
         return
       }
 
-      // Success - move to OTP step
-      setMaskedEmail(result.email)
-      setOtpExpiresIn(result.expiresIn || 300)
-      setVerificationStep('otp')
-      setVerificationError(null)
+      // Success - check if OTP is required
+      if (data?.require_otp_verification) {
+        // Move to OTP step
+        setMaskedEmail(result.email)
+        setOtpExpiresIn(result.expiresIn || 300)
+        setVerificationStep('otp')
+        setVerificationError(null)
 
-      // Start countdown timer
-      const timer = setInterval(() => {
-        setOtpExpiresIn(prev => {
-          if (prev <= 1) {
-            clearInterval(timer)
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+        // Start countdown timer
+        const timer = setInterval(() => {
+          setOtpExpiresIn(prev => {
+            if (prev <= 1) {
+              clearInterval(timer)
+              return 0
+            }
+            return prev - 1
+          })
+        }, 1000)
+      } else {
+        // No OTP required, go directly to verified
+        setVerificationStep('verified')
+        setVerificationError(null)
+      }
 
     } catch (err) {
       setVerificationError('Bağlantı hatası oluştu')
@@ -229,8 +250,14 @@ export default function ReconciliationViewPage() {
     )
   }
 
-  // Show verification screens if not verified
-  if (data && verificationStep !== 'verified') {
+  // Check if any verification is required
+  const needsVerification = data && (
+    (data.require_tax_verification && verificationStep === 'tax') ||
+    (data.require_otp_verification && verificationStep === 'otp')
+  )
+
+  // Show verification screens if needed and not verified
+  if (needsVerification && verificationStep !== 'verified') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">

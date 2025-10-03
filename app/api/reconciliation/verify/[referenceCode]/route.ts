@@ -27,6 +27,8 @@ export async function GET(
         c.address as company_address,
         c.logo_url as company_logo_url,
         c.stamp_url as company_stamp_url,
+        c.require_tax_verification,
+        c.require_otp_verification,
         ct.template_name,
         ct.header_text,
         ct.intro_text,
