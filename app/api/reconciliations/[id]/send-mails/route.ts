@@ -285,11 +285,25 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
 </html>
     `.trim()
 
-    // Send email via Brevo API
-    const brevoApiKey = process.env.BREVO_API_KEY
+    // Get Brevo settings from database
+    const brevoSettingsResult = await query(`
+      SELECT api_key, from_email, from_name
+      FROM brevo_settings
+      WHERE is_active = true
+      ORDER BY id DESC
+      LIMIT 1
+    `)
+
+    if (brevoSettingsResult.rows.length === 0) {
+      console.error('❌ Brevo settings not configured in database')
+      return false
+    }
+
+    const brevoSettings = brevoSettingsResult.rows[0]
+    const brevoApiKey = brevoSettings.api_key
 
     if (!brevoApiKey) {
-      console.error('❌ BREVO_API_KEY not configured')
+      console.error('❌ Brevo API key not found in settings')
       return false
     }
 
@@ -311,8 +325,8 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
       },
       body: JSON.stringify({
         sender: {
-          name: recon.company_name,
-          email: recon.company_email || process.env.EMAIL_FROM || 'noreply@iletigo.com'
+          name: brevoSettings.from_name || recon.company_name,
+          email: brevoSettings.from_email || recon.company_email || 'noreply@iletigo.com'
         },
         to: [
           {
