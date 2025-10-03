@@ -191,6 +191,50 @@ export default function MailContentTemplatesPage() {
     { key: '{{vergiNo}}', desc: 'Vergi No' },
   ]
 
+  const defaultTemplateContent = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h2 style="color: #2563eb; border-bottom: 3px solid #2563eb; padding-bottom: 10px;">
+    Cari Mutabakat Mektubu
+  </h2>
+
+  <p style="margin: 20px 0;">Sayın {{sirketAdi}} Yetkilileri,</p>
+
+  <p style="line-height: 1.6; color: #374151;">
+    Şirketimiz nezdindeki cari hesabınız <strong>{{tarih}}</strong> tarihi itibarıyla
+    <strong style="color: #059669;">{{tutar}} TL {{bakiyeTipi}}</strong> bakiyesi vermektedir.
+  </p>
+
+  <div style="background: #f3f4f6; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0;">
+    <p style="margin: 0; color: #1f2937;">
+      <strong>Referans Kodu:</strong> {{referansKodu}}
+    </p>
+  </div>
+
+  <p style="line-height: 1.6; color: #374151;">
+    Mutabakat detaylarını görüntülemek ve onaylamak için lütfen aşağıdaki linke tıklayınız:
+  </p>
+
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="{{linkUrl}}"
+       style="background: #2563eb; color: white; padding: 12px 30px; text-decoration: none;
+              border-radius: 6px; display: inline-block; font-weight: 600;">
+      Mutabakat Görüntüle
+    </a>
+  </div>
+
+  <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 15px; margin: 20px 0; border-radius: 6px;">
+    <p style="margin: 0; color: #92400e; font-size: 14px;">
+      ⚠️ <strong>Önemli:</strong> Mutabakat veya itirazınızı 30 gün içinde bildirmediğiniz takdirde
+      TTK'nın 94. maddesi uyarınca mutabık sayılacağınızı hatırlatırız.
+    </p>
+  </div>
+
+  <p style="line-height: 1.6; color: #374151; font-size: 14px;">
+    Saygılarımızla,<br>
+    <strong>{{gonderenSirket}}</strong><br>
+    Vergi No: {{vergiNo}}
+  </p>
+</div>`
+
   return (
     <div className="h-[calc(100vh-120px)] flex flex-col bg-gray-50">
       {isLoading && (
@@ -208,7 +252,12 @@ export default function MailContentTemplatesPage() {
         <button
           onClick={() => {
             setEditingTemplate(null)
-            setFormData({ name: '', subject: '', content: '', isActive: true })
+            setFormData({
+              name: 'Cari Mutabakat Mail Şablonu',
+              subject: 'Mutabakat Mektubu - {{referansKodu}}',
+              content: defaultTemplateContent,
+              isActive: true
+            })
             setShowEditor(true)
           }}
           className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
