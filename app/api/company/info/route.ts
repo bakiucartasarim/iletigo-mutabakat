@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
 
     // Get company information
     const companyQuery = `
-      SELECT id, name, email, tax_number, contact_person, phone, address, website, description, logo_url, stamp_url, is_active
+      SELECT id, name, email, tax_number, contact_person, phone, address, website, description, logo_url, stamp_url, is_active,
+             require_tax_verification, require_otp_verification
       FROM companies
       WHERE id = $1 AND is_active = true
     `
@@ -60,7 +61,9 @@ export async function GET(request: NextRequest) {
       description: company.description,
       logo_url: company.logo_url,
       stamp_url: company.stamp_url,
-      is_active: company.is_active
+      is_active: company.is_active,
+      require_tax_verification: company.require_tax_verification,
+      require_otp_verification: company.require_otp_verification
     })
 
   } catch (error) {
