@@ -65,8 +65,8 @@ export async function POST(request: NextRequest) {
     const companyCode = `COMP-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`
 
     const companyResult = await query(
-      `INSERT INTO companies (code, name, tax_number, contact_person, email, phone, address, password_hash, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `INSERT INTO companies (code, name, tax_number, contact_person, email, phone, address, password_hash, require_tax_verification, require_otp_verification, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
        RETURNING id, code, name, tax_number, contact_person, email, phone, address, created_at`,
       [
         companyCode,
@@ -76,7 +76,9 @@ export async function POST(request: NextRequest) {
         email.toLowerCase(),
         (phone && phone.trim() !== '') ? phone.trim() : null,
         (address && address.trim() !== '') ? address.trim() : null,
-        passwordHash
+        passwordHash,
+        true,  // require_tax_verification - Default AÇIK
+        false  // require_otp_verification - Default KAPALI
       ]
     )
 

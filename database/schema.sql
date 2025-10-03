@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS companies (
     contact_person VARCHAR(255),
     password_hash VARCHAR(255),
     is_active BOOLEAN DEFAULT true,
+    require_tax_verification BOOLEAN DEFAULT true,
+    require_otp_verification BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
