@@ -34,11 +34,11 @@ export default function CompanyTemplatesPage() {
   const [templateData, setTemplateData] = useState<TemplateData>({
     templateName: 'Cari Mutabakat',
     headerText: '',
-    introText: 'Giriş metnindeki cari hesabımız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir.',
+    introText: 'Giriş metnindeki cari hesabımız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir. Mutabakat Belge No: %MUTABAKATKODU%',
     note1: 'Hata ve Unutma Müstesnadır.',
     note2: 'Mutabakat veya itirazınız 30 gün içinde bildirmedığiniz takdirde TTK\'nın 94. maddesi uyarınca mutabık sayılacağınızı hatırlatırız.',
     note3: 'Mutabakat ile ilgili sorunlarınız için nolu telefondan Sayın ile görüşebilirsiniz.',
-    note4: 'Mutabık olmanızız durumunda cari hesap ekstrenizi www.kolaymutabakat.com sitesine yüklemenizi yada asım.koc@dorufinansol.com adresine e-posta olarak göndermenizi rica ederiz.',
+    note4: 'Mutabık olmanız durumunda firma@firma.com adresine e-posta olarak göndermenizi rica ederiz.',
     note5: ''
   })
 
@@ -212,7 +212,7 @@ export default function CompanyTemplatesPage() {
               placeholder="Giriş metnini buraya yazın..."
             />
             <p className="mt-1 text-xs text-gray-500">
-              Değişkenler: %DÖNEM% (tarih), %TUTAR% (miktar), %BORÇALACAK% (ALACAK/BORÇ)
+              Değişkenler: %DÖNEM% (tarih), %TUTAR% (miktar), %BORÇALACAK% (ALACAK/BORÇ), %MUTABAKATKODU% (örn: ATL-72-145)
             </p>
             <p className="text-xs text-blue-600 mt-1">
               Not: "Sayın, [Şirket Adı]" kısmı Excel'den otomatik gelecek
@@ -361,7 +361,12 @@ export default function CompanyTemplatesPage() {
                   <strong>TARİH:</strong> 24 Temmuz 2020
                 </p>
                 <p className="text-sm text-gray-600">
-                  {templateData.introText || 'Şirketimiz nezdindeki cari hesabınız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir.'}
+                  {(templateData.introText || 'Şirketimiz nezdindeki cari hesabınız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir.')
+                    .replace(/%DÖNEM%/g, '31.12.2024')
+                    .replace(/%TUTAR%/g, '50.000,00 TL')
+                    .replace(/%BORÇALACAK%/g, 'ALACAK')
+                    .replace(/%MUTABAKATKODU%/g, 'ATL-72-145')
+                  }
                 </p>
               </div>
 
@@ -393,9 +398,6 @@ export default function CompanyTemplatesPage() {
               <div className="mb-6 pb-4 border-b border-gray-300">
                 <p className="text-sm font-semibold text-gray-900">
                   {company?.name || 'Yeni Mutabakat Şirketi A.Ş.'} <span className="text-xs text-gray-500">(Gönderen Şirket)</span>
-                </p>
-                <p className="text-sm text-gray-700">
-                  <strong>Vergi Numarası:</strong> {company?.tax_number || '808070'}
                 </p>
                 <p className="text-sm text-gray-700">
                   <strong>Adres:</strong>
