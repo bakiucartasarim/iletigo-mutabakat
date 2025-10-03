@@ -43,6 +43,14 @@ export default function NewReconciliationPage() {
   const [hasCompanyTemplate, setHasCompanyTemplate] = useState(false)
   const [hasEmailTemplate, setHasEmailTemplate] = useState(false)
   const [templateWarning, setTemplateWarning] = useState('')
+  // Helper function to format date as DD.MM.YYYY
+  const formatDateTurkish = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}.${month}.${year}`
+  }
+
   const [formData, setFormData] = useState({
     company_code: '',
     company_name: '',
@@ -58,12 +66,12 @@ export default function NewReconciliationPage() {
     description: '',
     due_date: '',
     reconciliation_date: new Date().toISOString().split('T')[0],
-    // Yeni alanlar HTML'e uygun olarak
-    reconciliation_period: new Date().toISOString().split('T')[0],
+    // Yeni alanlar HTML'e uygun olarak - Turkish format for display
+    reconciliation_period: formatDateTurkish(new Date()),
     end_date: (() => {
       const date = new Date()
       date.setDate(date.getDate() + 10)
-      return date.toISOString().split('T')[0]
+      return formatDateTurkish(date)
     })(),
     related_type: 'cari_hesap_bakiye',
     reminder_days: [],
@@ -623,7 +631,8 @@ export default function NewReconciliationPage() {
                           className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
                           id="reconciliation_period"
                           name="reconciliation_period"
-                          type="date"
+                          type="text"
+                          placeholder="GG.AA.YYYY"
                           value={formData.reconciliation_period}
                           onChange={handleInputChange}
                         />
@@ -638,7 +647,8 @@ export default function NewReconciliationPage() {
                           className="w-full rounded-md border border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent px-3 py-2"
                           id="end_date"
                           name="end_date"
-                          type="date"
+                          type="text"
+                          placeholder="GG.AA.YYYY"
                           value={formData.end_date}
                           onChange={handleInputChange}
                         />
