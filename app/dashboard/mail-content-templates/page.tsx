@@ -254,7 +254,7 @@ export default function MailContentTemplatesPage() {
             setEditingTemplate(null)
             setFormData({
               name: 'Cari Mutabakat Mail Şablonu',
-              subject: 'Mutabakat Mektubu - {{mutabakatKodu}}',
+              subject: 'Mutabakat Mektubu - {{mutabakatKodu}} - {{donem}}',
               content: defaultTemplateContent,
               isActive: true
             })

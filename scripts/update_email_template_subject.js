@@ -21,12 +21,15 @@ async function updateEmailTemplateSubject() {
       console.log(`    Subject: ${row.subject}`);
     });
 
-    // Update templates that use {{referansKodu}} or {{donem}} in subject
+    // Update templates to add {{donem}} at the end if not present
     const updateResult = await pool.query(`
       UPDATE email_templates
-      SET subject = REPLACE(REPLACE(subject, '{{referansKodu}}', '{{mutabakatKodu}}'), '{{donem}}', '{{mutabakatKodu}}'),
-          updated_at = NOW()
-      WHERE subject LIKE '%{{referansKodu}}%' OR subject LIKE '%{{donem}}%'
+      SET subject = CASE
+        WHEN subject NOT LIKE '%{{donem}}%' THEN subject || ' - {{donem}}'
+        ELSE subject
+      END,
+      updated_at = NOW()
+      WHERE subject NOT LIKE '%{{donem}}%'
       RETURNING id, name, subject
     `);
 
