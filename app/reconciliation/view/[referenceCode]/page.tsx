@@ -250,14 +250,8 @@ export default function ReconciliationViewPage() {
     )
   }
 
-  // Check if any verification is required
-  const needsVerification = data && (
-    (data.require_tax_verification && verificationStep === 'tax') ||
-    (data.require_otp_verification && verificationStep === 'otp')
-  )
-
-  // Show verification screens if needed and not verified
-  if (needsVerification && verificationStep !== 'verified') {
+  // Show verification screens if not verified yet
+  if (data && verificationStep !== 'verified') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
@@ -276,7 +270,7 @@ export default function ReconciliationViewPage() {
             </p>
           </div>
 
-          {verificationStep === 'tax' && (
+          {verificationStep === 'tax' && data.require_tax_verification && (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -336,7 +330,7 @@ export default function ReconciliationViewPage() {
             </div>
           )}
 
-          {verificationStep === 'otp' && (
+          {verificationStep === 'otp' && data.require_otp_verification && (
             <div className="space-y-4">
               {maskedEmail && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
