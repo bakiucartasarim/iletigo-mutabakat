@@ -187,8 +187,12 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
 
     const recon = reconData.rows[0]
 
-    // Generate unique reference code
-    const referenceCode = `MUT-${reconciliationId}-${record.id}-${Date.now()}`
+    // Generate secure unique reference code using crypto hash
+    const crypto = require('crypto')
+    const randomBytes = crypto.randomBytes(32)
+    const dataString = `${reconciliationId}-${record.id}-${Date.now()}-${record.email}`
+    const hash = crypto.createHash('sha256').update(dataString + randomBytes.toString('hex')).digest('hex')
+    const referenceCode = hash.toUpperCase()
 
     // Calculate expiry date (30 days from now)
     const expiresAt = new Date()

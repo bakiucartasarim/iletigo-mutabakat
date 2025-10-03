@@ -8,8 +8,8 @@ export async function GET(
   try {
     const { referenceCode } = params
 
-    // Validate reference code format
-    if (!referenceCode || !referenceCode.startsWith('MUT-')) {
+    // Validate reference code format (64 character hex hash)
+    if (!referenceCode || !/^[A-F0-9]{64}$/i.test(referenceCode)) {
       return NextResponse.json(
         { error: 'Geçersiz referans kodu' },
         { status: 400 }

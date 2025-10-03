@@ -47,8 +47,8 @@ export async function POST(
     // Get user agent for security logging
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
-    // Validate reference code format
-    if (!referenceCode || !referenceCode.startsWith('MUT-')) {
+    // Validate reference code format (64 character hex hash)
+    if (!referenceCode || !/^[A-F0-9]{64}$/i.test(referenceCode)) {
       return NextResponse.json(
         { error: 'Geçersiz referans kodu' },
         { status: 400 }
