@@ -40,6 +40,9 @@ export default function NewReconciliationPage() {
   const [isReminderDropdownOpen, setIsReminderDropdownOpen] = useState(false)
   const [companyTemplate, setCompanyTemplate] = useState<CompanyTemplate | null>(null)
   const [templateLoading, setTemplateLoading] = useState(false)
+  const [hasCompanyTemplate, setHasCompanyTemplate] = useState(false)
+  const [hasEmailTemplate, setHasEmailTemplate] = useState(false)
+  const [templateWarning, setTemplateWarning] = useState('')
   const [formData, setFormData] = useState({
     company_code: '',
     company_name: '',
@@ -91,35 +94,58 @@ export default function NewReconciliationPage() {
   }, [])
 
   useEffect(() => {
-    // Şirket şablonunu yükle
-    const fetchCompanyTemplate = async () => {
+    // Şirket şablonunu ve mail şablonunu yükle
+    const fetchTemplates = async () => {
       try {
         setTemplateLoading(true)
-        const response = await fetch('/api/company-templates')
 
-        if (response.ok) {
-          const data = await response.json()
+        // Company template kontrolü
+        const companyTemplateResponse = await fetch('/api/company-templates')
+        if (companyTemplateResponse.ok) {
+          const data = await companyTemplateResponse.json()
           setCompanyTemplate(data)
-          // Şirket şablonunu seç
+          setHasCompanyTemplate(true)
           if (data && data.id) {
             setFormData(prev => ({
               ...prev,
               template: `sirket_sablonu_${data.id}`
             }))
-          } else {
-            console.log('No company template found')
           }
         } else {
-          console.log('Company template not found - user should create one')
+          setHasCompanyTemplate(false)
         }
+
+        // Email template kontrolü
+        const emailTemplateResponse = await fetch('/api/mail-templates')
+        if (emailTemplateResponse.ok) {
+          const emailData = await emailTemplateResponse.json()
+          if (emailData.data && emailData.data.length > 0) {
+            setHasEmailTemplate(true)
+          } else {
+            setHasEmailTemplate(false)
+          }
+        } else {
+          setHasEmailTemplate(false)
+        }
+
+        // Uyarı mesajı oluştur
+        if (!companyTemplateResponse.ok && !emailTemplateResponse.ok) {
+          setTemplateWarning('⚠️ Mutabakat PDF şablonu ve Mail metin şablonu bulunamadı. Lütfen önce şablonları oluşturun.')
+        } else if (!companyTemplateResponse.ok) {
+          setTemplateWarning('⚠️ Mutabakat PDF şablonu bulunamadı. Lütfen "Cari Şablonları" sayfasından şablon oluşturun.')
+        } else if (!emailTemplateResponse.ok) {
+          setTemplateWarning('⚠️ Mail metin şablonu bulunamadı. Lütfen "Mail Metin Şablonları" sayfasından şablon oluşturun.')
+        }
+
       } catch (error) {
-        console.error('Error fetching company template:', error)
+        console.error('Error fetching templates:', error)
+        setTemplateWarning('⚠️ Şablon kontrolü yapılırken hata oluştu.')
       } finally {
         setTemplateLoading(false)
       }
     }
 
-    fetchCompanyTemplate()
+    fetchTemplates()
   }, [])
 
   useEffect(() => {
@@ -468,6 +494,44 @@ export default function NewReconciliationPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Template Warning */}
+          {templateWarning && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3 flex-1">
+                  <p className="text-sm text-yellow-700">
+                    {templateWarning}
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    {!hasCompanyTemplate && (
+                      <button
+                        type="button"
+                        onClick={() => router.push('/dashboard/company-templates')}
+                        className="text-sm bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition-colors"
+                      >
+                        Cari Şablon Oluştur
+                      </button>
+                    )}
+                    {!hasEmailTemplate && (
+                      <button
+                        type="button"
+                        onClick={() => router.push('/dashboard/mail-content-templates')}
+                        className="text-sm bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition-colors"
+                      >
+                        Mail Şablon Oluştur
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Step 1: Mutabakat Ayarları */}
           {currentStep === 1 && (
             <>
