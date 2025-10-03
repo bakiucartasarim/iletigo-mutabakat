@@ -86,6 +86,8 @@ export async function GET(
       is_expired: isExpired || linkData.is_expired,
       is_used: linkData.is_used,
       response_status: linkData.response_status,
+      require_tax_verification: linkData.require_tax_verification ?? true,
+      require_otp_verification: linkData.require_otp_verification ?? false,
       company_template: {
         template_name: linkData.template_name,
         header_text: linkData.header_text,
