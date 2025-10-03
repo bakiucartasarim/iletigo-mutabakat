@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { query } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,13 +15,42 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // For now, just check if token exists and follows our format
-    // In production, you'd validate the JWT or session token properly
+    // Extract user ID from token (format: user-{id}-{timestamp})
     if (authToken.startsWith('user-')) {
-      return NextResponse.json(
-        { message: 'Authenticated', userId: authToken },
-        { status: 200 }
-      )
+      const tokenParts = authToken.split('-')
+      if (tokenParts.length >= 2) {
+        const userId = tokenParts[1]
+
+        // Fetch user info from database
+        const userQuery = `
+          SELECT u.id, u.email, u.first_name, u.last_name, u.role, u.company_id,
+                 c.name as company_name
+          FROM users u
+          LEFT JOIN companies c ON u.company_id = c.id
+          WHERE u.id = $1 AND u.is_active = true
+        `
+
+        const result = await query(userQuery, [userId])
+
+        if (result.rows.length > 0) {
+          const user = result.rows[0]
+          return NextResponse.json(
+            {
+              message: 'Authenticated',
+              user: {
+                id: user.id,
+                email: user.email,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                role: user.role,
+                companyId: user.company_id,
+                companyName: user.company_name
+              }
+            },
+            { status: 200 }
+          )
+        }
+      }
     }
 
     return NextResponse.json(

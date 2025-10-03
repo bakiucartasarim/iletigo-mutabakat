@@ -37,16 +37,14 @@ export default function DashboardLayout({
       const response = await fetch('/api/auth/verify')
       if (response.ok) {
         const data = await response.json()
-        // Get company info from companies table
-        const companyResponse = await fetch('/api/company/info')
-        if (companyResponse.ok) {
-          const companyData = await companyResponse.json()
-          setCompany(companyData)
-          setUser({
-            name: companyData.contact_person || 'Admin User',
-            email: companyData.email,
-            role: 'Şirket Yetkilisi'
-          })
+        if (data.user) {
+          setUser(data.user)
+          // Get company info from companies table
+          const companyResponse = await fetch('/api/company/info')
+          if (companyResponse.ok) {
+            const companyData = await companyResponse.json()
+            setCompany(companyData)
+          }
         }
       }
     } catch (error) {
@@ -155,7 +153,8 @@ export default function DashboardLayout({
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
-      )
+      ),
+      adminOnly: true // Sadece super_admin görebilir
     },
     {
       name: 'Ayarlar',
@@ -212,7 +211,9 @@ export default function DashboardLayout({
           {/* Navigation */}
           <nav className="flex-1 mt-8 px-4 overflow-y-auto">
             <div className="space-y-2">
-              {navigation.map((item) => {
+              {navigation
+                .filter(item => !item.adminOnly || user?.role === 'super_admin')
+                .map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <Link
@@ -268,7 +269,9 @@ export default function DashboardLayout({
           {/* Mobile Navigation */}
           <nav className="flex-1 mt-6 px-4 overflow-y-auto">
             <div className="space-y-2">
-              {navigation.map((item) => {
+              {navigation
+                .filter(item => !item.adminOnly || user?.role === 'super_admin')
+                .map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <Link
