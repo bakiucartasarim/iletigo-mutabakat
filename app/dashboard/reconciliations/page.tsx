@@ -38,6 +38,7 @@ interface ReconciliationResponse {
 export default function ReconciliationsPage() {
   const [reconciliations, setReconciliations] = useState<ReconciliationResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [searchInput, setSearchInput] = useState('')
   const [filters, setFilters] = useState({
     status: 'all',
     priority: 'all',
@@ -45,9 +46,18 @@ export default function ReconciliationsPage() {
     page: 1
   })
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters(prev => ({ ...prev, search: searchInput, page: 1 }))
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchInput])
+
   useEffect(() => {
     fetchReconciliations()
-  }, [filters])
+  }, [filters.status, filters.priority, filters.search, filters.page])
 
   const fetchReconciliations = async () => {
     try {
@@ -154,8 +164,8 @@ export default function ReconciliationsPage() {
             <input
               type="text"
               placeholder="Baslik, sirket veya referans..."
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value, page: 1 })}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
@@ -188,7 +198,10 @@ export default function ReconciliationsPage() {
           </div>
           <div className="flex items-end">
             <button
-              onClick={() => setFilters({ status: 'all', priority: 'all', search: '', page: 1 })}
+              onClick={() => {
+                setSearchInput('')
+                setFilters({ status: 'all', priority: 'all', search: '', page: 1 })
+              }}
               className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
             >
               Temizle
