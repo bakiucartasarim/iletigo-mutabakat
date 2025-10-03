@@ -472,7 +472,10 @@ export default function ReconciliationViewPage() {
                 ? 'Mutabakat onayınız başarıyla kaydedildi. Teşekkür ederiz.'
                 : 'İtirazınız başarıyla kaydedildi. En kısa sürede sizinle iletişime geçilecektir.'}
             </p>
-            <p className="text-sm text-gray-500">Referans Kodu: {data.reference_code}</p>
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">Referans Kodu:</p>
+              <p className="text-xs font-mono text-gray-700 break-all">{data.reference_code}</p>
+            </div>
           </div>
         </div>
       </div>
