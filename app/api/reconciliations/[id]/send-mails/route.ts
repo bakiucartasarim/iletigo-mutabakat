@@ -255,7 +255,8 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
     const variables = {
       sirketAdi: record.cari_hesap_adi,
       gonderenSirket: recon.company_name,
-      referansKodu: referenceCode,
+      referansKodu: recon.period || referenceCode, // Use period name instead of reference code
+      donem: recon.period || new Date().toLocaleDateString('tr-TR'), // Add donem variable
       tarih: new Date().toLocaleDateString('tr-TR'),
       tutar: record.tutar.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }),
       bakiyeTipi: record.borc_alacak

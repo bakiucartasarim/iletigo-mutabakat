@@ -183,12 +183,12 @@ export default function MailContentTemplatesPage() {
   const availableVariables = [
     { key: '{{sirketAdi}}', desc: 'Karşı Taraf Şirket Adı (Excel)' },
     { key: '{{gonderenSirket}}', desc: 'Sizin Şirket Adınız' },
-    { key: '{{referansKodu}}', desc: 'Referans Kodu' },
-    { key: '{{tarih}}', desc: 'Tarih' },
+    { key: '{{referansKodu}}', desc: 'Dönem Adı (Mail konusu için)' },
+    { key: '{{donem}}', desc: 'Dönem Adı' },
+    { key: '{{tarih}}', desc: 'Günün Tarihi' },
     { key: '{{tutar}}', desc: 'Tutar' },
     { key: '{{bakiyeTipi}}', desc: 'Bakiye Tipi (ALACAK/BORÇ)' },
     { key: '{{linkUrl}}', desc: 'Mutabakat Görüntüleme Linki' },
-    { key: '{{vergiNo}}', desc: 'Vergi No' },
   ]
 
   const defaultTemplateContent = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -230,8 +230,7 @@ export default function MailContentTemplatesPage() {
 
   <p style="line-height: 1.6; color: #374151; font-size: 14px;">
     Saygılarımızla,<br>
-    <strong>{{gonderenSirket}}</strong><br>
-    Vergi No: {{vergiNo}}
+    <strong>{{gonderenSirket}}</strong>
   </p>
 </div>`
 
@@ -380,15 +379,23 @@ export default function MailContentTemplatesPage() {
                     <div className="p-8">
                       <div
                         className="text-gray-800 leading-relaxed space-y-4 prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedTemplate.content }}
+                        dangerouslySetInnerHTML={{
+                          __html: selectedTemplate.content
+                            .replace(/\{\{gonderenSirket\}\}/g, company?.name || 'Şirket Adı')
+                            .replace(/\{\{vergiNo\}\}/g, company?.tax_number || '0000000000')
+                            .replace(/\{\{sirketAdi\}\}/g, 'Örnek Cari Hesap')
+                            .replace(/\{\{tarih\}\}/g, new Date().toLocaleDateString('tr-TR'))
+                            .replace(/\{\{donem\}\}/g, 'Ocak 2025')
+                            .replace(/\{\{tutar\}\}/g, '10.000,00')
+                            .replace(/\{\{bakiyeTipi\}\}/g, 'ALACAK')
+                            .replace(/\{\{referansKodu\}\}/g, 'XXXXX')
+                        }}
                       />
                     </div>
 
                     {/* Email Footer */}
                     <div className="bg-gray-50 p-6 border-t">
                       <div className="text-sm text-gray-600">
-                        <p className="font-semibold">{company?.name || 'Şirket Adı'}</p>
-                        <p>Vergi No: {company?.tax_number || '0000000000'}</p>
                         <p className="mt-2 text-xs text-gray-500">
                           Bu email otomatik olarak oluşturulmuştur.
                         </p>

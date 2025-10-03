@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Pool } from 'pg'
+import { query } from '@/lib/db'
 
 // Helper function to parse Turkish currency format
 function parseTurkishCurrency(value: string | number): number {
@@ -33,6 +34,37 @@ function parseTurkishCurrency(value: string | number): number {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check for auth token and get user info
+    const authToken = request.cookies.get('auth-token')?.value
+
+    if (!authToken) {
+      return NextResponse.json(
+        { error: 'Kimlik doğrulama gerekli' },
+        { status: 401 }
+      )
+    }
+
+    // Extract user ID from token (format: user-{id}-{timestamp})
+    let userId = 1; // Default fallback
+    let companyId = 1; // Default fallback
+
+    if (authToken.startsWith('user-')) {
+      const tokenParts = authToken.split('-')
+      if (tokenParts.length >= 2) {
+        userId = parseInt(tokenParts[1])
+
+        // Fetch user's company_id from database
+        const userResult = await query(
+          'SELECT company_id, role FROM users WHERE id = $1 AND is_active = true',
+          [userId]
+        )
+
+        if (userResult.rows.length > 0) {
+          companyId = userResult.rows[0].company_id || 1
+        }
+      }
+    }
+
     const {
       formData,
       excelData
@@ -105,8 +137,8 @@ export async function POST(request: NextRequest) {
         RETURNING id
       `, [
         periodId,
-        1, // Default user_id
-        1, // Default company_id
+        userId, // From auth token
+        companyId, // From user's company_id
         formData.reconciliation_period || new Date().toLocaleDateString('tr-TR'),
         'pending',
         excelData.length,
