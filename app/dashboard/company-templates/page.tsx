@@ -29,6 +29,7 @@ export default function CompanyTemplatesPage() {
   const [company, setCompany] = useState<Company | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [hasExistingTemplate, setHasExistingTemplate] = useState(false)
 
   const [templateData, setTemplateData] = useState<TemplateData>({
     templateName: 'Cari Mutabakat',
@@ -76,6 +77,7 @@ export default function CompanyTemplatesPage() {
       const response = await fetch('/api/company-templates')
       if (response.ok) {
         const data = await response.json()
+        setHasExistingTemplate(true)
         setTemplateData({
           templateName: data.template_name || 'Cari Mutabakat',
           headerText: data.header_text || '',
@@ -86,9 +88,13 @@ export default function CompanyTemplatesPage() {
           note4: data.note4 || '',
           note5: data.note5 || ''
         })
+      } else {
+        // 404 means no template exists yet
+        setHasExistingTemplate(false)
       }
     } catch (error) {
       console.error('Error loading template:', error)
+      setHasExistingTemplate(false)
     }
   }
 
@@ -112,6 +118,7 @@ export default function CompanyTemplatesPage() {
       })
 
       if (response.ok) {
+        setHasExistingTemplate(true)
         showToast('Şablon başarıyla kaydedildi', 'success')
       } else {
         const error = await response.json()
@@ -300,7 +307,7 @@ export default function CompanyTemplatesPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Güncelle</span>
+                <span>{hasExistingTemplate ? 'Güncelle' : 'Kaydet'}</span>
               </>
             )}
           </button>
