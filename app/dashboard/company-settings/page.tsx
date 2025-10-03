@@ -15,6 +15,7 @@ export default function CompanySettingsPage() {
     contact_person: '',
     website: '',
     description: '',
+    reconciliation_code_prefix: '',
     require_tax_verification: true,
     require_otp_verification: false
   })
@@ -71,6 +72,7 @@ export default function CompanySettingsPage() {
           contact_person: data.contact_person || '',
           website: data.website || '',
           description: data.description || '',
+          reconciliation_code_prefix: data.reconciliation_code_prefix || '',
           require_tax_verification: data.require_tax_verification ?? true,
           require_otp_verification: data.require_otp_verification ?? false
         })
@@ -295,6 +297,24 @@ export default function CompanySettingsPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="1234567890"
                     />
+                  </div>
+                  <div>
+                    <label htmlFor="reconciliation_code_prefix" className="block text-sm font-medium text-gray-700 mb-2">
+                      Mutabakat Belge No Öneki
+                    </label>
+                    <input
+                      type="text"
+                      id="reconciliation_code_prefix"
+                      name="reconciliation_code_prefix"
+                      value={formData.reconciliation_code_prefix}
+                      onChange={handleInputChange}
+                      maxLength={10}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      placeholder="ATL, IKIZ, ABC vb."
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Mutabakat belgelerinde kullanılacak kod öneki (örn: ATL-123, IKIZ-456)
+                    </p>
                   </div>
                   <div>
                     <label htmlFor="contact_person" className="block text-sm font-medium text-gray-700 mb-2">

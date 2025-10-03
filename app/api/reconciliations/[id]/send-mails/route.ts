@@ -174,7 +174,7 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
 
     // Fetch reconciliation and company data
     const reconData = await query(`
-      SELECT r.*, c.name as company_name, c.email as company_email
+      SELECT r.*, c.name as company_name, c.email as company_email, c.reconciliation_code_prefix
       FROM reconciliations r
       JOIN companies c ON r.company_id = c.id
       WHERE r.id = $1
@@ -239,12 +239,28 @@ async function sendEmail(record: MailRecord, reconciliationId: string): Promise<
     let emailContent = template.content
     let emailSubject = template.subject
 
+    // Helper to format period - if it's a date (YYYY-MM-DD), convert to Turkish format
+    const formatPeriod = (period: string) => {
+      if (!period) return formatTurkishDate()
+      // Check if it's a date format (YYYY-MM-DD)
+      if (period.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return new Date(period).toLocaleDateString('tr-TR')
+      }
+      return period
+    }
+
+    // Generate mutabakat code: {companyPrefix}-{reconciliationId}-{recordId}
+    const mutabakatKodu = recon.reconciliation_code_prefix
+      ? `${recon.reconciliation_code_prefix}-${reconciliationId}-${record.id}`
+      : `MUT-${reconciliationId}-${record.id}`
+
     // Define all variables including linkUrl
     const variables = {
       sirketAdi: record.cari_hesap_adi,
       gonderenSirket: recon.company_name,
-      referansKodu: recon.period || referenceCode, // Use period name instead of reference code
-      donem: recon.period || formatTurkishDate(), // Add donem variable with Turkish date format (DD.MM.YYYY)
+      referansKodu: referenceCode, // The actual reference code (token from URL)
+      mutabakatKodu: mutabakatKodu, // Human-readable code like ATL-123
+      donem: formatPeriod(recon.period) || formatTurkishDate(), // Add donem variable with Turkish date format (DD.MM.YYYY)
       tarih: formatTurkishDate(), // Turkish date format (DD.MM.YYYY)
       tutar: record.tutar.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }),
       bakiyeTipi: record.borc_alacak,

@@ -32,6 +32,7 @@ export async function PUT(request: NextRequest) {
       contact_person,
       website,
       description,
+      reconciliation_code_prefix,
       require_tax_verification,
       require_otp_verification
     } = await request.json()
@@ -98,11 +99,13 @@ export async function PUT(request: NextRequest) {
            contact_person = $6,
            website = $7,
            description = $8,
-           require_tax_verification = $9,
-           require_otp_verification = $10,
+           reconciliation_code_prefix = $9,
+           require_tax_verification = $10,
+           require_otp_verification = $11,
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $11`,
+       WHERE id = $12`,
       [name, tax_number, email, phone, address, contact_person, website, description,
+       reconciliation_code_prefix || null,
        require_tax_verification ?? true, require_otp_verification ?? false, companyId]
     )
 

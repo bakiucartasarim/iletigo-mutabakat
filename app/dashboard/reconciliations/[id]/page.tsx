@@ -480,7 +480,12 @@ export default function ReconciliationDetailPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                   <div>
                     <span className="text-gray-500 block">Dönem:</span>
-                    <span className="font-medium text-gray-900">{reconciliation.period}</span>
+                    <span className="font-medium text-gray-900">
+                      {reconciliation.period && reconciliation.period.match(/^\d{4}-\d{2}-\d{2}$/)
+                        ? new Date(reconciliation.period).toLocaleDateString('tr-TR')
+                        : reconciliation.period
+                      }
+                    </span>
                   </div>
                   <div>
                     <span className="text-gray-500 block">Tarih:</span>
@@ -493,7 +498,7 @@ export default function ReconciliationDetailPage() {
                   <div>
                     <span className="text-gray-500 block">Durum:</span>
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      {reconciliation.status}
+                      {reconciliation.status === 'pending' ? 'Beklemede' : reconciliation.status === 'completed' ? 'Tamamlandı' : reconciliation.status === 'approved' ? 'Onaylandı' : reconciliation.status}
                     </span>
                   </div>
                 </div>
@@ -588,7 +593,7 @@ export default function ReconciliationDetailPage() {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Sıra No
+                          Mutabakat Kodu
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Cari Hesap
@@ -611,10 +616,14 @@ export default function ReconciliationDetailPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {reconciliation.excel_data.map((record) => (
+                      {reconciliation.excel_data.map((record) => {
+                        const codePrefix = reconciliation.reconciliation_code_prefix || 'MUT'
+                        const mutabakatKodu = `${codePrefix}-${reconciliation.id}-${record.id}`
+
+                        return (
                         <tr key={record.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {record.sira_no}
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">
+                            {mutabakatKodu}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
@@ -685,7 +694,8 @@ export default function ReconciliationDetailPage() {
                             {getReconciliationStatusBadge(record.reconciliation_status || 'beklemede')}
                           </td>
                         </tr>
-                      ))}
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>

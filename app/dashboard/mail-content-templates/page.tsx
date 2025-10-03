@@ -183,7 +183,8 @@ export default function MailContentTemplatesPage() {
   const availableVariables = [
     { key: '{{sirketAdi}}', desc: 'Karşı Taraf Şirket Adı (Excel)' },
     { key: '{{gonderenSirket}}', desc: 'Sizin Şirket Adınız' },
-    { key: '{{referansKodu}}', desc: 'Dönem Adı (Mail konusu için)' },
+    { key: '{{mutabakatKodu}}', desc: 'Mutabakat Belge No (örn: ATL-72-145)' },
+    { key: '{{referansKodu}}', desc: 'Güvenlik Referans Kodu (Link Token)' },
     { key: '{{donem}}', desc: 'Dönem Adı' },
     { key: '{{tarih}}', desc: 'Günün Tarihi' },
     { key: '{{tutar}}', desc: 'Tutar' },
@@ -205,7 +206,7 @@ export default function MailContentTemplatesPage() {
 
   <div style="background: #f3f4f6; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0;">
     <p style="margin: 0; color: #1f2937;">
-      <strong>Referans Kodu:</strong> {{referansKodu}}
+      <strong>Mutabakat Kodu:</strong> {{mutabakatKodu}}
     </p>
   </div>
 
@@ -253,7 +254,7 @@ export default function MailContentTemplatesPage() {
             setEditingTemplate(null)
             setFormData({
               name: 'Cari Mutabakat Mail Şablonu',
-              subject: 'Mutabakat Mektubu - {{referansKodu}}',
+              subject: 'Mutabakat Mektubu - {{donem}}',
               content: defaultTemplateContent,
               isActive: true
             })
@@ -385,7 +386,8 @@ export default function MailContentTemplatesPage() {
                             .replace(/\{\{donem\}\}/g, 'Ocak 2025')
                             .replace(/\{\{tutar\}\}/g, '10.000,00')
                             .replace(/\{\{bakiyeTipi\}\}/g, 'ALACAK')
-                            .replace(/\{\{referansKodu\}\}/g, 'XXXXX')
+                            .replace(/\{\{mutabakatKodu\}\}/g, 'ATL-72-145')
+                            .replace(/\{\{referansKodu\}\}/g, 'XXXXXXXXXXXXX')
                         }}
                       />
                     </div>

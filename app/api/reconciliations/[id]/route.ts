@@ -101,6 +101,7 @@ export async function GET(
           rp.description as period_description,
           rp.created_at as period_created_at,
           COALESCE(c.name, 'İletigo Teknoloji') as company_name,
+          c.reconciliation_code_prefix,
           COALESCE(u.first_name || ' ' || u.last_name, 'Admin User') as user_name
         FROM reconciliations r
         LEFT JOIN reconciliation_periods rp ON r.period_id = rp.id

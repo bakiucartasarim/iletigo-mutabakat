@@ -322,7 +322,7 @@ export async function GET(request: NextRequest) {
       const dataQuery = `
         SELECT
           r.id,
-          CONCAT('MUT-', r.id) as reference_number,
+          CONCAT(COALESCE(c.reconciliation_code_prefix, 'MUT'), '-', r.id) as reference_number,
           r.period as title,
           COALESCE(c.name, 'İletigo Teknoloji') as company_name,
           COALESCE(
