@@ -6,10 +6,14 @@ import Link from 'next/link'
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [hasCompanyTemplate, setHasCompanyTemplate] = useState(false)
+  const [hasEmailTemplate, setHasEmailTemplate] = useState(false)
+  const [templateLoading, setTemplateLoading] = useState(true)
 
   useEffect(() => {
     console.log('Dashboard component mounted!')
     fetchStats()
+    checkTemplates()
   }, [])
 
   const fetchStats = async () => {
@@ -23,6 +27,27 @@ export default function DashboardPage() {
       console.error('Error fetching stats:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const checkTemplates = async () => {
+    try {
+      // Company template kontrolü
+      const companyTemplateResponse = await fetch('/api/company-templates')
+      setHasCompanyTemplate(companyTemplateResponse.ok)
+
+      // Email template kontrolü
+      const emailTemplateResponse = await fetch('/api/mail-templates')
+      if (emailTemplateResponse.ok) {
+        const emailData = await emailTemplateResponse.json()
+        setHasEmailTemplate(emailData.data && emailData.data.length > 0)
+      } else {
+        setHasEmailTemplate(false)
+      }
+    } catch (error) {
+      console.error('Error checking templates:', error)
+    } finally {
+      setTemplateLoading(false)
     }
   }
 
@@ -107,25 +132,73 @@ export default function DashboardPage() {
           {/* Welcome Card */}
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h2 className="text-lg font-semibold mb-4">Hoşgeldiniz!</h2>
-            <div className="flex items-start space-x-4">
-              <div className="relative">
-                <svg className="w-16 h-16" viewBox="0 0 36 36">
-                  <path className="text-gray-200" d="M18 2.0845
-                                                  a 15.9155 15.9155 0 0 1 0 31.831
-                                                  a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4"></path>
-                  <path className="text-blue-600" d="M18 2.0845
-                                                  a 15.9155 15.9155 0 0 1 0 31.831
-                                                  a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray="85, 100" strokeLinecap="round" strokeWidth="4"></path>
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xl font-bold text-blue-600">!</span>
+            {templateLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : !hasCompanyTemplate || !hasEmailTemplate ? (
+              <div className="flex items-start space-x-4">
+                <div className="relative">
+                  <svg className="w-16 h-16" viewBox="0 0 36 36">
+                    <path className="text-gray-200" d="M18 2.0845
+                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4"></path>
+                    <path className="text-yellow-500" d="M18 2.0845
+                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray={`${(!hasCompanyTemplate && !hasEmailTemplate) ? '0' : (!hasCompanyTemplate || !hasEmailTemplate) ? '50' : '100'}, 100`} strokeLinecap="round" strokeWidth="4"></path>
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xl font-bold text-yellow-500">!</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {!hasCompanyTemplate && !hasEmailTemplate
+                      ? 'Şablonlarınızı oluşturmanız gerekiyor. Mutabakat oluşturmak için her iki şablon da zorunludur.'
+                      : !hasCompanyTemplate
+                      ? 'PDF şablonunuzu oluşturmanız gerekiyor.'
+                      : 'Mail metin şablonunuzu oluşturmanız gerekiyor.'
+                    }
+                  </p>
+                  <div className="flex gap-2">
+                    {!hasCompanyTemplate && (
+                      <Link href="/dashboard/company-templates" className="text-blue-600 text-sm font-medium hover:underline">
+                        PDF Şablon Oluştur
+                      </Link>
+                    )}
+                    {!hasEmailTemplate && (
+                      <Link href="/dashboard/mail-content-templates" className="text-blue-600 text-sm font-medium hover:underline">
+                        Mail Şablon Oluştur
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Şirket bilgilerinizi neredeyse tamamladınız. Doldurmanız gereken sadece 2 alan kalmış.</p>
-                <Link href="/dashboard/settings" className="text-blue-600 text-sm font-medium mt-2 inline-block">Hemen tamamla</Link>
+            ) : (
+              <div className="flex items-start space-x-4">
+                <div className="relative">
+                  <svg className="w-16 h-16" viewBox="0 0 36 36">
+                    <path className="text-gray-200" d="M18 2.0845
+                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4"></path>
+                    <path className="text-green-600" d="M18 2.0845
+                                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray="100, 100" strokeLinecap="round" strokeWidth="4"></path>
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">Tebrikler! Tüm şablonlarınız hazır.</p>
+                  <Link href="/dashboard/reconciliations/new" className="text-blue-600 text-sm font-medium hover:underline">
+                    Hemen Mutabakat Oluştur →
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Info Cards */}
