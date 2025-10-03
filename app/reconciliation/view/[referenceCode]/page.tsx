@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 
 interface CompanyTemplate {
@@ -58,9 +58,18 @@ export default function ReconciliationViewPage() {
   const [attemptsRemaining, setAttemptsRemaining] = useState(3)
   const [maskedEmail, setMaskedEmail] = useState<string | null>(null)
   const [otpExpiresIn, setOtpExpiresIn] = useState(300)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const otpSentRef = useRef(false)
 
   useEffect(() => {
     fetchReconciliationData()
+
+    // Cleanup timer on unmount
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+    }
   }, [referenceCode])
 
   const fetchReconciliationData = async () => {
@@ -81,12 +90,19 @@ export default function ReconciliationViewPage() {
       if (!result.require_tax_verification && !result.require_otp_verification) {
         // No verification required
         setVerificationStep('verified')
+      } else if (result.require_tax_verification && result.require_otp_verification) {
+        // Both verifications required - start with tax (OTP will be sent after tax verification)
+        setVerificationStep('tax')
       } else if (result.require_tax_verification) {
-        // Tax verification required (already default)
+        // Only tax verification required
         setVerificationStep('tax')
       } else if (result.require_otp_verification) {
-        // Only OTP verification required
+        // Only OTP verification required - send OTP immediately (but only once)
         setVerificationStep('otp')
+        if (!otpSentRef.current) {
+          otpSentRef.current = true
+          await sendOtpDirectly(referenceCode)
+        }
       }
     } catch (err) {
       setError('Bağlantı hatası oluştu')
@@ -121,19 +137,31 @@ export default function ReconciliationViewPage() {
         return
       }
 
-      // Success - check if OTP is required
-      if (data?.require_otp_verification) {
+      // Success - check if OTP is required or if already verified
+      if (result.verified) {
+        // Tax verification complete, no OTP required
+        setVerificationStep('verified')
+        setVerificationError(null)
+      } else if (data?.require_otp_verification) {
         // Move to OTP step
         setMaskedEmail(result.email)
         setOtpExpiresIn(result.expiresIn || 300)
         setVerificationStep('otp')
         setVerificationError(null)
 
+        // Clear any existing timer
+        if (timerRef.current) {
+          clearInterval(timerRef.current)
+        }
+
         // Start countdown timer
-        const timer = setInterval(() => {
+        timerRef.current = setInterval(() => {
           setOtpExpiresIn(prev => {
             if (prev <= 1) {
-              clearInterval(timer)
+              if (timerRef.current) {
+                clearInterval(timerRef.current)
+                timerRef.current = null
+              }
               return 0
             }
             return prev - 1
@@ -186,11 +214,64 @@ export default function ReconciliationViewPage() {
     }
   }
 
+  const sendOtpDirectly = async (refCode: string) => {
+    try {
+      console.log('🔄 Sending OTP directly (no tax verification required)')
+
+      const response = await fetch(`/api/reconciliation/send-otp-direct/${refCode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setVerificationError(result.error || 'OTP gönderilemedi')
+        return
+      }
+
+      setMaskedEmail(result.email)
+      setOtpExpiresIn(result.expiresIn || 300)
+
+      // Clear any existing timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+
+      // Start countdown timer
+      timerRef.current = setInterval(() => {
+        setOtpExpiresIn(prev => {
+          if (prev <= 1) {
+            if (timerRef.current) {
+              clearInterval(timerRef.current)
+              timerRef.current = null
+            }
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+    } catch (err) {
+      console.error('OTP send error:', err)
+      setVerificationError('OTP gönderimi sırasında hata oluştu')
+    }
+  }
+
   const handleResendOtp = async () => {
-    setTaxNumber('')
+    // Clear timer when resending
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
     setOtpCode('')
-    setVerificationStep('tax')
     setVerificationError(null)
+    setOtpExpiresIn(300)
+
+    // Resend OTP (always allow manual resend)
+    otpSentRef.current = false
+    await sendOtpDirectly(referenceCode)
+    otpSentRef.current = true
   }
 
   const handleSubmit = async () => {

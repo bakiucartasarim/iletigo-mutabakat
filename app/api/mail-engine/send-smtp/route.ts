@@ -37,11 +37,12 @@ export async function POST(request: NextRequest) {
     console.log('📧 Sending SMTP email to:', toEmail)
     console.log('🔧 SMTP Config:', { host: smtpHost, port: smtpPort, user: smtpUser })
 
-    // Create transporter
-    const transporter = nodemailer.createTransporter({
+    // Create transporter with same pattern as send-verification-email
+    const smtpPortNum = parseInt(smtpPort)
+    const transporter = nodemailer.createTransport({
       host: smtpHost,
-      port: Number(smtpPort),
-      secure: smtpPort === 465, // true for 465, false for other ports
+      port: smtpPortNum,
+      secure: smtpPortNum === 465, // true for 465, false for other ports
       auth: {
         user: smtpUser,
         pass: smtpPassword

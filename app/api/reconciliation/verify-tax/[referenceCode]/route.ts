@@ -17,14 +17,20 @@ export async function POST(
       )
     }
 
-    // Fetch reconciliation link with recipient tax number
+    // Fetch reconciliation link with recipient tax number and company settings
     const result = await query(`
       SELECT
         rl.*,
         red.vergi_no as recipient_tax_number,
-        red.ilgili_kisi_eposta as recipient_email
+        red.ilgili_kisi_eposta as recipient_email,
+        red.cari_hesap_adi as recipient_name,
+        r.company_id,
+        c.require_tax_verification,
+        c.require_otp_verification
       FROM reconciliation_links rl
       JOIN reconciliation_excel_data red ON rl.record_id = red.id
+      JOIN reconciliations r ON rl.reconciliation_id = r.id
+      JOIN companies c ON r.company_id = c.id
       WHERE rl.reference_code = $1
     `, [referenceCode])
 
@@ -108,44 +114,78 @@ export async function POST(
     }
 
     // Tax number verified successfully
-    // Generate 6-digit OTP code
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
-    const codeExpiresAt = new Date(Date.now() + 5 * 60000) // 5 minutes
+    // Check if OTP verification is also required
+    if (linkData.require_otp_verification) {
+      // Generate 6-digit OTP code
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+      const codeExpiresAt = new Date(Date.now() + 5 * 60000) // 5 minutes
 
-    await query(`
-      UPDATE reconciliation_links
-      SET
-        verification_code = $1,
-        verification_code_expires_at = $2,
-        verification_attempts = 0,
-        verification_locked_until = NULL,
-        updated_at = NOW()
-      WHERE id = $3
-    `, [otpCode, codeExpiresAt, linkData.id])
+      await query(`
+        UPDATE reconciliation_links
+        SET
+          verification_code = $1,
+          verification_code_expires_at = $2,
+          verification_attempts = 0,
+          verification_locked_until = NULL,
+          updated_at = NOW()
+        WHERE id = $3
+      `, [otpCode, codeExpiresAt, linkData.id])
 
-    // Send OTP code via email
-    if (linkData.recipient_email) {
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-verification-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: linkData.recipient_email,
-            code: otpCode,
-            recipientName: linkData.recipient_name
+      // Send OTP code via email
+      if (linkData.recipient_email) {
+        try {
+          console.log('📧 Sending OTP email to:', linkData.recipient_email)
+          console.log('📧 OTP Code:', otpCode)
+
+          const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-verification-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: linkData.recipient_email,
+              code: otpCode,
+              recipientName: linkData.recipient_name
+            })
           })
-        })
-      } catch (emailError) {
-        console.error('Email send error:', emailError)
-      }
-    }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Doğrulama kodu email adresinize gönderildi',
-      email: linkData.recipient_email ? `${linkData.recipient_email.substring(0, 3)}***@${linkData.recipient_email.split('@')[1]}` : null,
-      expiresIn: 300 // seconds
-    })
+          const emailResult = await emailResponse.json()
+
+          if (emailResponse.ok) {
+            console.log('✅ OTP email sent successfully:', emailResult)
+          } else {
+            console.error('❌ OTP email failed:', emailResult)
+          }
+        } catch (emailError) {
+          console.error('❌ Email send error:', emailError)
+        }
+      } else {
+        console.log('⚠️ No recipient email found for OTP sending')
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Doğrulama kodu email adresinize gönderildi',
+        email: linkData.recipient_email ? `${linkData.recipient_email.substring(0, 3)}***@${linkData.recipient_email.split('@')[1]}` : null,
+        expiresIn: 300 // seconds
+      })
+    } else {
+      // Only tax verification required - mark as verified
+      await query(`
+        UPDATE reconciliation_links
+        SET
+          is_verified = true,
+          verified_at = NOW(),
+          verification_attempts = 0,
+          verification_locked_until = NULL,
+          updated_at = NOW()
+        WHERE id = $1
+      `, [linkData.id])
+
+      return NextResponse.json({
+        success: true,
+        verified: true,
+        message: 'Vergi numarası doğrulandı'
+      })
+    }
 
   } catch (error) {
     console.error('Tax verification error:', error)

@@ -20,10 +20,13 @@ export default function MailEnginePage() {
   })
   const [testEmail, setTestEmail] = useState('bakiucartasarim@gmail.com')
   const [smtpSettings, setSmtpSettings] = useState({
-    smtpHost: 'smtp.gmail.com',
-    smtpPort: '587',
-    smtpUser: '',
-    smtpPassword: ''
+    smtp_host: '',
+    smtp_port: '465',
+    smtp_user: '',
+    smtp_password: '',
+    from_email: '',
+    from_name: '',
+    is_active: false
   })
   const [brevoSettings, setBrevoSettings] = useState({
     api_key: '',
@@ -36,6 +39,7 @@ export default function MailEnginePage() {
   useEffect(() => {
     checkSuperAdminAccess()
     loadBrevoSettings()
+    loadSmtpSettings()
     loadMailStats()
   }, [])
 
@@ -63,6 +67,18 @@ export default function MailEnginePage() {
     }
   }
 
+  const loadSmtpSettings = async () => {
+    try {
+      const response = await fetch('/api/mail-engine/smtp-settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSmtpSettings(data)
+      }
+    } catch (error) {
+      console.error('Error loading SMTP settings:', error)
+    }
+  }
+
   const saveBrevoSettings = async () => {
     try {
       setIsLoading(true)
@@ -79,6 +95,28 @@ export default function MailEnginePage() {
       }
     } catch (error) {
       console.error('Brevo settings save error:', error)
+      showToast('Kaydetme hatası', 'error')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const saveSmtpSettings = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/mail-engine/smtp-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(smtpSettings)
+      })
+
+      if (response.ok) {
+        showToast('SMTP ayarları kaydedildi', 'success')
+      } else {
+        showToast('Ayarlar kaydedilemedi', 'error')
+      }
+    } catch (error) {
+      console.error('SMTP settings save error:', error)
       showToast('Kaydetme hatası', 'error')
     } finally {
       setIsLoading(false)
@@ -109,7 +147,7 @@ export default function MailEnginePage() {
       return
     }
 
-    if (!smtpSettings.smtpUser || !smtpSettings.smtpPassword) {
+    if (!smtpSettings.smtp_user || !smtpSettings.smtp_password) {
       showToast('Lütfen SMTP kullanıcı adı ve şifresini girin', 'error')
       return
     }
@@ -120,9 +158,12 @@ export default function MailEnginePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...smtpSettings,
-          fromEmail: smtpSettings.smtpUser,
-          fromName: 'İletigo Mail Engine',
+          smtpHost: smtpSettings.smtp_host,
+          smtpPort: smtpSettings.smtp_port,
+          smtpUser: smtpSettings.smtp_user,
+          smtpPassword: smtpSettings.smtp_password,
+          fromEmail: smtpSettings.from_email || smtpSettings.smtp_user,
+          fromName: smtpSettings.from_name || 'İletigo Mail Engine',
           toEmail: testEmail,
           subject: 'Test Email - İletigo Mail Engine',
         })
@@ -489,7 +530,7 @@ export default function MailEnginePage() {
               SMTP (Gmail/Outlook)
             </h4>
             <p className="text-sm text-blue-800 mb-3">
-              Alternatif: SMTP ile email gönderimi
+              Alternatif: SMTP ile email gönderimi (Güvenlik ayarlarında kullanılır)
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
@@ -497,9 +538,9 @@ export default function MailEnginePage() {
                 <label className="block text-xs font-medium text-blue-900 mb-1">SMTP Host</label>
                 <input
                   type="text"
-                  placeholder="smtp.gmail.com"
-                  value={smtpSettings.smtpHost}
-                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtpHost: e.target.value }))}
+                  placeholder="smtpout.secureserver.net"
+                  value={smtpSettings.smtp_host}
+                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_host: e.target.value }))}
                   className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -507,9 +548,9 @@ export default function MailEnginePage() {
                 <label className="block text-xs font-medium text-blue-900 mb-1">SMTP Port</label>
                 <input
                   type="text"
-                  placeholder="587"
-                  value={smtpSettings.smtpPort}
-                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtpPort: e.target.value }))}
+                  placeholder="465"
+                  value={smtpSettings.smtp_port}
+                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_port: e.target.value }))}
                   className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -517,9 +558,9 @@ export default function MailEnginePage() {
                 <label className="block text-xs font-medium text-blue-900 mb-1">Email/Kullanıcı</label>
                 <input
                   type="email"
-                  placeholder="your@gmail.com"
-                  value={smtpSettings.smtpUser}
-                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtpUser: e.target.value }))}
+                  placeholder="socialhub@atalga.com"
+                  value={smtpSettings.smtp_user}
+                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_user: e.target.value }))}
                   className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -528,12 +569,43 @@ export default function MailEnginePage() {
                 <input
                   type="password"
                   placeholder="••••••••"
-                  value={smtpSettings.smtpPassword}
-                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtpPassword: e.target.value }))}
+                  value={smtpSettings.smtp_password}
+                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_password: e.target.value }))}
+                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-blue-900 mb-1">From Email</label>
+                <input
+                  type="email"
+                  placeholder="socialhub@atalga.com"
+                  value={smtpSettings.from_email}
+                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, from_email: e.target.value }))}
+                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-blue-900 mb-1">From Name</label>
+                <input
+                  type="text"
+                  placeholder="İletigo Mail Engine"
+                  value={smtpSettings.from_name}
+                  onChange={(e) => setSmtpSettings(prev => ({ ...prev, from_name: e.target.value }))}
                   className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
+
+            <button
+              onClick={saveSmtpSettings}
+              disabled={isLoading}
+              className="w-full px-3 py-2 mb-3 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50"
+            >
+              {isLoading ? 'Kaydediliyor...' : 'SMTP Ayarlarını Kaydet'}
+            </button>
+            <p className="text-xs text-blue-600 mb-3">
+              ✅ Ayarlar database'e güvenli şekilde saklanır
+            </p>
 
             <div className="flex gap-3">
               <input
@@ -545,7 +617,7 @@ export default function MailEnginePage() {
               />
               <button
                 onClick={sendSmtpTestEmail}
-                disabled={isLoading || !testEmail || !smtpSettings.smtpUser || !smtpSettings.smtpPassword}
+                disabled={isLoading || !testEmail || !smtpSettings.smtp_user || !smtpSettings.smtp_password}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

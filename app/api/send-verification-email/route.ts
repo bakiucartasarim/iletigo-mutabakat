@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { query } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,15 +13,45 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get SMTP settings from database
+    const smtpResult = await query(`
+      SELECT smtp_host, smtp_port, smtp_user, smtp_password, from_email, from_name
+      FROM smtp_settings
+      WHERE is_active = true
+      ORDER BY id DESC
+      LIMIT 1
+    `)
+
+    if (smtpResult.rows.length === 0) {
+      console.error('❌ SMTP settings not configured in database')
+      console.log('📧 Attempting to send verification email but SMTP not configured')
+      console.log('📧 Email:', email, 'Code:', code)
+      return NextResponse.json(
+        { error: 'SMTP ayarları yapılandırılmamış' },
+        { status: 500 }
+      )
+    }
+
+    const smtpSettings = smtpResult.rows[0]
+
+    console.log('📧 SMTP Settings loaded:', {
+      host: smtpSettings.smtp_host,
+      port: smtpSettings.smtp_port,
+      user: smtpSettings.smtp_user,
+      from: smtpSettings.from_email,
+      is_active: smtpSettings.is_active
+    })
+
+    const smtpPort = parseInt(smtpSettings.smtp_port)
+
     // Create transporter
-    const smtpPort = parseInt(process.env.SMTP_PORT || '587')
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      host: smtpSettings.smtp_host,
       port: smtpPort,
       secure: smtpPort === 465, // true for 465, false for other ports
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpSettings.smtp_user,
+        pass: smtpSettings.smtp_password,
       },
     })
 
@@ -108,12 +139,20 @@ export async function POST(request: NextRequest) {
     `
 
     // Send email
-    await transporter.sendMail({
-      from: `"Mutabakat Sistemi" <${process.env.SMTP_USER}>`,
+    console.log('📧 Sending verification email to:', email)
+    const mailOptions = {
+      from: `"${smtpSettings.from_name || 'Mutabakat Sistemi'}" <${smtpSettings.from_email || smtpSettings.smtp_user}>`,
       to: email,
       subject: '🔐 Mutabakat Doğrulama Kodu',
       html: htmlContent,
-    })
+    }
+    console.log('📧 Mail options:', { from: mailOptions.from, to: mailOptions.to, subject: mailOptions.subject })
+
+    const info = await transporter.sendMail(mailOptions)
+
+    console.log('✅ Verification email sent successfully!')
+    console.log('📧 Message ID:', info.messageId)
+    console.log('📧 Response:', info.response)
 
     return NextResponse.json({
       success: true,
