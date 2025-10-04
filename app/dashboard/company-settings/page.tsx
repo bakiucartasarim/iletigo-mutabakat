@@ -131,21 +131,8 @@ export default function CompanySettingsPage() {
         const data = await response.json()
         alert(data.message)
 
-        // Update preview
-        if (type === 'logo') {
-          setLogoFile(file)
-          const reader = new FileReader()
-          reader.onload = (e) => setLogoPreview(e.target?.result as string)
-          reader.readAsDataURL(file)
-        } else {
-          setStampFile(file)
-          const reader = new FileReader()
-          reader.onload = (e) => setStampPreview(e.target?.result as string)
-          reader.readAsDataURL(file)
-        }
-
-        // Refresh company info
-        fetchCompanyInfo()
+        // Refresh company info to get R2 URL
+        await fetchCompanyInfo()
       } else {
         const error = await response.json()
         alert('Hata: ' + (error.error || 'Yükleme başarısız'))
@@ -506,7 +493,7 @@ export default function CompanySettingsPage() {
                         alt="Logo Preview"
                         className="mx-auto h-20 w-20 object-contain rounded-lg border"
                       />
-                      <p className="text-xs text-gray-600">{logoFile?.name}</p>
+                      <p className="text-xs text-green-600">✓ Logo yüklenmiş</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -541,7 +528,7 @@ export default function CompanySettingsPage() {
                         alt="Stamp Preview"
                         className="mx-auto h-20 w-20 object-contain rounded-lg border"
                       />
-                      <p className="text-xs text-gray-600">{stampFile?.name}</p>
+                      <p className="text-xs text-green-600">✓ Kaşe yüklenmiş</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
