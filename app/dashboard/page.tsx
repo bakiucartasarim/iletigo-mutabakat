@@ -190,7 +190,7 @@ export default function DashboardPage() {
                       </Link>
                     )}
                     {!hasReconciliationPrefix && (
-                      <Link href="/dashboard/settings" className="text-blue-600 text-sm font-medium hover:underline">
+                      <Link href="/dashboard/company-settings" className="text-blue-600 text-sm font-medium hover:underline">
                         → Mutabakat Belge No Öneki Ekle
                       </Link>
                     )}
