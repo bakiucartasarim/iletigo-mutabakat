@@ -25,7 +25,7 @@ async function updateAtalga() {
     const result = await pool.query(`
       UPDATE company_templates
       SET
-        intro_text = 'Giriş metnindeki cari hesabımız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir. Mutabakat Belge No: %MUTABAKATKODU%',
+        intro_text = 'Giriş metnindeki cari hesabımız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir.',
         note4 = 'Mutabık olmanız durumunda firma@firma.com adresine e-posta olarak göndermenizi rica ederiz.',
         updated_at = NOW()
       WHERE id = 4

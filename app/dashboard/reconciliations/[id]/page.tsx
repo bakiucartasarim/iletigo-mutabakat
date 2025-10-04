@@ -67,6 +67,9 @@ export default function ReconciliationDetailPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [sendingMail, setSendingMail] = useState(false)
   const [sendingMailId, setSendingMailId] = useState<number | null>(null)
+  const [showMailTemplateModal, setShowMailTemplateModal] = useState(false)
+  const [showPdfTemplateModal, setShowPdfTemplateModal] = useState(false)
+  const [selectedRecord, setSelectedRecord] = useState<ExcelRecord | null>(null)
 
   const getBorcAlacakStats = () => {
     if (!reconciliation?.excel_data) return { borc: 0, alacak: 0 }
@@ -450,6 +453,7 @@ export default function ReconciliationDetailPage() {
   }
 
   return (
+    <>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -612,6 +616,9 @@ export default function ReconciliationDetailPage() {
                         <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                           Mutabakat Durumu
                         </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                          Şablonlar
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -692,6 +699,37 @@ export default function ReconciliationDetailPage() {
                           <td className="px-3 py-2 whitespace-nowrap">
                             {getReconciliationStatusBadge(record.reconciliation_status || 'beklemede')}
                           </td>
+                          <td className="px-3 py-2 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              {/* Mail Template Icon */}
+                              <button
+                                onClick={() => {
+                                  setSelectedRecord(record)
+                                  setShowMailTemplateModal(true)
+                                }}
+                                className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                title="Mail Şablonu Önizle"
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                              </button>
+
+                              {/* PDF Template Icon */}
+                              <button
+                                onClick={() => {
+                                  setSelectedRecord(record)
+                                  setShowPdfTemplateModal(true)
+                                }}
+                                className="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                                title="PDF Şablonu Önizle"
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                         )
                       })}
@@ -707,5 +745,152 @@ export default function ReconciliationDetailPage() {
         </div>
       </div>
     </div>
+
+    {/* Mail Template Preview Modal */}
+    {showMailTemplateModal && selectedRecord && reconciliation && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="text-lg font-semibold">Mail Şablonu Önizleme</h3>
+            <button
+              onClick={() => {
+                setShowMailTemplateModal(false)
+                setSelectedRecord(null)
+              }}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="p-6 overflow-y-auto">
+            <div className="bg-gray-50 rounded p-4 mb-4">
+              <div className="text-sm text-gray-600 mb-2">
+                <strong>Cari Hesap:</strong> {selectedRecord.cari_hesap_adi}
+              </div>
+              <div className="text-sm text-gray-600 mb-2">
+                <strong>Tutar:</strong> {selectedRecord.tutar} {selectedRecord.birim}
+              </div>
+              <div className="text-sm text-gray-600">
+                <strong>Mutabakat Kodu:</strong> {reconciliation.reconciliation_code_prefix || 'MUT'}-{reconciliation.id}-{selectedRecord.sira_no}
+              </div>
+            </div>
+            <div className="border rounded p-4 bg-white">
+              <div className="mb-4">
+                <div className="text-sm font-semibold text-gray-700 mb-2">Konu:</div>
+                <div className="text-gray-900">Mutabakat Mektubu - {reconciliation.reconciliation_code_prefix || 'MUT'}-{reconciliation.id}-{selectedRecord.sira_no} - {reconciliation.period}</div>
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-gray-700 mb-2">İçerik:</div>
+                <div className="prose max-w-none">
+                  <p>Sayın {selectedRecord.cari_hesap_adi},</p>
+                  <p>{reconciliation.period} dönemi için mutabakat mektubumuz ektedir.</p>
+                  <p>Cari hesabınızın {reconciliation.period} tarihi itibariyle bakiyesi <strong>{selectedRecord.tutar} {selectedRecord.birim} {selectedRecord.borc_alacak}</strong> olarak görünmektedir.</p>
+                  <p>Mutabakat Belge No: <strong>{reconciliation.reconciliation_code_prefix || 'MUT'}-{reconciliation.id}-{selectedRecord.sira_no}</strong></p>
+                  <p>Lütfen mutabakat linkine tıklayarak onaylayınız.</p>
+                  <p className="mt-4">Saygılarımızla,<br/>{reconciliation.company_name}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 border-t bg-gray-50 flex justify-end">
+            <button
+              onClick={() => {
+                setShowMailTemplateModal(false)
+                setSelectedRecord(null)
+              }}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              Kapat
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* PDF Template Preview Modal */}
+    {showPdfTemplateModal && selectedRecord && reconciliation && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="text-lg font-semibold">PDF Şablonu Önizleme</h3>
+            <button
+              onClick={() => {
+                setShowPdfTemplateModal(false)
+                setSelectedRecord(null)
+              }}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="p-6 overflow-y-auto">
+            <div className="bg-white border-4 border-black p-8">
+              <div className="border-b-2 border-gray-200 pb-4 mb-6">
+                <h1 className="text-2xl font-bold text-center">MUTABAKAT MEKTUBU</h1>
+                <p className="text-sm text-center mt-2">Mutabakat Kodu: <span className="font-semibold">{reconciliation.reconciliation_code_prefix || 'MUT'}-{reconciliation.id}-{selectedRecord.sira_no}</span></p>
+              </div>
+
+              <div className="mb-6">
+                <p className="mb-4">Sayın, <span className="font-semibold">{selectedRecord.cari_hesap_adi}</span></p>
+                <p className="mb-2"><strong>TARİH:</strong> {new Date(reconciliation.period).toLocaleDateString('tr-TR')}</p>
+                <p className="leading-relaxed">
+                  Giriş metnindeki cari hesabımız {new Date(reconciliation.period).toLocaleDateString('tr-TR')} tarihi itibarıyle {selectedRecord.tutar.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {selectedRecord.birim} {selectedRecord.borc_alacak} bakiyesi vermektedir. Mutabakat Belge No: {reconciliation.reconciliation_code_prefix || 'MUT'}-{reconciliation.id}-{selectedRecord.sira_no}
+                </p>
+              </div>
+
+              <div className="border border-gray-300 mb-6">
+                <table className="w-full">
+                  <tbody>
+                    <tr className="border-b border-gray-300">
+                      <td className="bg-gray-50 px-4 py-3 font-semibold w-1/3">Form</td>
+                      <td className="px-4 py-3">Cari Mutabakat Formu</td>
+                    </tr>
+                    <tr className="border-b border-gray-300">
+                      <td className="bg-gray-50 px-4 py-3 font-semibold">Dönemi</td>
+                      <td className="px-4 py-3">{new Date(reconciliation.period).toLocaleDateString('tr-TR')}</td>
+                    </tr>
+                    <tr>
+                      <td className="bg-gray-50 px-4 py-3 font-semibold">Bakiye</td>
+                      <td className="px-4 py-3">
+                        {selectedRecord.tutar.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {selectedRecord.birim} -
+                        <span className={`ml-2 font-semibold ${selectedRecord.borc_alacak === 'Borç' ? 'text-red-600' : 'text-green-600'}`}>
+                          {selectedRecord.borc_alacak?.toUpperCase()}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="border-l-4 border-blue-600 pl-4 mb-6">
+                <p className="font-semibold text-gray-800">{reconciliation.company_name}</p>
+              </div>
+
+              <div className="border border-gray-300 p-4 bg-gray-50">
+                <p className="text-sm text-gray-700">
+                  Mutabık olmanız durumunda firma@firma.com adresine e-posta olarak göndermenizi rica ederiz.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 border-t bg-gray-50 flex justify-end">
+            <button
+              onClick={() => {
+                setShowPdfTemplateModal(false)
+                setSelectedRecord(null)
+              }}
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            >
+              Kapat
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

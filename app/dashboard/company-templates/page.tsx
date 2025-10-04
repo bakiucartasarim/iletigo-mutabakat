@@ -34,7 +34,7 @@ export default function CompanyTemplatesPage() {
   const [templateData, setTemplateData] = useState<TemplateData>({
     templateName: 'Cari Mutabakat',
     headerText: '',
-    introText: 'Giriş metnindeki cari hesabımız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir. Mutabakat Belge No: %MUTABAKATKODU%',
+    introText: 'Giriş metnindeki cari hesabımız %DÖNEM% tarihi itibarıyle %TUTAR% %BORÇALACAK% bakiyesi vermektedir.',
     note1: 'Hata ve Unutma Müstesnadır.',
     note2: 'Mutabakat veya itirazınız 30 gün içinde bildirmedığiniz takdirde TTK\'nın 94. maddesi uyarınca mutabık sayılacağınızı hatırlatırız.',
     note3: 'Mutabakat ile ilgili sorunlarınız için nolu telefondan Sayın ile görüşebilirsiniz.',
@@ -382,13 +382,9 @@ export default function CompanyTemplatesPage() {
                       <td className="px-4 py-2 bg-gray-100 font-semibold">Dönemi</td>
                       <td className="px-4 py-2">24 Temmuz 2020</td>
                     </tr>
-                    <tr className="border-b border-gray-300">
+                    <tr>
                       <td className="px-4 py-2 bg-gray-100 font-semibold">Bakiye</td>
                       <td className="px-4 py-2">10.000,00 TRY - ALACAK</td>
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-2 bg-gray-100 font-semibold">Gönderen Şirket Vergi No</td>
-                      <td className="px-4 py-2">{company?.tax_number || '7079098080'}</td>
                     </tr>
                   </tbody>
                 </table>
