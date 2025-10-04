@@ -253,11 +253,11 @@ export default function CompanySettingsPage() {
   return (
     <div className="space-y-6">
       {/* Company Form */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Main Form */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 space-y-4">
               {/* Basic Information */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">Temel Bilgiler</h2>
@@ -493,24 +493,24 @@ export default function CompanySettingsPage() {
 
         {/* Logo and Stamp Upload Sidebar */}
         <div className="lg:col-span-1">
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Logo Upload */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Firma Logosu</h3>
-              <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Firma Logosu</h3>
+              <div className="space-y-3">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                   {logoPreview ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <img
                         src={logoPreview}
                         alt="Logo Preview"
-                        className="mx-auto h-24 w-24 object-contain rounded-lg border"
+                        className="mx-auto h-20 w-20 object-contain rounded-lg border"
                       />
-                      <p className="text-sm text-gray-600">{logoFile?.name}</p>
+                      <p className="text-xs text-gray-600">{logoFile?.name}</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <div className="space-y-2">
+                      <svg className="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <div className="text-sm text-gray-600">
@@ -530,22 +530,22 @@ export default function CompanySettingsPage() {
             </div>
 
             {/* Stamp Upload */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Firma Kaşesi</h3>
-              <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Firma Kaşesi</h3>
+              <div className="space-y-3">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                   {stampPreview ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <img
                         src={stampPreview}
                         alt="Stamp Preview"
-                        className="mx-auto h-24 w-24 object-contain rounded-lg border"
+                        className="mx-auto h-20 w-20 object-contain rounded-lg border"
                       />
-                      <p className="text-sm text-gray-600">{stampFile?.name}</p>
+                      <p className="text-xs text-gray-600">{stampFile?.name}</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <div className="space-y-2">
+                      <svg className="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <div className="text-sm text-gray-600">
@@ -564,45 +564,6 @@ export default function CompanySettingsPage() {
               </div>
             </div>
 
-            {/* Company Stats */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Şirket İstatistikleri</h3>
-              <div className="space-y-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-600">Toplam Mutabakat</p>
-                      <p className="text-2xl font-bold text-gray-900">0</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-600">Tamamlanan</p>
-                      <p className="text-2xl font-bold text-gray-900">0</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-yellow-50 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-600">Beklemede</p>
-                      <p className="text-2xl font-bold text-gray-900">0</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

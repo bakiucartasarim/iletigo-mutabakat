@@ -95,11 +95,11 @@ export default function ProfilePage() {
     <div className="space-y-6">
       {/* Profile Form */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
           {/* Personal Information */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Kişisel Bilgiler</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <h2 className="text-base font-semibold text-gray-900 mb-2">Kişisel Bilgiler</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div>
                 <label htmlFor="contact_person" className="block text-sm font-medium text-gray-700 mb-1">
                   Ad Soyad *
@@ -148,9 +148,9 @@ export default function ProfilePage() {
           </div>
 
           {/* Password Change */}
-          <div className="border-t pt-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Şifre Değiştir</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="border-t pt-3">
+            <h2 className="text-base font-semibold text-gray-900 mb-2">Şifre Değiştir</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <div>
                 <label htmlFor="current_password" className="block text-sm font-medium text-gray-700 mb-1">
                   Mevcut Şifre
@@ -194,13 +194,13 @@ export default function ProfilePage() {
                 />
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 mt-1">
               Şifre değiştirmek istemiyorsanız şifre alanlarını boş bırakabilirsiniz.
             </p>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-4 border-t">
+          <div className="flex justify-end pt-3 border-t">
             <button
               type="submit"
               disabled={saving}
