@@ -10,6 +10,7 @@ interface MailStats {
 }
 
 export default function MailEnginePage() {
+  const [activeTab, setActiveTab] = useState<'mail' | 'files'>('mail')
   const [isLoading, setIsLoading] = useState(true)
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean | null>(null)
   const [mailStats, setMailStats] = useState<MailStats>({
@@ -35,12 +36,22 @@ export default function MailEnginePage() {
     is_active: false
   })
   const [bulkEmails, setBulkEmails] = useState('')
+  const [r2Settings, setR2Settings] = useState({
+    account_id: '',
+    bucket_name: '',
+    access_key_id: '',
+    secret_access_key: '',
+    endpoint_url: '',
+    public_domain: '',
+    is_active: true
+  })
 
   useEffect(() => {
     checkSuperAdminAccess()
     loadBrevoSettings()
     loadSmtpSettings()
     loadMailStats()
+    loadR2Settings()
   }, [])
 
   const loadMailStats = async () => {
@@ -76,6 +87,42 @@ export default function MailEnginePage() {
       }
     } catch (error) {
       console.error('Error loading SMTP settings:', error)
+    }
+  }
+
+  const loadR2Settings = async () => {
+    try {
+      const response = await fetch('/api/r2-settings')
+      if (response.ok) {
+        const data = await response.json()
+        setR2Settings(data)
+      }
+    } catch (error) {
+      console.error('Error loading R2 settings:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const saveR2Settings = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/r2-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(r2Settings)
+      })
+
+      if (response.ok) {
+        showToast('R2 ayarları başarıyla kaydedildi', 'success')
+      } else {
+        showToast('R2 ayarları kaydedilemedi', 'error')
+      }
+    } catch (error) {
+      console.error('R2 settings save error:', error)
+      showToast('Kaydetme hatası', 'error')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -324,23 +371,46 @@ export default function MailEnginePage() {
 
   return (
     <div className="p-4 max-w-7xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            Mail Motoru
-          </h1>
-          <p className="text-gray-600 mt-1 text-sm">SMTP ile email gönderim sistemi</p>
-        </div>
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          brevoSettings.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-        }`}>
-          {brevoSettings.is_active ? 'Aktif' : 'Pasif'}
-        </span>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex gap-4">
+          <button
+            onClick={() => setActiveTab('mail')}
+            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'mail'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Mail Motoru
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('files')}
+            className={`py-2 px-4 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'files'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+              </svg>
+              Cloudflare Yönetimi
+            </div>
+          </button>
+        </nav>
       </div>
 
+      {/* Mail Motoru Tab */}
+      {activeTab === 'mail' && (
+        <>
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
@@ -404,6 +474,7 @@ export default function MailEnginePage() {
             <h3 className="text-base font-semibold">Email Gönderim Ayarları</h3>
           </div>
 
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
             <h4 className="font-medium text-green-900 mb-2 flex items-center gap-2 text-sm">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -631,8 +702,166 @@ export default function MailEnginePage() {
               <strong>Gmail için:</strong> myaccount.google.com → Security → App passwords (16 haneli şifre)
             </div>
           </div>
+          </div>
         </div>
       </div>
+        </>
+      )}
+
+      {/* Cloudflare Yönetimi Tab */}
+      {activeTab === 'files' && (
+        <div className="space-y-4">
+            {/* Cloudflare R2 Settings */}
+            <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <h4 className="font-medium text-orange-900 mb-3 text-sm flex items-center gap-2">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                </svg>
+                Cloudflare R2 Storage Ayarları
+              </h4>
+
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-orange-900 mb-1">Account ID</label>
+                    <input
+                      type="text"
+                      placeholder="32dfe4bd056fa5895191d093587d780b"
+                      value={r2Settings.account_id}
+                      onChange={(e) => setR2Settings({...r2Settings, account_id: e.target.value})}
+                      className="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-orange-900 mb-1">Bucket Name</label>
+                    <input
+                      type="text"
+                      placeholder="mutabakat-files"
+                      value={r2Settings.bucket_name}
+                      onChange={(e) => setR2Settings({...r2Settings, bucket_name: e.target.value})}
+                      className="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-orange-900 mb-1">Access Key ID</label>
+                  <input
+                    type="text"
+                    placeholder="ffc555c6b23b9f694bfab055f45b02e7"
+                    value={r2Settings.access_key_id}
+                    onChange={(e) => setR2Settings({...r2Settings, access_key_id: e.target.value})}
+                    className="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-orange-900 mb-1">Secret Access Key</label>
+                  <input
+                    type="password"
+                    placeholder="64970eb2041f058e63d87aae676464ff..."
+                    value={r2Settings.secret_access_key}
+                    onChange={(e) => setR2Settings({...r2Settings, secret_access_key: e.target.value})}
+                    className="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-orange-900 mb-1">Endpoint URL (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="https://32dfe4bd056fa5895191d093587d780b.r2.cloudflarestorage.com"
+                    value={r2Settings.endpoint_url}
+                    onChange={(e) => setR2Settings({...r2Settings, endpoint_url: e.target.value})}
+                    className="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-orange-900 mb-1">Public Domain (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="https://files.yourdomain.com"
+                      value={r2Settings.public_domain}
+                      onChange={(e) => setR2Settings({...r2Settings, public_domain: e.target.value})}
+                      className="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-orange-900 mb-1">Durum</label>
+                    <select
+                      value={r2Settings.is_active ? 'true' : 'false'}
+                      onChange={(e) => setR2Settings({...r2Settings, is_active: e.target.value === 'true'})}
+                      className="w-full px-3 py-2 text-sm border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      <option value="true">Aktif</option>
+                      <option value="false">Pasif</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  onClick={saveR2Settings}
+                  disabled={isLoading}
+                  className="w-full px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                >
+                  {isLoading ? 'Kaydediliyor...' : 'R2 Ayarlarını Kaydet'}
+                </button>
+
+                <div className="mt-3 p-3 bg-orange-100 rounded-lg">
+                  <p className="text-xs text-orange-800">
+                    <strong>Not:</strong> R2 credentials güvenli şekilde şifrelenerek saklanır.
+                    Cloudflare Dashboard'dan R2 → Manage R2 API Tokens ile oluşturabilirsiniz.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Current R2 Settings */}
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <h4 className="font-medium text-gray-900 mb-3 text-sm">Mevcut R2 Ayarları</h4>
+              {r2Settings.account_id ? (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2 border-b border-gray-200">
+                    <span className="text-gray-600">Account ID:</span>
+                    <span className="font-medium text-gray-900">{r2Settings.account_id}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-200">
+                    <span className="text-gray-600">Bucket Name:</span>
+                    <span className="font-medium text-gray-900">{r2Settings.bucket_name}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-200">
+                    <span className="text-gray-600">Access Key ID:</span>
+                    <span className="font-mono text-xs text-gray-900">{r2Settings.access_key_id.substring(0, 20)}...</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-200">
+                    <span className="text-gray-600">Endpoint URL:</span>
+                    <span className="text-xs text-gray-900 truncate max-w-xs">{r2Settings.endpoint_url || 'Varsayılan'}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-gray-200">
+                    <span className="text-gray-600">Public Domain:</span>
+                    <span className="text-xs text-gray-900">{r2Settings.public_domain || 'Ayarlanmamış'}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-600">Durum:</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      r2Settings.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {r2Settings.is_active ? 'Aktif' : 'Pasif'}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500 text-sm">
+                  R2 yapılandırması henüz tamamlanmamış
+                </div>
+              )}
+            </div>
+          </div>
+      )}
     </div>
   )
 }
