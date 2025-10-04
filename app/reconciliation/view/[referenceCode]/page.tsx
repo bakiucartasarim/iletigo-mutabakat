@@ -648,15 +648,6 @@ export default function ReconciliationViewPage() {
             {/* Company Info */}
             <div className="border-l-4 border-blue-600 pl-4">
               <p className="font-semibold text-gray-800">{data.company_name}</p>
-              {data.company_tax_number && (
-                <p className="text-sm text-gray-600">Vergi Numarası: {data.company_tax_number}</p>
-              )}
-              {data.company_tax_office && (
-                <p className="text-sm text-gray-600">Vergi Dairesi: {data.company_tax_office}</p>
-              )}
-              {data.company_address && (
-                <p className="text-sm text-gray-600">Adres: {data.company_address}</p>
-              )}
             </div>
 
             {/* Notes Section */}
