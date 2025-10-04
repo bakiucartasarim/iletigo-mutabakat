@@ -321,7 +321,7 @@ export default function DashboardLayout({
             <div className="flex items-center space-x-4">
               <div className="text-right text-xs hidden sm:block">
                 <p className="font-semibold">{company?.name || 'İletigo Mutabakat Şirketi A.Ş.'} <span className="text-blue-600">▼</span></p>
-                <p className="text-gray-600">{user?.name || 'Admin User'}</p>
+                <p className="text-gray-600">{company?.contact_person || user?.name || 'Yetkili Kişi'}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <a className="flex items-center text-gray-600 hover:text-blue-600" href="#">
