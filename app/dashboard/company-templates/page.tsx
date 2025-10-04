@@ -393,13 +393,7 @@ export default function CompanyTemplatesPage() {
               {/* Company Details - SENDER (Your Company) */}
               <div className="mb-6 pb-4 border-b border-gray-300">
                 <p className="text-sm font-semibold text-gray-900">
-                  {company?.name || 'Yeni Mutabakat Şirketi A.Ş.'} <span className="text-xs text-gray-500">(Gönderen Şirket)</span>
-                </p>
-                <p className="text-sm text-gray-700">
-                  <strong>Adres:</strong>
-                </p>
-                <p className="text-sm text-gray-600">
-                  {company?.address || 'Maslak, İstanbul.'}
+                  {company?.name || 'Yeni Mutabakat Şirketi A.Ş.'}
                 </p>
               </div>
 

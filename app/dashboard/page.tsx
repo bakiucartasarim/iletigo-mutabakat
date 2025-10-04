@@ -8,6 +8,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [hasCompanyTemplate, setHasCompanyTemplate] = useState(false)
   const [hasEmailTemplate, setHasEmailTemplate] = useState(false)
+  const [hasReconciliationPrefix, setHasReconciliationPrefix] = useState(false)
   const [templateLoading, setTemplateLoading] = useState(true)
 
   useEffect(() => {
@@ -56,6 +57,15 @@ export default function DashboardPage() {
         }
       } else {
         setHasEmailTemplate(false)
+      }
+
+      // Reconciliation prefix kontrolü
+      const companyInfoResponse = await fetch('/api/company/info')
+      if (companyInfoResponse.ok) {
+        const companyData = await companyInfoResponse.json()
+        setHasReconciliationPrefix(!!companyData.reconciliation_code_prefix && companyData.reconciliation_code_prefix.trim() !== '')
+      } else {
+        setHasReconciliationPrefix(false)
       }
     } catch (error) {
       console.error('Error checking templates:', error)
@@ -149,7 +159,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
-            ) : !hasCompanyTemplate || !hasEmailTemplate ? (
+            ) : !hasCompanyTemplate || !hasEmailTemplate || !hasReconciliationPrefix ? (
               <div className="flex items-start space-x-4">
                 <div className="relative">
                   <svg className="w-16 h-16" viewBox="0 0 36 36">
@@ -158,7 +168,7 @@ export default function DashboardPage() {
                                                     a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4"></path>
                     <path className="text-yellow-500" d="M18 2.0845
                                                     a 15.9155 15.9155 0 0 1 0 31.831
-                                                    a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray={`${(!hasCompanyTemplate && !hasEmailTemplate) ? '0' : (!hasCompanyTemplate || !hasEmailTemplate) ? '50' : '100'}, 100`} strokeLinecap="round" strokeWidth="4"></path>
+                                                    a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray={`${(!hasCompanyTemplate && !hasEmailTemplate && !hasReconciliationPrefix) ? '0' : ((!hasCompanyTemplate ? 1 : 0) + (!hasEmailTemplate ? 1 : 0) + (!hasReconciliationPrefix ? 1 : 0)) === 1 ? '66' : '33'}, 100`} strokeLinecap="round" strokeWidth="4"></path>
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-xl font-bold text-yellow-500">!</span>
@@ -166,22 +176,22 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-3">
-                    {!hasCompanyTemplate && !hasEmailTemplate
-                      ? 'Şablonlarınızı oluşturmanız gerekiyor. Mutabakat oluşturmak için her iki şablon da zorunludur.'
-                      : !hasCompanyTemplate
-                      ? 'PDF şablonunuzu oluşturmanız gerekiyor.'
-                      : 'Mail metin şablonunuzu oluşturmanız gerekiyor.'
-                    }
+                    Tamamlanması gerekenler:
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2">
                     {!hasCompanyTemplate && (
                       <Link href="/dashboard/company-templates" className="text-blue-600 text-sm font-medium hover:underline">
-                        PDF Şablon Oluştur
+                        → PDF Şablon Oluştur
                       </Link>
                     )}
                     {!hasEmailTemplate && (
                       <Link href="/dashboard/mail-content-templates" className="text-blue-600 text-sm font-medium hover:underline">
-                        Mail Şablon Oluştur
+                        → Mail Şablon Oluştur
+                      </Link>
+                    )}
+                    {!hasReconciliationPrefix && (
+                      <Link href="/dashboard/settings" className="text-blue-600 text-sm font-medium hover:underline">
+                        → Mutabakat Belge No Öneki Ekle
                       </Link>
                     )}
                   </div>
