@@ -29,6 +29,7 @@ export async function GET(
         c.stamp_url as company_stamp_url,
         c.require_tax_verification,
         c.require_otp_verification,
+        c.reconciliation_code_prefix,
         ct.template_name,
         ct.header_text,
         ct.intro_text,
@@ -37,7 +38,8 @@ export async function GET(
         ct.note3,
         ct.note4,
         ct.note5,
-        red.birim as currency
+        red.birim as currency,
+        red.sira_no
       FROM reconciliation_links rl
       JOIN reconciliations r ON rl.reconciliation_id = r.id
       JOIN companies c ON r.company_id = c.id
@@ -69,9 +71,14 @@ export async function GET(
       `, [linkData.id])
     }
 
+    // Build reconciliation code
+    const prefix = linkData.reconciliation_code_prefix || 'MUT'
+    const reconciliationCode = `${prefix}-${linkData.reconciliation_id}-${linkData.sira_no || ''}`
+
     // Return reconciliation data with company template
     return NextResponse.json({
       reference_code: linkData.reference_code,
+      reconciliation_code: reconciliationCode,
       company_name: linkData.company_name,
       company_tax_number: linkData.company_tax_number,
       company_tax_office: linkData.company_tax_office,

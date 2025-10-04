@@ -16,6 +16,7 @@ interface CompanyTemplate {
 
 interface ReconciliationData {
   reference_code: string
+  reconciliation_code: string
   company_name: string
   company_tax_number: string | null
   company_tax_office: string | null
@@ -532,6 +533,7 @@ export default function ReconciliationViewPage() {
       .replace(/%BORÇALACAK%/g, data.balance_type)
       .replace(/%CARİ_HESAP%/g, data.recipient_name)
       .replace(/%ŞİRKET%/g, data.company_name)
+      .replace(/%MUTABAKATKODU%/g, data.reconciliation_code)
   }
 
   const primaryColor = '#2563eb'
@@ -593,7 +595,7 @@ export default function ReconciliationViewPage() {
           {/* Document Title */}
           <div className="border-4 border-black p-4 mx-6 mt-8 text-center">
             <h1 className="text-2xl font-bold">MUTABAKAT MEKTUBU</h1>
-            <p className="text-sm mt-2">Referans Kodu: <span className="font-semibold">{data.reference_code}</span></p>
+            <p className="text-sm mt-2">Mutabakat Kodu: <span className="font-semibold">{data.reconciliation_code}</span></p>
           </div>
 
           {/* Blue Line */}
