@@ -320,16 +320,10 @@ export default function DashboardLayout({
             {/* Company and User Info */}
             <div className="flex items-center space-x-4">
               <div className="text-right text-xs hidden sm:block">
-                <p className="font-semibold">{company?.name || 'İletigo Mutabakat Şirketi A.Ş.'} <span className="text-blue-600">▼</span></p>
-                <p className="text-gray-600">{company?.contact_person || user?.name || 'Yetkili Kişi'}</p>
+                <p className="font-semibold">{company?.name || 'İletigo Mutabakat Şirketi A.Ş.'}</p>
+                <p className="text-gray-600">{user?.role || 'Yetkili'}</p>
               </div>
               <div className="flex items-center space-x-2">
-                <a className="flex items-center text-gray-600 hover:text-blue-600" href="#">
-                  <span className="text-sm">🇹🇷</span>
-                  <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </a>
                 <div className="relative profile-dropdown">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
@@ -338,7 +332,7 @@ export default function DashboardLayout({
                     <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold mr-1">
                       A
                     </div>
-                    <span className="text-sm hidden sm:inline">{user?.name || 'Admin User'}</span>
+                    <span className="text-sm hidden sm:inline">{company?.contact_person || 'Yetkili Kişi'}</span>
                     <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
