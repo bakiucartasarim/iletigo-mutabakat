@@ -42,6 +42,7 @@ export default function NewReconciliationPage() {
   const [templateLoading, setTemplateLoading] = useState(false)
   const [hasCompanyTemplate, setHasCompanyTemplate] = useState(false)
   const [hasEmailTemplate, setHasEmailTemplate] = useState(false)
+  const [hasReconciliationPrefix, setHasReconciliationPrefix] = useState(false)
   const [templateWarning, setTemplateWarning] = useState('')
   const [formData, setFormData] = useState({
     company_code: '',
@@ -142,13 +143,25 @@ export default function NewReconciliationPage() {
           setHasEmailTemplate(false)
         }
 
+        // Reconciliation prefix kontrolü
+        let prefixOk = false
+        const companyInfoResponse = await fetch('/api/company/info')
+        if (companyInfoResponse.ok) {
+          const companyData = await companyInfoResponse.json()
+          prefixOk = !!companyData.reconciliation_code_prefix && companyData.reconciliation_code_prefix.trim() !== ''
+          setHasReconciliationPrefix(prefixOk)
+        } else {
+          setHasReconciliationPrefix(false)
+        }
+
         // Uyarı mesajı oluştur
-        if (!companyTemplateResponse.ok && !emailTemplateOk) {
-          setTemplateWarning('⚠️ Mutabakat PDF şablonu ve Mail metin şablonu bulunamadı. Lütfen önce şablonları oluşturun.')
-        } else if (!companyTemplateResponse.ok) {
-          setTemplateWarning('⚠️ Mutabakat PDF şablonu bulunamadı. Lütfen "Cari Şablonları" sayfasından şablon oluşturun.')
-        } else if (!emailTemplateOk) {
-          setTemplateWarning('⚠️ Mail metin şablonu bulunamadı. Lütfen "Mail Metin Şablonları" sayfasından şablon oluşturun.')
+        const warnings = []
+        if (!companyTemplateResponse.ok) warnings.push('Mutabakat PDF şablonu')
+        if (!emailTemplateOk) warnings.push('Mail metin şablonu')
+        if (!prefixOk) warnings.push('Mutabakat Belge No Öneki')
+
+        if (warnings.length > 0) {
+          setTemplateWarning(`⚠️ ${warnings.join(', ')} bulunamadı. Lütfen önce gerekli ayarları yapın.`)
         }
 
       } catch (error) {
