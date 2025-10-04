@@ -313,7 +313,29 @@ export default function DashboardLayout({
             {/* Page Title */}
             <div className="flex-1 lg:flex-none ml-4 lg:ml-0">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">
-                {navigation.find(item => item.href === pathname)?.name || 'Ana Sayfa'}
+                {(() => {
+                  const pageTitles: { [key: string]: string } = {
+                    '/dashboard': 'Dashboard',
+                    '/dashboard/company-settings': 'Firma Ayarları',
+                    '/dashboard/profile': 'Profil Bilgileri',
+                    '/dashboard/company-templates': 'Şirket Şablonları',
+                    '/dashboard/mail-content-templates': 'Mail Metin Şablonu',
+                    '/dashboard/reconciliations': 'Mutabakatlar',
+                    '/dashboard/reconciliations/new': 'Yeni Mutabakat',
+                    '/dashboard/companies': 'Şirketler',
+                    '/dashboard/users': 'Kullanıcılar',
+                    '/dashboard/reports': 'Raporlar',
+                    '/dashboard/mail-engine': 'Mail Motoru',
+                    '/dashboard/settings': 'Ayarlar'
+                  }
+
+                  // Check if pathname starts with a known route (for dynamic routes like /dashboard/reconciliations/[id])
+                  if (pathname.startsWith('/dashboard/reconciliations/') && pathname !== '/dashboard/reconciliations/new') {
+                    return 'Mutabakat Detayı'
+                  }
+
+                  return pageTitles[pathname] || navigation.find(item => item.href === pathname)?.name || 'Ana Sayfa'
+                })()}
               </h2>
             </div>
 

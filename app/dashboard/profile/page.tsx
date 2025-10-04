@@ -93,21 +93,15 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Profil Bilgileri</h1>
-        <p className="text-gray-600">Kişisel bilgilerinizi ve şifrenizi güncelleyebilirsiniz.</p>
-      </div>
-
       {/* Profile Form */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Personal Information */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Kişisel Bilgiler</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Kişisel Bilgiler</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label htmlFor="contact_person" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="contact_person" className="block text-sm font-medium text-gray-700 mb-1">
                   Ad Soyad *
                 </label>
                 <input
@@ -117,12 +111,12 @@ export default function ProfilePage() {
                   value={formData.contact_person}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="Adınız ve soyadınız"
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   E-posta Adresi *
                 </label>
                 <input
@@ -132,12 +126,12 @@ export default function ProfilePage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="ornek@sirket.com"
                 />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                   Telefon
                 </label>
                 <input
@@ -146,7 +140,7 @@ export default function ProfilePage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="0212 xxx xx xx"
                 />
               </div>
@@ -154,11 +148,11 @@ export default function ProfilePage() {
           </div>
 
           {/* Password Change */}
-          <div className="border-t pt-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Şifre Değiştir</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="border-t pt-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Şifre Değiştir</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <label htmlFor="current_password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="current_password" className="block text-sm font-medium text-gray-700 mb-1">
                   Mevcut Şifre
                 </label>
                 <input
@@ -167,12 +161,12 @@ export default function ProfilePage() {
                   name="current_password"
                   value={formData.current_password}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="Mevcut şifreniz"
                 />
               </div>
               <div>
-                <label htmlFor="new_password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="new_password" className="block text-sm font-medium text-gray-700 mb-1">
                   Yeni Şifre
                 </label>
                 <input
@@ -181,12 +175,12 @@ export default function ProfilePage() {
                   name="new_password"
                   value={formData.new_password}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="Yeni şifreniz"
                 />
               </div>
               <div>
-                <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700 mb-1">
                   Yeni Şifre (Tekrar)
                 </label>
                 <input
@@ -195,7 +189,7 @@ export default function ProfilePage() {
                   name="confirm_password"
                   value={formData.confirm_password}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="Yeni şifrenizi tekrar girin"
                 />
               </div>
@@ -206,7 +200,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-6 border-t">
+          <div className="flex justify-end pt-4 border-t">
             <button
               type="submit"
               disabled={saving}

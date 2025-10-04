@@ -252,24 +252,18 @@ export default function CompanySettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Firma Ayarları</h1>
-        <p className="text-gray-600">Şirketinizin bilgilerini güncelleyebilir ve düzenleyebilirsiniz.</p>
-      </div>
-
       {/* Company Form */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Form */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {/* Basic Information */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Temel Bilgiler</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">Temel Bilgiler</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                       Şirket Adı *
                     </label>
                     <input
@@ -279,12 +273,12 @@ export default function CompanySettingsPage() {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="Şirket Adı A.Ş."
                     />
                   </div>
                   <div>
-                    <label htmlFor="tax_number" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="tax_number" className="block text-sm font-medium text-gray-700 mb-1">
                       Vergi Numarası *
                     </label>
                     <input
@@ -294,12 +288,12 @@ export default function CompanySettingsPage() {
                       value={formData.tax_number}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="1234567890"
                     />
                   </div>
                   <div>
-                    <label htmlFor="reconciliation_code_prefix" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="reconciliation_code_prefix" className="block text-sm font-medium text-gray-700 mb-1">
                       Mutabakat Belge No Öneki
                     </label>
                     <input
@@ -309,7 +303,7 @@ export default function CompanySettingsPage() {
                       value={formData.reconciliation_code_prefix}
                       onChange={handleInputChange}
                       maxLength={10}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="ATL, IKIZ, ABC vb."
                     />
                     <p className="mt-1 text-xs text-gray-500">
@@ -317,7 +311,7 @@ export default function CompanySettingsPage() {
                     </p>
                   </div>
                   <div>
-                    <label htmlFor="contact_person" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="contact_person" className="block text-sm font-medium text-gray-700 mb-1">
                       Yetkili Kişi *
                     </label>
                     <input
@@ -327,12 +321,12 @@ export default function CompanySettingsPage() {
                       value={formData.contact_person}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="Yetkili kişinin adı soyadı"
                     />
                   </div>
                   <div>
-                    <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
                       Web Sitesi
                     </label>
                     <input
@@ -341,7 +335,7 @@ export default function CompanySettingsPage() {
                       name="website"
                       value={formData.website}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="https://www.sirket.com"
                     />
                   </div>
@@ -349,11 +343,11 @@ export default function CompanySettingsPage() {
               </div>
 
               {/* Contact Information */}
-              <div className="border-t pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">İletişim Bilgileri</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border-t pt-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">İletişim Bilgileri</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                       E-posta Adresi *
                     </label>
                     <input
@@ -363,12 +357,12 @@ export default function CompanySettingsPage() {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="info@sirket.com"
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                       Telefon
                     </label>
                     <input
@@ -377,52 +371,52 @@ export default function CompanySettingsPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                       placeholder="0212 xxx xx xx"
                     />
                   </div>
                 </div>
-                <div className="mt-4">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="mt-3">
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                     Adres
                   </label>
                   <textarea
                     id="address"
                     name="address"
-                    rows={3}
+                    rows={2}
                     value={formData.address}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
                     placeholder="Şirket adresi..."
                   />
                 </div>
               </div>
 
               {/* Additional Information */}
-              <div className="border-t pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Ek Bilgiler</h2>
+              <div className="border-t pt-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">Ek Bilgiler</h2>
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                     Şirket Açıklaması
                   </label>
                   <textarea
                     id="description"
                     name="description"
-                    rows={3}
+                    rows={2}
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
+                    className="w-full px-2 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
                     placeholder="Şirketiniz hakkında kısa bir açıklama..."
                   />
                 </div>
               </div>
 
               {/* Security Settings */}
-              <div className="border-t pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Güvenlik Ayarları</h2>
-                <p className="text-sm text-gray-600 mb-4">Müşterilerinizin mutabakat linklerini görüntülemek için hangi doğrulama yöntemlerini kullanmasını istediğinizi belirleyin.</p>
+              <div className="border-t pt-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">Güvenlik Ayarları</h2>
+                <p className="text-sm text-gray-600 mb-3">Müşterilerinizin mutabakat linklerini görüntülemek için hangi doğrulama yöntemlerini kullanmasını istediğinizi belirleyin.</p>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="flex items-start">
                     <div className="flex items-center h-5">
                       <input
@@ -477,7 +471,7 @@ export default function CompanySettingsPage() {
               </div>
 
               {/* Submit Button */}
-              <div className="flex justify-end pt-6 border-t">
+              <div className="flex justify-end pt-4 border-t">
                 <button
                   type="submit"
                   disabled={saving}
