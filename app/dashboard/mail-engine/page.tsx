@@ -323,18 +323,18 @@ export default function MailEnginePage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 max-w-7xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             Mail Motoru
           </h1>
-          <p className="text-gray-600 mt-2">SMTP ile email gönderim sistemi</p>
+          <p className="text-gray-600 mt-1 text-sm">SMTP ile email gönderim sistemi</p>
         </div>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           brevoSettings.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
         }`}>
           {brevoSettings.is_active ? 'Aktif' : 'Pasif'}
@@ -342,52 +342,52 @@ export default function MailEnginePage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Gönderilen</p>
-              <p className="text-3xl font-bold text-green-600">{mailStats.totalSent}</p>
+              <p className="text-xs font-medium text-gray-600">Gönderilen</p>
+              <p className="text-2xl font-bold text-green-600">{mailStats.totalSent}</p>
             </div>
-            <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Başarısız</p>
-              <p className="text-3xl font-bold text-red-600">{mailStats.totalFailed}</p>
+              <p className="text-xs font-medium text-gray-600">Başarısız</p>
+              <p className="text-2xl font-bold text-red-600">{mailStats.totalFailed}</p>
             </div>
-            <svg className="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Beklemede</p>
-              <p className="text-3xl font-bold text-yellow-600">{mailStats.totalPending}</p>
+              <p className="text-xs font-medium text-gray-600">Beklemede</p>
+              <p className="text-2xl font-bold text-yellow-600">{mailStats.totalPending}</p>
             </div>
-            <svg className="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
             </svg>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Son Gönderim</p>
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-xs font-medium text-gray-600">Son Gönderim</p>
+              <p className="text-xs font-bold text-gray-900">
                 {mailStats.lastSentDate ? new Date(mailStats.lastSentDate).toLocaleDateString('tr-TR') : 'Henüz yok'}
               </p>
             </div>
-            <svg className="h-8 w-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             </svg>
           </div>
@@ -396,26 +396,26 @@ export default function MailEnginePage() {
 
       {/* Settings */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            <h3 className="text-lg font-semibold">Email Gönderim Ayarları</h3>
+            <h3 className="text-base font-semibold">Email Gönderim Ayarları</h3>
           </div>
 
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h4 className="font-medium text-green-900 mb-3 flex items-center gap-2">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+            <h4 className="font-medium text-green-900 mb-2 flex items-center gap-2 text-sm">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Brevo API (Önerilen)
             </h4>
-            <p className="text-sm text-green-800 mb-3">
+            <p className="text-xs text-green-800 mb-2">
               ✅ Basit, hızlı ve güvenilir - Sadece API key yeterli!
             </p>
 
-            <div className="space-y-3 mb-3">
+            <div className="space-y-2 mb-2">
               <div>
                 <label className="block text-xs font-medium text-green-900 mb-1">Brevo API Key</label>
                 <input
@@ -423,7 +423,7 @@ export default function MailEnginePage() {
                   placeholder="xkeysib-..."
                   value={brevoSettings.api_key}
                   onChange={(e) => setBrevoSettings({...brevoSettings, api_key: e.target.value})}
-                  className="w-full px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-2 py-1.5 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
               <div>
@@ -433,7 +433,7 @@ export default function MailEnginePage() {
                   placeholder="noreply@yourdomain.com"
                   value={brevoSettings.from_email}
                   onChange={(e) => setBrevoSettings({...brevoSettings, from_email: e.target.value})}
-                  className="w-full px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-2 py-1.5 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
               <div>
@@ -443,13 +443,13 @@ export default function MailEnginePage() {
                   placeholder="iletiGo Mutabakat"
                   value={brevoSettings.from_name}
                   onChange={(e) => setBrevoSettings({...brevoSettings, from_name: e.target.value})}
-                  className="w-full px-3 py-2 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-2 py-1.5 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
               <button
                 onClick={saveBrevoSettings}
                 disabled={isLoading}
-                className="w-full px-3 py-2 text-sm bg-green-700 text-white rounded-lg hover:bg-green-800 disabled:opacity-50"
+                className="w-full px-2 py-1.5 text-sm bg-green-700 text-white rounded-lg hover:bg-green-800 disabled:opacity-50"
               >
                 {isLoading ? 'Kaydediliyor...' : 'Brevo Ayarlarını Kaydet'}
               </button>
@@ -458,18 +458,18 @@ export default function MailEnginePage() {
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <input
                 type="email"
                 placeholder="Alıcı email: test@example.com"
                 value={testEmail}
                 onChange={(e) => setTestEmail(e.target.value)}
-                className="flex-1 px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="flex-1 px-2 py-1.5 text-sm border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
               <button
                 onClick={sendBrevoEmail}
                 disabled={isLoading || !testEmail || !brevoSettings.api_key}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -478,31 +478,31 @@ export default function MailEnginePage() {
               </button>
             </div>
 
-            <div className="mt-3 text-xs text-green-700 bg-green-100 p-2 rounded">
+            <div className="mt-2 text-xs text-green-700 bg-green-100 p-2 rounded">
               <strong>Brevo:</strong> app.brevo.com → SMTP & API → API Keys
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-            <h4 className="font-medium text-purple-900 mb-3 flex items-center gap-2">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+            <h4 className="font-medium text-purple-900 mb-2 flex items-center gap-2 text-sm">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               Brevo Toplu Mail Gönder
             </h4>
-            <p className="text-sm text-purple-800 mb-3">
+            <p className="text-xs text-purple-800 mb-2">
               Çoklu alıcıya email gönderin (virgül veya satır ile ayırın)
             </p>
 
-            <div className="space-y-3 mb-3">
+            <div className="space-y-2 mb-2">
               <div>
                 <label className="block text-xs font-medium text-purple-900 mb-1">Email Adresleri</label>
                 <textarea
                   placeholder="test1@example.com, test2@example.com&#10;test3@example.com"
                   value={bulkEmails}
                   onChange={(e) => setBulkEmails(e.target.value)}
-                  rows={4}
-                  className="w-full px-3 py-2 text-sm border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  rows={3}
+                  className="w-full px-2 py-1.5 text-sm border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 />
                 <p className="text-xs text-purple-600 mt-1">
                   Virgül (,) veya satır sonu ile ayırarak birden fazla email girin
@@ -513,7 +513,7 @@ export default function MailEnginePage() {
             <button
               onClick={sendBrevoBulkEmail}
               disabled={isLoading || !bulkEmails || !brevoSettings.api_key}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -522,18 +522,18 @@ export default function MailEnginePage() {
             </button>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-3 flex items-center gap-2">
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2 text-sm">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               SMTP (Gmail/Outlook)
             </h4>
-            <p className="text-sm text-blue-800 mb-3">
+            <p className="text-xs text-blue-800 mb-2">
               Alternatif: SMTP ile email gönderimi (Güvenlik ayarlarında kullanılır)
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
               <div>
                 <label className="block text-xs font-medium text-blue-900 mb-1">SMTP Host</label>
                 <input
@@ -541,7 +541,7 @@ export default function MailEnginePage() {
                   placeholder="smtpout.secureserver.net"
                   value={smtpSettings.smtp_host}
                   onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_host: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
@@ -551,7 +551,7 @@ export default function MailEnginePage() {
                   placeholder="465"
                   value={smtpSettings.smtp_port}
                   onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_port: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
@@ -561,7 +561,7 @@ export default function MailEnginePage() {
                   placeholder="socialhub@atalga.com"
                   value={smtpSettings.smtp_user}
                   onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_user: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
@@ -571,7 +571,7 @@ export default function MailEnginePage() {
                   placeholder="••••••••"
                   value={smtpSettings.smtp_password}
                   onChange={(e) => setSmtpSettings(prev => ({ ...prev, smtp_password: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
@@ -581,7 +581,7 @@ export default function MailEnginePage() {
                   placeholder="socialhub@atalga.com"
                   value={smtpSettings.from_email}
                   onChange={(e) => setSmtpSettings(prev => ({ ...prev, from_email: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
@@ -591,7 +591,7 @@ export default function MailEnginePage() {
                   placeholder="İletigo Mail Engine"
                   value={smtpSettings.from_name}
                   onChange={(e) => setSmtpSettings(prev => ({ ...prev, from_name: e.target.value }))}
-                  className="w-full px-3 py-2 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
@@ -599,26 +599,26 @@ export default function MailEnginePage() {
             <button
               onClick={saveSmtpSettings}
               disabled={isLoading}
-              className="w-full px-3 py-2 mb-3 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50"
+              className="w-full px-2 py-1.5 mb-2 text-sm bg-blue-700 text-white rounded-lg hover:bg-blue-800 disabled:opacity-50"
             >
               {isLoading ? 'Kaydediliyor...' : 'SMTP Ayarlarını Kaydet'}
             </button>
-            <p className="text-xs text-blue-600 mb-3">
+            <p className="text-xs text-blue-600 mb-2">
               ✅ Ayarlar database'e güvenli şekilde saklanır
             </p>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <input
                 type="email"
                 placeholder="Alıcı email: test@example.com"
                 value={testEmail}
                 onChange={(e) => setTestEmail(e.target.value)}
-                className="flex-1 px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-2 py-1.5 text-sm border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <button
                 onClick={sendSmtpTestEmail}
                 disabled={isLoading || !testEmail || !smtpSettings.smtp_user || !smtpSettings.smtp_password}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -627,7 +627,7 @@ export default function MailEnginePage() {
               </button>
             </div>
 
-            <div className="mt-3 text-xs text-blue-700 bg-blue-100 p-2 rounded">
+            <div className="mt-2 text-xs text-blue-700 bg-blue-100 p-2 rounded">
               <strong>Gmail için:</strong> myaccount.google.com → Security → App passwords (16 haneli şifre)
             </div>
           </div>
